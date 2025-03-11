@@ -1,0 +1,37 @@
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+def create_db_conn_str() -> str:
+    db_name = os.getenv("DB_NAME")
+    assert db_name is not None
+    db_user = os.getenv("DB_USER")
+    assert db_user is not None
+    db_host = os.getenv("DB_HOST")
+    assert db_host is not None
+    db_port = os.getenv("DB_PORT")
+    assert db_port is not None
+    db_port = int(db_port)
+    db_password = os.getenv("DB_PASSWORD")
+    assert db_password is not None
+
+    return f"dbname={db_name} user={db_user} password={db_password} host={db_host} port={db_port}"
+
+
+class Config:
+    model = os.getenv("OPENAI_MODEL")
+    assert model, "OPENAI_MODEL is not set"
+    api_key = os.getenv("OPENAI_API_KEY")
+    assert api_key, "OPENAI_API_KEY is not set"
+    db_conn_str = create_db_conn_str()
+    
+    # Connection pool settings
+    pool_min_size: int = int(os.getenv("DB_POOL_MIN_SIZE", "1"))
+    pool_max_size: int = int(os.getenv("DB_POOL_MAX_SIZE", "10"))
+    pool_timeout: float = float(os.getenv("DB_POOL_TIMEOUT", "30.0"))
+
+
+cfg = Config()
