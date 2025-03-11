@@ -1,3 +1,3 @@
 """
-Test package for consultant_finder.
-""" 
+Test package for expert_matcher.
+"""

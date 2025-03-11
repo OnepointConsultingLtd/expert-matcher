@@ -27,11 +27,18 @@ class Config:
     api_key = os.getenv("OPENAI_API_KEY")
     assert api_key, "OPENAI_API_KEY is not set"
     db_conn_str = create_db_conn_str()
-    
+
     # Connection pool settings
     pool_min_size: int = int(os.getenv("DB_POOL_MIN_SIZE", "1"))
     pool_max_size: int = int(os.getenv("DB_POOL_MAX_SIZE", "10"))
     pool_timeout: float = float(os.getenv("DB_POOL_TIMEOUT", "30.0"))
 
 
+class WebsocketConfig:
+    websocket_server = os.getenv("WEBSOCKET_SERVER", "0.0.0.0")
+    websocket_port = int(os.getenv("WEBSOCKET_PORT", 8080))
+    websocket_cors_allowed_origins = os.getenv("WEBSOCKET_CORS_ALLOWED_ORIGINS", "*")
+
+
 cfg = Config()
+ws_cfg = WebsocketConfig()
