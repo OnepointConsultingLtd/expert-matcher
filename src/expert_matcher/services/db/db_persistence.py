@@ -4,6 +4,7 @@ from psycopg import AsyncCursor
 
 from expert_matcher.model.question import QuestionSuggestions
 from expert_matcher.model.session import Session
+from expert_matcher.model.state import State
 from expert_matcher.services.db.db_support import select_from, create_cursor
 
 
@@ -90,5 +91,71 @@ DELETE FROM TB_SESSION WHERE SESSION_ID = %(session_id)s;
 """
         await cur.execute(sql, {"session_id": session_id})
         return cur.rowcount
+
+    return await create_cursor(process)
+
+
+async def get_session_state(session_id: str) -> State:
+    """Get the session state from the database."""
+
+    async def process(cur: AsyncCursor) -> Awaitable[State]:
+        sql = """
+-- select categories and questions
+select cq.id, c.NAME, cq.QUESTION from TB_SESSION_QUESTION sq 
+INNER JOIN TB_SESSION s on s.id = sq.SESSION_ID
+INNER JOIN TB_CATEGORY_QUESTION cq on cq.ID = sq.CATEGORY_QUESTION_ID
+INNER JOIN TB_CATEGORY c on c.ID = cq.CATEGORY_ID
+WHERE s.session_id = %(session_id)s;
+"""
+        suggestions_sql = """
+-- select suggestions (category items) for session and question
+select ci.ITEM from TB_CATEGORY_ITEM ci 
+INNER JOIN TB_CATEGORY c on c.ID = ci.CATEGORY_ID
+INNER JOIN TB_CATEGORY_QUESTION cq on cq.CATEGORY_ID = c.ID
+INNER JOIN TB_SESSION_QUESTION sq on sq.CATEGORY_QUESTION_ID = cq.ID
+INNER JOIN TB_SESSION s on s.id = sq.SESSION_ID
+WHERE s.session_id = %(session_id)s and cq.ID = %(question_id)s;
+"""
+        selected_suggestions_sql = """
+-- select selected suggestions (category items) for session and question
+select ci.ITEM from TB_SESSION_QUESTION_RESPONSES r
+inner join TB_SESSION_QUESTION sq on sq.ID = r.SESSION_QUESTION_ID
+inner join TB_SESSION s on s.ID = sq.SESSION_ID
+inner join TB_CATEGORY_ITEM ci on ci.ID = r.CATEGORY_ITEM_ID
+INNER JOIN TB_CATEGORY c on c.ID = ci.CATEGORY_ID
+INNER JOIN TB_CATEGORY_QUESTION cq on cq.CATEGORY_ID = c.ID
+WHERE s.session_id = %(session_id)s and cq.ID = %(question_id)s;
+"""
+        await cur.execute(sql, {"session_id": session_id})
+        question_rows = await cur.fetchall()
+        question_id_index = 0
+        category_index = 1
+        question_index = 2
+        history: list[QuestionSuggestions] = []
+        for question_row in question_rows:
+            question_id = question_row[question_id_index]
+            category = question_row[category_index]
+            question = question_row[question_index]
+            await cur.execute(suggestions_sql, {"session_id": session_id, "question_id": question_id})
+            suggestions = await cur.fetchall()
+            await cur.execute(selected_suggestions_sql, {"session_id": session_id, "question_id": question_id})
+            selected_suggestions = await cur.fetchall()
+            question_suggestions = QuestionSuggestions(
+                id=question_id,
+                category=category,
+                question=question,
+                suggestions=[s[0] for s in suggestions],
+                selected_suggestions=[s[0] for s in selected_suggestions],
+            )
+            history.append(question_suggestions)
+        return State(session_id=session_id, history=history)
+
+    return await create_cursor(process)
+
+
+async def execute_script(script: str) -> State:
+    async def process(cur: AsyncCursor) -> Awaitable[None]:
+        await cur.execute(script)
+        return None
 
     return await create_cursor(process)

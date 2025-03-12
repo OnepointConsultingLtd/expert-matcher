@@ -8,6 +8,8 @@ from expert_matcher.services.db.db_persistence import (
     delete_session,
     save_session_question,
     delete_session_question,
+    execute_script,
+    get_session_state
 )
 
 
@@ -66,3 +68,48 @@ async def test_save_session(test_session):
     async for item in test_session:
         assert item.session_id == "123"
         assert item.email == "test@test.com"
+
+
+@pytest.mark.asyncio
+async def test_get_session_state():
+    """Test getting the session state from the database."""
+
+    session_id = "1234"
+    # Create dummy data
+    await execute_script(f"""
+delete from tb_session where session_id = '{session_id}';
+                         
+insert into tb_session(session_id, user_email) values('{session_id}', 'anon@test.com');
+
+insert into TB_SESSION_QUESTION(SESSION_ID, CATEGORY_QUESTION_ID)
+values((select id from TB_SESSION where SESSION_ID='{session_id}'), (select id from TB_CATEGORY_QUESTION order by order_index limit 1));
+
+insert into TB_SESSION_QUESTION(SESSION_ID, CATEGORY_QUESTION_ID)
+values((select id from TB_SESSION where SESSION_ID='{session_id}'), 
+(select id from TB_CATEGORY_QUESTION order by order_index offset 1 limit 1));
+
+insert into TB_SESSION_QUESTION_RESPONSES(SESSION_QUESTION_ID, CATEGORY_ITEM_ID)
+values((select sq.id from TB_SESSION_QUESTION sq
+where SESSION_ID = ((select id from TB_SESSION where SESSION_ID='{session_id}')) 
+and CATEGORY_QUESTION_ID = (select id from TB_CATEGORY_QUESTION order by order_index limit 1)), 
+(select id from TB_CATEGORY_ITEM where category_id = (select C.id from TB_CATEGORY C 
+INNER JOIN TB_CATEGORY_QUESTION q on C.id = q.CATEGORY_ID
+WHERE q.id = (select id from TB_CATEGORY_QUESTION order by order_index limit 1)) limit 1));
+
+insert into TB_SESSION_QUESTION_RESPONSES(SESSION_QUESTION_ID, CATEGORY_ITEM_ID)
+values((select sq.id from TB_SESSION_QUESTION sq
+where SESSION_ID = ((select id from TB_SESSION where SESSION_ID='{session_id}')) 
+and CATEGORY_QUESTION_ID = (select id from TB_CATEGORY_QUESTION order by order_index offset 1 limit 1)), 
+(select id from TB_CATEGORY_ITEM where category_id = (select C.id from TB_CATEGORY C 
+INNER JOIN TB_CATEGORY_QUESTION q on C.id = q.CATEGORY_ID
+WHERE q.id = (select id from TB_CATEGORY_QUESTION order by order_index offset 1 limit 1)) limit 1));
+
+""")
+    
+    state = await get_session_state(session_id)
+    assert state is not None
+    assert state.session_id == session_id
+    assert state.history is not None
+    assert len(state.history) == 1
+
+
