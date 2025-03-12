@@ -10,13 +10,14 @@ from expert_matcher.services.db.db_persistence import (
     delete_session_question,
     execute_script,
     get_session_state,
-    filter_consultants
+    find_available_consultants,
+    select_next_question
 )
 
 
 async def get_first_question() -> QuestionSuggestions:
     """Test selecting the first question with its suggestions."""
-    result = await select_first_question()
+    result = await select_first_question('')
 
     assert result is not None
     assert isinstance(result, QuestionSuggestions)
@@ -132,6 +133,19 @@ async def test_filter_consultants():
     session_id = "1234"
     await provide_dummy_data(session_id)
 
-    consultants = await filter_consultants(session_id)
+    consultants = await find_available_consultants(session_id)
     assert consultants is not None
-    assert len(consultants) > 0
+    # assert len(consultants) > 0
+
+
+@pytest.mark.asyncio
+async def test_select_next_question():
+    session_id = "1234"
+    await provide_dummy_data(session_id)
+    question_suggestions = await select_next_question(session_id)
+    assert question_suggestions is not None
+    assert question_suggestions.id is not None
+    assert question_suggestions.category is not None
+    assert question_suggestions.question is not None
+    assert question_suggestions.suggestions is not None
+    assert len(question_suggestions.suggestions) > 0

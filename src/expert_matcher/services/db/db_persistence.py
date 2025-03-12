@@ -9,23 +9,30 @@ from expert_matcher.services.db.db_support import select_from, create_cursor
 from expert_matcher.model.consultant import Consultant
 
 
-async def select_first_question() -> QuestionSuggestions | None:
+async def select_first_question(session_id: str) -> QuestionSuggestions | None:
     """Select the first question with its suggestions."""
+    return await select_next_question(session_id)
+
+
+async def select_next_question(session_id: str) -> QuestionSuggestions | None:
+    """Select the next question with its suggestions."""
 
     sql = """
-SELECT C.ID CATEGORY_ID, C.NAME CATEGORY, Q.question, Q.id question_id FROM TB_CATEGORY_QUESTION Q 
-INNER JOIN TB_CATEGORY C ON C.ID = Q.CATEGORY_ID 
+SELECT C.ID CATEGORY_ID, C.NAME CATEGORY, Q.question, Q.id question_id from TB_CATEGORY_QUESTION Q
+INNER JOIN TB_CATEGORY C ON C.ID = Q.CATEGORY_ID
 WHERE ACTIVE is true
-ORDER BY ORDER_INDEX LIMIT 1;
+ORDER BY order_index offset (SELECT count(*) FROM TB_SESSION_QUESTION sq
+INNER JOIN TB_SESSION s on s.id = sq.session_id
+where s.session_id = %(session_id)s) LIMIT 1
 """
-    res = await select_from(sql, {})
+    res = await select_from(sql, {"session_id": session_id})
     if len(res) == 0:
         return None
-    category_pos = 0
+    category_index = 0
     category = 1
     question = 2
     question_id = 3
-    category_id = res[0][category_pos]
+    category_id = res[0][category_index]
     question_suggestions = QuestionSuggestions(
         id=res[0][question_id],
         category=res[0][category],
@@ -154,7 +161,7 @@ WHERE s.session_id = %(session_id)s and cq.ID = %(question_id)s;
     return await create_cursor(process)
 
 
-async def filter_consultants(session_id: str) -> list[Consultant]:
+async def find_available_consultants(session_id: str) -> list[Consultant]:
     """Filter the consultants based on the session state."""
     async def processor(cur: AsyncCursor) -> Awaitable[list[Consultant]]:
         sql = """
@@ -195,6 +202,8 @@ where ID = ANY(%(consultant_ids)s)
                 consultant_id_rows = await select_from(consultant_sql_template, 
                                 {"category_name": category_name, "category_items": category_items, "consultant_ids": consultant_ids})
                 consultant_ids = [c[0] for c in consultant_id_rows]
+        if len(consultant_ids) == 0:
+            return []
         consultant_details = await select_from(consultant_details_sql, {"consultant_ids": consultant_ids})
         consultant_id_index = 0
         given_name_index = 1
