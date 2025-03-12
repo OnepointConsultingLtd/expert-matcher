@@ -6,6 +6,7 @@ from expert_matcher.model.question import QuestionSuggestions
 from expert_matcher.model.session import Session
 from expert_matcher.model.state import State
 from expert_matcher.services.db.db_support import select_from, create_cursor
+from expert_matcher.model.consultant import Consultant
 
 
 async def select_first_question() -> QuestionSuggestions | None:
@@ -152,6 +153,65 @@ WHERE s.session_id = %(session_id)s and cq.ID = %(question_id)s;
 
     return await create_cursor(process)
 
+
+async def filter_consultants(session_id: str) -> list[Consultant]:
+    """Filter the consultants based on the session state."""
+    async def processor(cur: AsyncCursor) -> Awaitable[list[Consultant]]:
+        sql = """
+-- select categories that has already been picked up in a session
+select cq.order_index, c.NAME, STRING_AGG(ci.ITEM, '@@') CATEGORY_ITEMS from TB_SESSION s
+INNER JOIN TB_SESSION_QUESTION sq ON sq.SESSION_ID = s.ID
+INNER JOIN TB_CATEGORY_QUESTION cq ON cq.ID = sq.CATEGORY_QUESTION_ID
+INNER JOIN TB_CATEGORY c ON c.ID = cq.CATEGORY_ID
+INNER JOIN TB_SESSION_QUESTION_RESPONSES r ON r.SESSION_QUESTION_ID = sq.id
+INNER JOIN TB_CATEGORY_ITEM ci ON ci.ID = r.CATEGORY_ITEM_ID
+WHERE s.SESSION_ID = %(session_id)s group by cq.order_index, c.NAME order by cq.order_index
+"""
+        consultant_sql_template_initial = """
+select distinct CONSULTANT_ID from VW_CONSULTANT_CATEGORY_ITEM
+WHERE CATEGORY_NAME = %(category_name)s AND CATEGORY_ITEM = ANY(%(category_items)s)
+"""
+        consultant_sql_template = """
+select distinct CONSULTANT_ID from VW_CONSULTANT_CATEGORY_ITEM
+WHERE CATEGORY_NAME = %(category_name)s AND CATEGORY_ITEM = ANY(%(category_items)s)
+AND CONSULTANT_ID = ANY(%(consultant_ids)s)
+"""
+        consultant_details_sql = """
+select ID, GIVEN_NAME, SURNAME, LINKEDIN_PROFILE_URL from TB_CONSULTANT
+where ID = ANY(%(consultant_ids)s)
+"""
+        categories_with_items = await select_from(sql, {"session_id": session_id})
+        category_name_index = 1
+        category_items_index = 2
+        consultant_ids = []
+        for index, category in enumerate(categories_with_items):
+            category_name = category[category_name_index]
+            category_items = category[category_items_index].split('@@')
+            if index == 0:
+                consultant_id_rows = await select_from(consultant_sql_template_initial, 
+                                {"category_name": category_name, "category_items": category_items})
+                consultant_ids = [c[0] for c in consultant_id_rows]
+            else:
+                consultant_id_rows = await select_from(consultant_sql_template, 
+                                {"category_name": category_name, "category_items": category_items, "consultant_ids": consultant_ids})
+                consultant_ids = [c[0] for c in consultant_id_rows]
+        consultant_details = await select_from(consultant_details_sql, {"consultant_ids": consultant_ids})
+        consultant_id_index = 0
+        given_name_index = 1
+        surname_index = 2
+        linkedin_profile_url_index = 3
+        consultants: list[Consultant] = []
+        for consultant_detail in consultant_details:
+            consultant = Consultant(
+                id=consultant_detail[consultant_id_index],
+                given_name=consultant_detail[given_name_index],
+                surname=consultant_detail[surname_index],
+                linkedin_profile_url=consultant_detail[linkedin_profile_url_index]
+            )
+            consultants.append(consultant)
+        return consultants
+
+    return await create_cursor(processor)
 
 async def execute_script(script: str) -> State:
     async def process(cur: AsyncCursor) -> Awaitable[None]:

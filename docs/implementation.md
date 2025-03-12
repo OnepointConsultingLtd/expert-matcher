@@ -3,13 +3,17 @@
 		create session id
 		save session
 		select first question from TB_CATEGORY_QUESTION
-		send question to client
+		insert first question into TB_SESSION_QUESTION
+		build state object
+		send state to client
 	there is a session:
 		process_session:
 			select all questions from TB_SESSION_QUESTION
 			select upcoming question from TB_CATEGORY_QUESTION
 			select all category items as suggestions from TB_CATEGORY_ITEM
 			send question to client
+			build state object
+			send state to client
 
 - on send response
 	get response

@@ -1,0 +1,48 @@
+{
+    "session_id": "1234",
+    "history": [
+        {
+            "id": 87,
+            "category": "location",
+            "question": "Which geographic location are you looking for in a consultant?",
+            "suggestions": [
+                "Antwerp, Belgium",
+                "Athens, Attiki",
+                "Coventry, England, United Kingdom",
+                "Dublin, County Dublin, Ireland",
+                "Durban Area, South Africa",
+                "Enfield, England",
+                "Greater London, England",
+                "Leicester, England",
+                "Lisbon Area, Portugal",
+                "London Area, United Kingdom",
+                "London, England",
+                "London, England, United Kingdom",
+                "Madurai, Tamil Nadu",
+                "Manchester Area, United Kingdom",
+                "Pune, Maharashtra",
+                "Strathaven, Scotland"
+            ],
+            "selected_suggestions": [
+                "London, England, United Kingdom"
+            ]
+        },
+        {
+            "id": 88,
+            "category": "industry",
+            "question": "What specific industry sector are you seeking a consultant for?",
+            "suggestions": [
+                "Banking",
+                "Civil Engineering",
+                "Computer Software",
+                "Financial Services",
+                "Information Technology & Services",
+                "Insurance",
+                "Investment Banking"
+            ],
+            "selected_suggestions": [
+                "Information Technology & Services"
+            ]
+        }
+    ]
+}
