@@ -7,5 +7,6 @@ class QuestionSuggestions(BaseModel):
     question: str = Field(description="The question to be asked")
     suggestions: list[str] = Field(description="All suggestions for the question")
     selected_suggestions: list[str] = Field(
-        description="The selected suggestions used in a conversation", default_factory=list
+        description="The selected suggestions used in a conversation",
+        default_factory=list,
     )

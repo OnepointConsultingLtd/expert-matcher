@@ -20,5 +20,18 @@ class MessageStatus(StrEnum):
 
 
 class ServerMessage(BaseModel):
-    status: MessageStatus = Field(default=MessageStatus.OK, description="Whether the command was successful")
+    status: MessageStatus = Field(
+        default=MessageStatus.OK, description="Whether the command was successful"
+    )
+    session_id: str = Field(default="", description="The session id")
     content: any = Field(default=None, description="The content of the message")
+
+
+class ClientResponse(BaseModel):
+    session_id: str = Field(default="", description="The session id")
+    question: str = Field(default="", description="The response from the client")
+    response_items: list[str] = Field(default=[], description="The response items from the client")
+
+
+class ErrorMessage(BaseModel):
+    message: str = Field(default=None, description="The content of the message")

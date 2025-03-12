@@ -11,13 +11,14 @@ from expert_matcher.services.db.db_persistence import (
     execute_script,
     get_session_state,
     find_available_consultants,
-    select_next_question
+    select_next_question,
+    session_exists,
 )
 
 
 async def get_first_question() -> QuestionSuggestions:
     """Test selecting the first question with its suggestions."""
-    result = await select_first_question('')
+    result = await select_first_question("")
 
     assert result is not None
     assert isinstance(result, QuestionSuggestions)
@@ -74,7 +75,8 @@ async def test_save_session(test_session):
 
 async def provide_dummy_data(session_id: str):
     # Create dummy data
-    await execute_script(f"""
+    await execute_script(
+        f"""
 delete from tb_session where session_id = '{session_id}';
                          
 insert into tb_session(session_id, user_email) values('{session_id}', 'anon@test.com');
@@ -110,7 +112,8 @@ and CATEGORY_QUESTION_ID = (select id from TB_CATEGORY_QUESTION order by order_i
 INNER JOIN TB_CATEGORY_QUESTION q on C.id = q.CATEGORY_ID
 WHERE q.id = (select id from TB_CATEGORY_QUESTION order by order_index offset 1 limit 1)) offset 1 limit 1));
 
-""")
+"""
+    )
 
 
 @pytest.mark.asyncio
@@ -119,12 +122,21 @@ async def test_get_session_state():
 
     session_id = "1234"
     await provide_dummy_data(session_id)
-    
+
     state = await get_session_state(session_id)
     assert state is not None
     assert state.session_id == session_id
     assert state.history is not None
     assert len(state.history) == 2
+
+
+@pytest.mark.asyncio
+async def test_filter_consultants_on_unexisting_session():
+    """Test filtering consultants based on the session state."""
+    session_id = "1234567"
+
+    consultants = await find_available_consultants(session_id)
+    assert consultants is not None
 
 
 @pytest.mark.asyncio
@@ -142,6 +154,7 @@ async def test_filter_consultants():
 async def test_select_next_question():
     session_id = "1234"
     await provide_dummy_data(session_id)
+    assert await session_exists(session_id)
     question_suggestions = await select_next_question(session_id)
     assert question_suggestions is not None
     assert question_suggestions.id is not None
