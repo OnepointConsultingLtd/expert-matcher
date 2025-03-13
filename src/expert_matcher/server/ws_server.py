@@ -6,6 +6,7 @@ from expert_matcher.server.agent_session import AgentSession
 from expert_matcher.config.config import ws_cfg
 from expert_matcher.config.logger import logger
 from expert_matcher.model.session import Session
+from expert_matcher.model.consultant import Consultant
 from expert_matcher.model.ws_commands import WSCommand
 from expert_matcher.model.ws_commands import ServerMessage, MessageStatus, ErrorMessage, ClientResponse
 from expert_matcher.model.question import QuestionSuggestions
@@ -16,7 +17,9 @@ from expert_matcher.services.db.db_persistence import (
     save_session_question,
     get_session_state,
     session_exists,
-    save_client_response
+    save_client_response,
+    find_available_consultants,
+    get_configuration_value
 )
 
 
@@ -50,36 +53,69 @@ async def start_session(
         default_email = "default@email.com"
         await save_session(Session(session_id=session_id, email=default_email))
         question_suggestions = await select_first_question(session_id)
-        await send_question_suggestions(session_id, question_suggestions)
+        await send_question_suggestions(sid, session_id, question_suggestions)
     else:
         # check if session exists
         # if not, throw error
-        if not await session_exists(client_session):
-            server_message = ServerMessage(
-                status=MessageStatus.ERROR,
-                session_id=session_id,
-                content=ErrorMessage(message="Session not found"),
-            )
-            await sio.emit(WSCommand.SERVER_MESSAGE, server_message.model_dump())
-        question_suggestions = await select_next_question(client_session)
-        await send_question_suggestions(session_id, question_suggestions)
+        await handle_response(sid, session_id, None)
+
+
+@sio.event
+async def client_response(sid: str, session_id: str, response: str):
+    # if not, throw error
+    await handle_response(sid, session_id, response)
+
+
+async def handle_response(sid: str, session_id: str, response: str | None):
+        # if not, throw error
+    if not await session_exists(session_id):
+        await handle_missing_session(sid, session_id)
+        return
+    
+    consultants = await find_available_consultants(session_id)
+    consultants_threshold = await get_configuration_value("consultants_threshold")
+    if len(consultants) < consultants_threshold:
+        await handle_limited_consultants(sid, session_id)
+        return
+    
+    if response:
+        # convert response from json to ClientResponse
+        client_response = ClientResponse.model_validate_json(response)
+        # save response
+        await save_client_response(session_id, client_response)
+
+    question_suggestions = await select_next_question(session_id)
+    if question_suggestions:
+        await send_question_suggestions(sid, session_id, question_suggestions)
+    else:
+        await send_state(sid, session_id, question_suggestions)
+
+
+async def handle_missing_session(sid: str, session_id: str):
+    server_message = ServerMessage(
+        status=MessageStatus.ERROR,
+        session_id=session_id,
+        content=ErrorMessage(message="Session not found"),
+    )
+    await sio.emit(WSCommand.SERVER_MESSAGE, server_message.model_dump(), room=sid)
 
 
 async def send_question_suggestions(
-    session_id: str, question_suggestions: QuestionSuggestions
+    sid: str, session_id: str, question_suggestions: QuestionSuggestions
 ):
     await save_session_question(session_id, question_suggestions.id)
+    await send_state(sid, session_id, question_suggestions)
+
+
+async def send_state(sid: str,session_id: str, question_suggestions: QuestionSuggestions):
     state = await get_session_state(session_id)
-    # Change the last question suggestions to the optimized suggestions
     state.history[-1].suggestions = question_suggestions.suggestions
     server_message = ServerMessage(
         status=MessageStatus.OK, session_id=session_id, content=state
     )
-    await sio.emit(WSCommand.SERVER_MESSAGE, server_message.model_dump())
+    await sio.emit(WSCommand.SERVER_MESSAGE, server_message.model_dump(), room=sid)
 
-@sio.event
-async def client_response(sid: str, session_id: str, response: str):
-    # convert response from json to ClientResponse
-    client_response = ClientResponse.model_validate_json(response)
-    # save response
-    await save_client_response(session_id, client_response)
+
+async def handle_limited_consultants(sid: str, session_id: str, consultants: list[Consultant]):
+    # TODO: send message to user that there are limited consultants
+    pass

@@ -1,7 +1,6 @@
 from enum import StrEnum
 
 from pydantic import BaseModel, Field
-from expert_matcher.model.state import State
 
 
 class WSCommand(StrEnum):
@@ -24,7 +23,7 @@ class ServerMessage(BaseModel):
         default=MessageStatus.OK, description="Whether the command was successful"
     )
     session_id: str = Field(default="", description="The session id")
-    content: any = Field(default=None, description="The content of the message")
+    content: dict = Field(default=None, description="The content of the message")
 
 
 class ClientResponse(BaseModel):

@@ -5,6 +5,7 @@ from psycopg import AsyncCursor
 from expert_matcher.model.question import QuestionSuggestions
 from expert_matcher.model.session import Session
 from expert_matcher.model.state import State
+from expert_matcher.model.configuraton import Configuration
 from expert_matcher.services.db.db_support import select_from, create_cursor
 from expert_matcher.model.consultant import Consultant
 from expert_matcher.model.ws_commands import ClientResponse
@@ -22,7 +23,7 @@ async def select_next_question(session_id: str) -> QuestionSuggestions | None:
 SELECT C.ID CATEGORY_ID, C.NAME CATEGORY, Q.question, Q.id question_id from TB_CATEGORY_QUESTION Q
 INNER JOIN TB_CATEGORY C ON C.ID = Q.CATEGORY_ID
 WHERE ACTIVE is true
-ORDER BY order_index offset (SELECT count(*) FROM TB_SESSION_QUESTION sq
+ORDER BY order_index offset (SELECT count(*) + 1 FROM TB_SESSION_QUESTION sq
 INNER JOIN TB_SESSION s on s.id = sq.session_id
 WHERE s.session_id = %(session_id)s and sq.id in (SELECT SESSION_QUESTION_ID FROM TB_SESSION_QUESTION_RESPONSES)) LIMIT 1
 """
@@ -57,6 +58,18 @@ GROUP BY I.ITEM
     for suggestion in res_suggestions:
         question_suggestions.suggestions.append(suggestion[0])
     return question_suggestions
+
+
+async def save_session_question_as_str(session_id: str, question: str) -> int:
+    res = await select_from(
+"""
+SELECT ID FROM TB_CATEGORY_QUESTION WHERE QUESTION = %(question)s
+""",
+        {"question": question},
+    )
+    if len(res) == 0:
+        return 0
+    return await save_session_question(session_id, res[0][0])
 
 
 async def save_session_question(session_id: str, question_id: int) -> int:
@@ -278,17 +291,18 @@ SELECT COUNT(*) FROM TB_SESSION WHERE SESSION_ID = %(session_id)s
     return res[0][0] > 0
 
 
-async def save_client_response(session_id: str, client_response: ClientResponse):
+async def save_client_response(session_id: str, client_response: ClientResponse) -> int:
     """Save the client response to the database."""
     sql = """
 INSERT INTO TB_SESSION_QUESTION_RESPONSES (SESSION_QUESTION_ID, CATEGORY_ITEM_ID) 
 VALUES (
-	SELECT sq.id from TB_SESSION_QUESTION sq 
+	(SELECT sq.id from TB_SESSION_QUESTION sq 
 inner join TB_CATEGORY_QUESTION cq on cq.id = sq.CATEGORY_QUESTION_ID
-where session_id = %(session_id)s AND cq.QUESTION = %(question)s), 
-	SELECT ci.id from TB_CATEGORY_ITEM ci
+INNER JOIN TB_SESSION s on s.id = sq.SESSION_ID
+where s.session_id = %(session_id)s AND cq.QUESTION = %(question)s), 
+	(SELECT ci.id from TB_CATEGORY_ITEM ci
 INNER JOIN TB_CATEGORY_QUESTION cq on cq.category_id = ci.category_id
-WHERE question = %(question)s and ci.item = %(item)s);
+WHERE question = %(question)s and ci.item = %(item)s));
 """
     async def process(cur: AsyncCursor) -> Awaitable[int]:
         count = 0
@@ -302,4 +316,25 @@ WHERE question = %(question)s and ci.item = %(item)s);
         return count
 
     return await create_cursor(process)
+
+
+async def get_configuration() -> Configuration:
+    sql = """
+SELECT KEY, VALUE FROM TB_CONFIGURATION
+"""
+    res = await select_from(sql, {})
+    config = {}
+    for r in res:
+        config[r[0]] = r[1]
+    return Configuration(config)
+
+
+async def get_configuration_value(key: str) -> str | None:
+    sql = """
+SELECT VALUE FROM TB_CONFIGURATION WHERE KEY = %(key)s
+"""
+    res = await select_from(sql, {"key": key})
+    if len(res) == 0:
+        return None
+    return res[0][0]
 

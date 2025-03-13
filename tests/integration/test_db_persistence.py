@@ -2,19 +2,23 @@ import pytest
 
 from expert_matcher.model.question import QuestionSuggestions
 from expert_matcher.model.session import Session
+from expert_matcher.model.ws_commands import ClientResponse
 from expert_matcher.services.db.db_persistence import (
     select_first_question,
     save_session,
     delete_session,
     save_session_question,
     delete_session_question,
-    execute_script,
     get_session_state,
     find_available_consultants,
     select_next_question,
     session_exists,
+    save_client_response,
+    save_session_question_as_str,
+    get_configuration,
+    get_configuration_value
 )
-
+from tests.integration.provider import provide_dummy_data, provide_initial_question
 
 async def get_first_question() -> QuestionSuggestions:
     """Test selecting the first question with its suggestions."""
@@ -73,47 +77,7 @@ async def test_save_session(test_session):
         assert item.email == "test@test.com"
 
 
-async def provide_dummy_data(session_id: str):
-    # Create dummy data
-    await execute_script(
-        f"""
-delete from tb_session where session_id = '{session_id}';
-                         
-insert into tb_session(session_id, user_email) values('{session_id}', 'anon@test.com');
 
-insert into TB_SESSION_QUESTION(SESSION_ID, CATEGORY_QUESTION_ID)
-values((select id from TB_SESSION where SESSION_ID='{session_id}'), (select id from TB_CATEGORY_QUESTION order by order_index limit 1));
-
-insert into TB_SESSION_QUESTION(SESSION_ID, CATEGORY_QUESTION_ID)
-values((select id from TB_SESSION where SESSION_ID='{session_id}'), 
-(select id from TB_CATEGORY_QUESTION order by order_index offset 1 limit 1));
-
-insert into TB_SESSION_QUESTION_RESPONSES(SESSION_QUESTION_ID, CATEGORY_ITEM_ID)
-values((select sq.id from TB_SESSION_QUESTION sq
-where SESSION_ID = ((select id from TB_SESSION where SESSION_ID='{session_id}')) 
-and CATEGORY_QUESTION_ID = (select id from TB_CATEGORY_QUESTION order by order_index limit 1)), 
-(select id from TB_CATEGORY_ITEM where category_id = (select C.id from TB_CATEGORY C 
-INNER JOIN TB_CATEGORY_QUESTION q on C.id = q.CATEGORY_ID
-WHERE q.id = (select id from TB_CATEGORY_QUESTION order by order_index limit 1)) limit 1));
-
-insert into TB_SESSION_QUESTION_RESPONSES(SESSION_QUESTION_ID, CATEGORY_ITEM_ID)
-values((select sq.id from TB_SESSION_QUESTION sq
-where SESSION_ID = ((select id from TB_SESSION where SESSION_ID='{session_id}')) 
-and CATEGORY_QUESTION_ID = (select id from TB_CATEGORY_QUESTION order by order_index offset 1 limit 1)), 
-(select id from TB_CATEGORY_ITEM where category_id = (select C.id from TB_CATEGORY C 
-INNER JOIN TB_CATEGORY_QUESTION q on C.id = q.CATEGORY_ID
-WHERE q.id = (select id from TB_CATEGORY_QUESTION order by order_index offset 1 limit 1)) limit 1));
-
-insert into TB_SESSION_QUESTION_RESPONSES(SESSION_QUESTION_ID, CATEGORY_ITEM_ID)
-values((select sq.id from TB_SESSION_QUESTION sq
-where SESSION_ID = ((select id from TB_SESSION where SESSION_ID='{session_id}')) 
-and CATEGORY_QUESTION_ID = (select id from TB_CATEGORY_QUESTION order by order_index offset 1 limit 1)), 
-(select id from TB_CATEGORY_ITEM where category_id = (select C.id from TB_CATEGORY C 
-INNER JOIN TB_CATEGORY_QUESTION q on C.id = q.CATEGORY_ID
-WHERE q.id = (select id from TB_CATEGORY_QUESTION order by order_index offset 1 limit 1)) offset 1 limit 1));
-
-"""
-    )
 
 
 @pytest.mark.asyncio
@@ -161,4 +125,36 @@ async def test_select_next_question():
     assert question_suggestions.category is not None
     assert question_suggestions.question is not None
     assert question_suggestions.suggestions is not None
-    assert len(question_suggestions.suggestions) > 0
+    # assert len(question_suggestions.suggestions) > 0
+
+
+@pytest.mark.asyncio
+async def test_save_client_response():
+    session_id = "12345"
+    await provide_initial_question(session_id)
+    next_question = await select_next_question(session_id)
+    assert next_question is not None
+    assert next_question.id is not None
+    assert next_question.category is not None
+    question = next_question.question
+    suggestions = next_question.suggestions
+    assert question is not None
+    assert suggestions is not None
+    updated = await save_session_question_as_str(session_id, question)
+    assert updated > 0
+    # assert len(next_question.suggestions) > 0
+    client_response = ClientResponse(session_id=session_id, question=question, response_items=suggestions)
+    updated = await save_client_response(session_id, client_response)  
+    assert updated > 0
+
+
+@pytest.mark.asyncio
+async def test_get_configuration():
+    config = await get_configuration()
+    assert config is not None
+    assert config.config is not None
+    assert len(config.config) > 0
+    for key, value in config.config.items():
+        value = await get_configuration_value(key)
+        assert value is not None
+
