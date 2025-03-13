@@ -119,3 +119,6 @@ async def send_state(sid: str,session_id: str, question_suggestions: QuestionSug
 async def handle_limited_consultants(sid: str, session_id: str, consultants: list[Consultant]):
     # TODO: send message to user that there are limited consultants
     pass
+
+
+

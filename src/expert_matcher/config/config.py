@@ -1,5 +1,5 @@
 import os
-
+from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -38,6 +38,8 @@ class WebsocketConfig:
     websocket_server = os.getenv("WEBSOCKET_SERVER", "0.0.0.0")
     websocket_port = int(os.getenv("WEBSOCKET_PORT", 8080))
     websocket_cors_allowed_origins = os.getenv("WEBSOCKET_CORS_ALLOWED_ORIGINS", "*")
+    ui_folder = Path(os.getenv("UI_FOLDER", "ui"))
+    assert ui_folder.exists(), f"UI_FOLDER {ui_folder} does not exist"
 
 
 cfg = Config()

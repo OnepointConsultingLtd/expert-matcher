@@ -15,3 +15,9 @@ uv sync
 ## Configuration
 
 The environment variables can be found in this file: [.env_local](.env_local)
+
+## Running
+
+```bash
+python ./src/expert_matcher/server/ws_server_main.py
+```
