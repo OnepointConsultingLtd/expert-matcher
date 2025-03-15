@@ -23,7 +23,7 @@ from expert_matcher.services.db.db_persistence import (
 )
 
 
-sio = socketio.AsyncServer(cors_allowed_origins=ws_cfg.websocket_cors_allowed_origins)
+sio = socketio.AsyncServer(cors_allowed_origins=ws_cfg.websocket_cors_allowed_origins, logger=True)
 app = web.Application()
 sio.attach(app)
 
@@ -47,6 +47,7 @@ async def start_session(
     """
     Start the session by setting the main topic.
     """
+    logger.info(f"Start session {sid}")
     agent_session = AgentSession(sid, client_session)
     session_id = agent_session.session_id
     if not client_session:
@@ -55,34 +56,38 @@ async def start_session(
         question_suggestions = await select_first_question(session_id)
         await send_question_suggestions(sid, session_id, question_suggestions)
     else:
-        # check if session exists
-        # if not, throw error
         await handle_response(sid, session_id, None)
 
 
 @sio.event
-async def client_response(sid: str, session_id: str, response: str):
+async def echo(sid: str, session_id: str):
+    logger.info(f"echo {sid}")
+    await sio.emit(WSCommand.ECHO, session_id, room=sid)
+
+
+@sio.event
+async def client_response(sid: str, response: str):
+    logger.info(f"Client response {sid}")
+    # convert response from json to ClientResponse
+    client_response = ClientResponse.model_validate_json(response)
+    await handle_response(sid, client_response.session_id, client_response)
+
+
+async def handle_response(sid: str, session_id: str | None, response: ClientResponse):
     # if not, throw error
-    await handle_response(sid, session_id, response)
-
-
-async def handle_response(sid: str, session_id: str, response: str | None):
-        # if not, throw error
     if not await session_exists(session_id):
         await handle_missing_session(sid, session_id)
         return
     
     consultants = await find_available_consultants(session_id)
-    consultants_threshold = await get_configuration_value("consultants_threshold")
+    consultants_threshold = int(await get_configuration_value("consultants_threshold", "3"))
     if len(consultants) < consultants_threshold:
         await handle_limited_consultants(sid, session_id)
         return
     
     if response:
-        # convert response from json to ClientResponse
-        client_response = ClientResponse.model_validate_json(response)
         # save response
-        await save_client_response(session_id, client_response)
+        await save_client_response(session_id, response)
 
     question_suggestions = await select_next_question(session_id)
     if question_suggestions:
@@ -109,9 +114,15 @@ async def send_question_suggestions(
 
 async def send_state(sid: str,session_id: str, question_suggestions: QuestionSuggestions):
     state = await get_session_state(session_id)
-    state.history[-1].suggestions = question_suggestions.suggestions
+    if not state:
+        raise ValueError(f"Session {session_id} not found")
+    # overwrite the last question suggestions with the new ones
+    last_question_suggestions = state.history[-1]
+    last_question_suggestions.suggestions = question_suggestions.suggestions
+    last_question_suggestions.suggestions_count = question_suggestions.suggestions_count
+    last_question_suggestions.selected_suggestions = question_suggestions.selected_suggestions
     server_message = ServerMessage(
-        status=MessageStatus.OK, session_id=session_id, content=state
+        status=MessageStatus.OK, session_id=session_id, content=state.model_dump()
     )
     await sio.emit(WSCommand.SERVER_MESSAGE, server_message.model_dump(), room=sid)
 

@@ -4,10 +4,24 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <title>Onepoint Expert Matcher™</title>
+    <meta
+      property="og:title"
+      content="Onepoint Expert Matcher™"
+    />
+    <script>
+      const server = "127.0.0.1";
+      const port = 8090;
+      window.expertMatcherConfig = {
+        websocketUrl: `ws://${server}:${port}`,
+        reportUrl: `http://${server}:${port}`,
+      };
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root" class="flex flex-col 
+    bg-gradient-to-b from-[#ffffff] from-15% to-[#edf7fc] dark:from-slate-700 dark:to-slate-800 dark:bg-slate-700
+    min-h-screen gap-10 dark:!bg-gray-800 dark:!text-gray-100"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -38,9 +38,11 @@ WHERE s.session_id = %(session_id)s and sq.id in (SELECT SESSION_QUESTION_ID FRO
         category=res[0][category],
         question=res[0][question],
         suggestions=[],
+        suggestions_count=[],
     )
     consultants = await find_available_consultants(session_id)
     consultant_ids = [c.id for c in consultants]
+    # Select only the consultants that have any chance of being a good match
     sql_suggestions = """
 SELECT I.ITEM, COUNT(*) FROM TB_CATEGORY_QUESTION Q 
 INNER JOIN TB_CATEGORY C ON C.ID = Q.CATEGORY_ID
@@ -57,6 +59,7 @@ GROUP BY I.ITEM
     )
     for suggestion in res_suggestions:
         question_suggestions.suggestions.append(suggestion[0])
+        question_suggestions.suggestions_count.append(suggestion[1])
     return question_suggestions
 
 
@@ -183,6 +186,7 @@ WHERE s.session_id = %(session_id)s and cq.ID = %(question_id)s;
                 question=question,
                 suggestions=[s[0] for s in suggestions],
                 selected_suggestions=[s[0] for s in selected_suggestions],
+                suggestions_count=[-1 for _ in suggestions],
             )
             history.append(question_suggestions)
         return State(session_id=session_id, history=history)
@@ -329,12 +333,12 @@ SELECT KEY, VALUE FROM TB_CONFIGURATION
     return Configuration(config)
 
 
-async def get_configuration_value(key: str) -> str | None:
+async def get_configuration_value(key: str, default_value: str | None = None) -> str | None:
     sql = """
 SELECT VALUE FROM TB_CONFIGURATION WHERE KEY = %(key)s
 """
     res = await select_from(sql, {"key": key})
     if len(res) == 0:
-        return None
+        return default_value
     return res[0][0]
 

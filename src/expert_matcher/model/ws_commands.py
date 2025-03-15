@@ -10,6 +10,7 @@ class WSCommand(StrEnum):
 
     START_SESSION = "start_session"
     SERVER_MESSAGE = "server_message"
+    ECHO = "echo"
     ERROR = "error"
 
 

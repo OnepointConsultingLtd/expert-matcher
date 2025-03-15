@@ -6,6 +6,7 @@ class QuestionSuggestions(BaseModel):
     category: str = Field(description="The category of the question")
     question: str = Field(description="The question to be asked")
     suggestions: list[str] = Field(description="All suggestions for the question")
+    suggestions_count: list[int] = Field(description="The number of consultants per suggestion")
     selected_suggestions: list[str] = Field(
         description="The selected suggestions used in a conversation",
         default_factory=list,
