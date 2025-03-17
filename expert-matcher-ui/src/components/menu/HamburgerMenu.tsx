@@ -15,7 +15,7 @@ export default function HamburgerMenu() {
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                     onClick={() => setOpen(!open)}
-                    className="cursor-pointer mr-6"
+                    className="cursor-pointer mr-0"
                 >
                     <path
                         d="M25.9453 13.8281H1.05469C0.472184 13.8281 0 14.3528 0 15C0 15.6472 0.472184 16.1719 1.05469 16.1719H25.9453C26.5278 16.1719 27 15.6472 27 15C27 14.3528 26.5278 13.8281 25.9453 13.8281Z"

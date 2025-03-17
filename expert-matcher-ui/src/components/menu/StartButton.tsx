@@ -1,15 +1,19 @@
 import { useTranslation } from "react-i18next";
 import MenuItemTemplate from "./MenuItemTemplate";
+import { showDialogue } from "../../lib/dialogueFunctions";
+import { RESTART_DIALOGUE_ID } from "../dialogue/RestartDialogue";
 import { useHamburgerStore } from "../../context/HamburgerStore";
 
 
 export default function StartButton() {
     const { t } = useTranslation();
     const { setOpen } = useHamburgerStore();
+    
     return (
       <>
         <MenuItemTemplate title={t("Restart")} func={() => {
-            setOpen(false);
+            setOpen(false)
+            showDialogue(RESTART_DIALOGUE_ID);
         }}>
           <svg
             width="21"

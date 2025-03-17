@@ -66,13 +66,13 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
     setErrorMessage: (errorMessage: string) => set({ errorMessage }),
     previousQuestion: () => set((state) => {
         if(state.currentIndex > 0) {
-            return { ...state, currentIndex: state.currentIndex - 1 }
+            return { ...state, currentIndex: state.currentIndex - 1, selectedSuggestions: [] }
         }
         return { ...state }
     }),
     nextQuestion: () => set((state) => {
         if(state.currentIndex < state.history.length - 1) {
-            return { ...state, currentIndex: state.currentIndex + 1 }
+            return { ...state, currentIndex: state.currentIndex + 1, selectedSuggestions: [] }
         }
         return { ...state }
     })

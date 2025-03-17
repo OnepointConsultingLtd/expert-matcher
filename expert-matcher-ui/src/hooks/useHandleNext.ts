@@ -8,7 +8,7 @@ import { useCurrentMessage } from "./useCurrentMessage";
 export function useHandleNext() {
     const { socket } = useChatStore();
     const currentMessage = useCurrentMessage();
-    const { selectedSuggestions, setSending, nextQuestion } = useAppStore();
+    const { selectedSuggestions, setSending, nextQuestion, deselectAllSuggestions } = useAppStore();
 
     function handleNext() {
         const sessionId = getSessionId();
@@ -25,6 +25,7 @@ export function useHandleNext() {
                 response_items: selectedSuggestions,
             };
             sendClientResponse(socket.current, clientResponse);
+            deselectAllSuggestions()
             // echo(socket.current, JSON.stringify(clientResponse));
         } else {
             if(!sessionId) {

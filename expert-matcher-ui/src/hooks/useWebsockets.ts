@@ -21,7 +21,6 @@ export function useWebsockets() {
             startSession(socket.current, sessionId);
             console.info("Connected to websocket");
 
-
             setInterval(() => {
                 safeEmit(socket.current, WS_EVENTS.ECHO, getSessionId());
             }, 60000);

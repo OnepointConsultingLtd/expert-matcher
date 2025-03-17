@@ -10,3 +10,7 @@ export type Session = {
     status: SessionStatus;
 }
 
+export type SessionHistory = {
+    sessions: Session[];
+}
+

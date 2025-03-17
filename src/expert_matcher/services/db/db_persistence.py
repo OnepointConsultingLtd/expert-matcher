@@ -9,6 +9,7 @@ from expert_matcher.model.configuraton import Configuration
 from expert_matcher.services.db.db_support import select_from, create_cursor
 from expert_matcher.model.consultant import Consultant
 from expert_matcher.model.ws_commands import ClientResponse
+from expert_matcher.config.logger import logger
 
 
 async def select_first_question(session_id: str) -> QuestionSuggestions | None:
@@ -311,11 +312,20 @@ WHERE question = %(question)s and ci.item = %(item)s));
     async def process(cur: AsyncCursor) -> Awaitable[int]:
         count = 0
         for item in client_response.response_items:
-            await cur.execute(sql, {
-                "session_id": session_id,
-                "question": client_response.question,
-                "item": item
-            })
+            try:
+                await cur.execute(sql, {
+                    "session_id": session_id,
+                    "question": client_response.question,
+                    "item": item
+                })
+            except Exception as e:
+                logger.error(f"Error saving client response: {e}")
+                logger.error(f"Parameters: {sql, {
+                    "session_id": session_id,
+                    "question": client_response.question,
+                    "item": item
+                }}")
+                raise e
             count += cur.rowcount
         return count
 

@@ -8,7 +8,7 @@ export default function Suggestions() {
     const { addSelectedSuggestions } = useAppStore();
     const currentMessage = useCurrentMessage();
     if (!currentMessage) return null;
-    const { questionSuggestions, selectedSuggestions } = currentMessage;
+    const { questionSuggestions, selectedSuggestions, isLast } = currentMessage;
     if(!questionSuggestions) return null;
     const { suggestions_count } = questionSuggestions;
 
@@ -19,10 +19,17 @@ export default function Suggestions() {
                     const isSelected = selectedSuggestions.includes(suggestion)
                     return (
                         <button key={i} 
-                            onClick={() => addSelectedSuggestions(suggestion)}
+                            onClick={() => {
+                                if(isLast) {
+                                    addSelectedSuggestions(suggestion)
+                                }
+                            }}
                             className={`suggestion ${buttonStyle} ${isSelected ? 'bg-teal-900' : ''}`}>
                             <div>{suggestion}</div>
-                            <div className={`text-sm ${isSelected ? 'text-white' : 'text-gray-500'}`}>{t("consultantWithCount", { count: suggestions_count[i] })}</div>
+                            {suggestions_count[i] > 0 && <div className={`text-sm ${isSelected ? 'text-white' : 'text-gray-300'}`}>
+                                {t("consultantWithCount", { count: suggestions_count[i] })}
+                            </div>}
+                            {suggestions_count[i] <= 0 && <br />}
                         </button>
                     )
                 })}
