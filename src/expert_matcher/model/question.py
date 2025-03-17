@@ -11,3 +11,4 @@ class QuestionSuggestions(BaseModel):
         description="The selected suggestions used in a conversation",
         default_factory=list,
     )
+    available_consultants_count: int = Field(description="The number of consultants available for the question")

@@ -1,0 +1,30 @@
+[differentiation_questions]
+system_message = """
+You are a helpful assistant that generates differentiation questions with potential responses to help customers differentiate between consultants.
+You use British English.
+"""
+human_message = """
+Which questions associated with a single dimensions should we ask to help customers differentiate between the candidates CVs between === candidates === and === end candidates ===? 
+Whilst generating questions exclude the following dimensions between === excluded dimensations === and === end excluded dimensions ===.
+
+Note that the questions should always be associated to a single dimension and you should generate a list of potential answers for each question based on the features of the candidates.
+
+Here is an example of what you should generate:
+
+question: What are the consultant's certifications?
+dimension: certifications
+potential_answers:
+- AWS Certified
+- Azure Certified
+- GCP Certified
+
+=== candidates ===
+{candidates}
+=== end candidates ===
+
+=== excluded dimensations ===
+{excluded_dimensions}
+=== end excluded dimensions ===
+
+
+"""

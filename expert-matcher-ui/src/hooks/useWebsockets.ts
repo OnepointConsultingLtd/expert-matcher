@@ -29,6 +29,7 @@ export function useWebsockets() {
         function onDisconnect() {
             setConnected(false);
             console.info("Disconnected from websocket");
+            setErrorMessage("Disconnected from websocket");
         }
 
         function onServerMessage(serverMessage: ServerMessage) {

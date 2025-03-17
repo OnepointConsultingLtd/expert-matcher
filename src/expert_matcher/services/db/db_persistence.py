@@ -40,6 +40,7 @@ WHERE s.session_id = %(session_id)s and sq.id in (SELECT SESSION_QUESTION_ID FRO
         question=res[0][question],
         suggestions=[],
         suggestions_count=[],
+        available_consultants_count=-1,
     )
     consultants = await find_available_consultants(session_id)
     consultant_ids = [c.id for c in consultants]
@@ -61,6 +62,25 @@ GROUP BY I.ITEM
     for suggestion in res_suggestions:
         question_suggestions.suggestions.append(suggestion[0])
         question_suggestions.suggestions_count.append(suggestion[1])
+    # get the number of consultants available for the question
+    sql_available_consultants_count = """
+SELECT
+	COUNT(DISTINCT CO.ID)
+FROM
+	TB_CATEGORY C
+	INNER JOIN TB_CATEGORY_QUESTION CQ ON CQ.CATEGORY_ID = C.ID
+	INNER JOIN TB_CATEGORY_ITEM I ON C.ID = I.CATEGORY_ID
+	INNER JOIN TB_CONSULTANT_CATEGORY_ITEM_ASSIGNMENT A ON A.CATEGORY_ITEM_ID = I.ID
+	INNER JOIN TB_CONSULTANT CO ON CO.ID = A.CONSULTANT_ID
+WHERE
+	CQ.QUESTION = %(question)s
+	AND A.CONSULTANT_ID = ANY(%(consultant_ids)s);
+"""
+    res_available_consultants_count = await select_from(
+        sql_available_consultants_count,
+        {"question": question_suggestions.question, "consultant_ids": consultant_ids},
+    )
+    question_suggestions.available_consultants_count = res_available_consultants_count[0][0]
     return question_suggestions
 
 
@@ -188,6 +208,7 @@ WHERE s.session_id = %(session_id)s and cq.ID = %(question_id)s;
                 suggestions=[s[0] for s in suggestions],
                 selected_suggestions=[s[0] for s in selected_suggestions],
                 suggestions_count=[-1 for _ in suggestions],
+                available_consultants_count=-1,
             )
             history.append(question_suggestions)
         return State(session_id=session_id, history=history)

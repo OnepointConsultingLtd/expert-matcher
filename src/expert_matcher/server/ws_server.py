@@ -79,17 +79,18 @@ async def handle_response(sid: str, session_id: str | None, response: ClientResp
         await handle_missing_session(sid, session_id)
         return
     
-    consultants = await find_available_consultants(session_id)
-    consultants_threshold = int(await get_configuration_value("consultants_threshold", "3"))
-    if len(consultants) < consultants_threshold:
-        await handle_limited_consultants(sid, session_id)
-        return
-    
+    # Get the consultants available for the current question, before saving the response
+    previous_question_consultants = await find_available_consultants(session_id)
     if response:
         # save response
         await save_client_response(session_id, response)
-
+    
+    consultants_threshold = int(await get_configuration_value("consultants_threshold", "3"))
     question_suggestions = await select_next_question(session_id)
+    if question_suggestions.available_consultants_count < consultants_threshold:
+        await handle_limited_consultants(sid, session_id, previous_question_consultants)
+        return
+    
     if question_suggestions:
         await send_question_suggestions(sid, session_id, question_suggestions)
     else:
@@ -121,13 +122,14 @@ async def send_state(sid: str,session_id: str, question_suggestions: QuestionSug
     last_question_suggestions.suggestions = question_suggestions.suggestions
     last_question_suggestions.suggestions_count = question_suggestions.suggestions_count
     last_question_suggestions.selected_suggestions = question_suggestions.selected_suggestions
+    last_question_suggestions.available_consultants_count = question_suggestions.available_consultants_count
     server_message = ServerMessage(
         status=MessageStatus.OK, session_id=session_id, content=state.model_dump()
     )
     await sio.emit(WSCommand.SERVER_MESSAGE, server_message.model_dump(), room=sid)
 
 
-async def handle_limited_consultants(sid: str, session_id: str, consultants: list[Consultant]):
+async def handle_limited_consultants(sid: str, session_id: str, previous_question_consultants: list[Consultant]):
     # TODO: send message to user that there are limited consultants
     pass
 

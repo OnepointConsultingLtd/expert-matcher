@@ -1,4 +1,6 @@
 {
+    "availableConsultants_one": "{{count}} available consultant",
+    "availableConsultants_other": "{{count}} available consultants",
     "consultantWithCount_one": "{{count}} consultant",
     "consultantWithCount_other": "{{count}} consultants",
     "Deselect all": "Deselect all",

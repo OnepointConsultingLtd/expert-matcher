@@ -2,6 +2,7 @@ import { useCurrentMessage } from "../hooks/useCurrentMessage";
 import { useTranslation } from "react-i18next";
 import { useAppStore } from "../context/AppStore";
 import { buttonStyle } from "./common";
+import AvailableConsultants from "./AvailableConsultants";
 
 export default function Suggestions() {
     const { t } = useTranslation();
@@ -13,8 +14,9 @@ export default function Suggestions() {
     const { suggestions_count } = questionSuggestions;
 
     return (
-        <div>
-            <div className="container suggestions animate-fade-down mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 max-w-full">
+        <div className="mt-6">
+            <AvailableConsultants />
+            <div className="container suggestions animate-fade-down grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 max-w-full">
                 {questionSuggestions.suggestions.map((suggestion, i) => {
                     const isSelected = selectedSuggestions.includes(suggestion)
                     return (

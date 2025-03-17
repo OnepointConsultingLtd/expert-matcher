@@ -1,20 +1,19 @@
 [project]
 name = "expert_matcher"
 version = "0.1.0"
-description = "A expert matcher application"
+description = "A consultant finder application"
 authors = [
     {name = "Your Name", email = "your.email@example.com"},
 ]
 dependencies = [
     "python-dotenv>=1.0.1",
-    "psycopg>=3.2.5",
+    "psycopg[binary]>=3.2.5",
     "psycopg-pool>=3.2.5",
-    "pydantic>=2.10.6",
-    "python-socketio>=5.12.1",
-    "python-ulid>=1.1.0",
-    "aiohttp>=3.10.11",
+    "langchain>=0.1.0",
+    "langchain-openai>=0.0.2",
+    "tomli>=2.2.1",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 
 [project.optional-dependencies]
 dev = [
@@ -26,7 +25,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/expert_matcher"] 
+packages = ["src/expert_matcher"]
 
 [dependency-groups]
 dev = [

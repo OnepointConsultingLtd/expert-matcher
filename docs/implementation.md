@@ -34,6 +34,12 @@
 - select consultants
 	create report
 
+
+Questions for last stage with limited set of candidates.
+- What should we ask to help customers differentiate between these candidates excluding the following dimensions?
+Please provide viable answers for each candidate for each of the questions which were generated.
+
+
 			
 		
 		
