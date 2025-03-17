@@ -1,6 +1,9 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+
+from expert_matcher.config.toml_support import load_toml
 
 load_dotenv()
 
@@ -32,6 +35,14 @@ class Config:
     pool_min_size: int = int(os.getenv("DB_POOL_MIN_SIZE", "1"))
     pool_max_size: int = int(os.getenv("DB_POOL_MAX_SIZE", "10"))
     pool_timeout: float = float(os.getenv("DB_POOL_TIMEOUT", "30.0"))
+
+    base_folder = Path(os.getenv("BASE_FOLDER", ""))
+    assert base_folder.exists(), f"BASE_FOLDER {base_folder} does not exist"
+    prompts_toml = base_folder / "prompts.toml"
+    assert prompts_toml.exists(), f"prompts.toml {prompts_toml} does not exist"
+    prompt_templates = load_toml(prompts_toml)
+
+    llm = ChatOpenAI(model=model, api_key=api_key)
 
 
 class WebsocketConfig:

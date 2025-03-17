@@ -5,7 +5,7 @@ You use British English.
 """
 human_message = """
 Which questions associated with a single dimensions should we ask to help customers differentiate between the candidates CVs between === candidates === and === end candidates ===? 
-Whilst generating questions exclude the following dimensions between === excluded dimensations === and === end excluded dimensions ===.
+Whilst generating questions exclude the following dimensions between === excluded dimensions === and === end excluded dimensions ===.
 
 Note that the questions should always be associated to a single dimension and you should generate a list of potential answers for each question based on the features of the candidates.
 
@@ -22,7 +22,7 @@ potential_answers:
 {candidates}
 === end candidates ===
 
-=== excluded dimensations ===
+=== excluded dimensions ===
 {excluded_dimensions}
 === end excluded dimensions ===
 

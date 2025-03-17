@@ -30,7 +30,9 @@ class ServerMessage(BaseModel):
 class ClientResponse(BaseModel):
     session_id: str = Field(default="", description="The session id")
     question: str = Field(default="", description="The response from the client")
-    response_items: list[str] = Field(default=[], description="The response items from the client")
+    response_items: list[str] = Field(
+        default=[], description="The response items from the client"
+    )
 
 
 class ErrorMessage(BaseModel):

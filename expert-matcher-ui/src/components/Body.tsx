@@ -5,7 +5,6 @@ import Question from "./Question";
 import Suggestions from "./Suggestions";
 import NavigationButtons from "./NavigationButtons";
 import ErrorMessage from "./messages/ErrorMessage";
-import AvailableConsultants from "./AvailableConsultants";
 export default function Body() {
     useWebsockets();
     const { connected, sending } = useAppStore();

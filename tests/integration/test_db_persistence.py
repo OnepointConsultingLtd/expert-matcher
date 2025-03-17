@@ -16,9 +16,10 @@ from expert_matcher.services.db.db_persistence import (
     save_client_response,
     save_session_question_as_str,
     get_configuration,
-    get_configuration_value
+    get_configuration_value,
 )
 from tests.integration.provider import provide_dummy_data, provide_initial_question
+
 
 async def get_first_question() -> QuestionSuggestions:
     """Test selecting the first question with its suggestions."""
@@ -75,9 +76,6 @@ async def test_save_session(test_session):
     async for item in test_session:
         assert item.session_id == "123"
         assert item.email == "test@test.com"
-
-
-
 
 
 @pytest.mark.asyncio
@@ -143,8 +141,10 @@ async def test_save_client_response():
     updated = await save_session_question_as_str(session_id, question)
     assert updated > 0
     # assert len(next_question.suggestions) > 0
-    client_response = ClientResponse(session_id=session_id, question=question, response_items=suggestions)
-    updated = await save_client_response(session_id, client_response)  
+    client_response = ClientResponse(
+        session_id=session_id, question=question, response_items=suggestions
+    )
+    updated = await save_client_response(session_id, client_response)
     assert updated > 0
 
 
@@ -157,4 +157,3 @@ async def test_get_configuration():
     for key, value in config.config.items():
         value = await get_configuration_value(key)
         assert value is not None
-

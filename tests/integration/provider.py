@@ -1,5 +1,5 @@
 from expert_matcher.services.db.db_persistence import execute_script
-    
+
 
 async def provide_initial_question(session_id: str):
     await execute_script(
@@ -14,9 +14,10 @@ values((select id from TB_SESSION where SESSION_ID='{session_id}'),
         """
     )
 
+
 async def provide_dummy_data(session_id: str):
     # Create
-    # 
+    #
     await provide_initial_question(session_id)
     await execute_script(
         f"""

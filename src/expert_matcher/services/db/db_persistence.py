@@ -80,13 +80,15 @@ WHERE
         sql_available_consultants_count,
         {"question": question_suggestions.question, "consultant_ids": consultant_ids},
     )
-    question_suggestions.available_consultants_count = res_available_consultants_count[0][0]
+    question_suggestions.available_consultants_count = res_available_consultants_count[
+        0
+    ][0]
     return question_suggestions
 
 
 async def save_session_question_as_str(session_id: str, question: str) -> int:
     res = await select_from(
-"""
+        """
 SELECT ID FROM TB_CATEGORY_QUESTION WHERE QUESTION = %(question)s
 """,
         {"question": question},
@@ -217,12 +219,13 @@ WHERE s.session_id = %(session_id)s and cq.ID = %(question_id)s;
 
 
 def consultant_factory(
-    consultant_details: list[tuple[int, str, str, str]],
+    consultant_details: list[tuple[int, str, str, str.str]],
 ) -> list[Consultant]:
     consultant_id_index = 0
     given_name_index = 1
     surname_index = 2
     linkedin_profile_url_index = 3
+    email_index = 4
     consultants: list[Consultant] = []
     for consultant_detail in consultant_details:
         consultant = Consultant(
@@ -230,6 +233,7 @@ def consultant_factory(
             given_name=consultant_detail[given_name_index],
             surname=consultant_detail[surname_index],
             linkedin_profile_url=consultant_detail[linkedin_profile_url_index],
+            email=consultant_detail[email_index],
         )
         consultants.append(consultant)
     return consultants
@@ -258,7 +262,7 @@ WHERE CATEGORY_NAME = %(category_name)s AND CATEGORY_ITEM = ANY(%(category_items
 AND CONSULTANT_ID = ANY(%(consultant_ids)s)
 """
     consultant_details_base_sql = (
-        "select ID, GIVEN_NAME, SURNAME, LINKEDIN_PROFILE_URL from TB_CONSULTANT"
+        "select ID, GIVEN_NAME, SURNAME, LINKEDIN_PROFILE_URL, EMAIL from TB_CONSULTANT"
     )
     consultant_details_sql = f"""
 {consultant_details_base_sql}
@@ -330,22 +334,28 @@ where s.session_id = %(session_id)s AND cq.QUESTION = %(question)s),
 INNER JOIN TB_CATEGORY_QUESTION cq on cq.category_id = ci.category_id
 WHERE question = %(question)s and ci.item = %(item)s));
 """
+
     async def process(cur: AsyncCursor) -> Awaitable[int]:
         count = 0
         for item in client_response.response_items:
             try:
-                await cur.execute(sql, {
-                    "session_id": session_id,
-                    "question": client_response.question,
-                    "item": item
-                })
+                await cur.execute(
+                    sql,
+                    {
+                        "session_id": session_id,
+                        "question": client_response.question,
+                        "item": item,
+                    },
+                )
             except Exception as e:
                 logger.error(f"Error saving client response: {e}")
-                logger.error(f"Parameters: {sql, {
+                logger.error(
+                    f"Parameters: {sql, {
                     "session_id": session_id,
                     "question": client_response.question,
                     "item": item
-                }}")
+                }}"
+                )
                 raise e
             count += cur.rowcount
         return count
@@ -364,7 +374,9 @@ SELECT KEY, VALUE FROM TB_CONFIGURATION
     return Configuration(config)
 
 
-async def get_configuration_value(key: str, default_value: str | None = None) -> str | None:
+async def get_configuration_value(
+    key: str, default_value: str | None = None
+) -> str | None:
     sql = """
 SELECT VALUE FROM TB_CONFIGURATION WHERE KEY = %(key)s
 """
@@ -372,4 +384,3 @@ SELECT VALUE FROM TB_CONFIGURATION WHERE KEY = %(key)s
     if len(res) == 0:
         return default_value
     return res[0][0]
-

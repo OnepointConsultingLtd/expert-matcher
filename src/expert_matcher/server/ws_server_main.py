@@ -23,7 +23,7 @@ def run_server():
     os.chdir(ws_cfg.ui_folder)
     os.system("npm run build")
     os.chdir(original_dir)
-    
+
     # Setup the routes for the web application
     for url in INDEX_LINKS:
         app.router.add_get(url, get_index)
@@ -32,7 +32,7 @@ def run_server():
         app.router.add_static(
             f"/{folder}", path=(ws_cfg.ui_folder / folder).as_posix(), name=folder
         )
-    
+
     loop = asyncio.new_event_loop()
 
     web.run_app(
