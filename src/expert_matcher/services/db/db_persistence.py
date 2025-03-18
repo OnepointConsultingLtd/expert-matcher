@@ -5,10 +5,10 @@ from psycopg import AsyncCursor
 from expert_matcher.model.question import QuestionSuggestions
 from expert_matcher.model.session import Session
 from expert_matcher.model.state import State
-from expert_matcher.model.configuraton import Configuration
 from expert_matcher.services.db.db_support import select_from, create_cursor
-from expert_matcher.model.consultant import Consultant
+from expert_matcher.model.consultant import Consultant, ConsultantExperience
 from expert_matcher.model.ws_commands import ClientResponse
+from expert_matcher.model.configuraton import Configuration
 from expert_matcher.config.logger import logger
 
 
@@ -219,13 +219,14 @@ WHERE s.session_id = %(session_id)s and cq.ID = %(question_id)s;
 
 
 def consultant_factory(
-    consultant_details: list[tuple[int, str, str, str.str]],
+    consultant_details: list[tuple[int, str, str, str, str, str]],
 ) -> list[Consultant]:
     consultant_id_index = 0
     given_name_index = 1
     surname_index = 2
     linkedin_profile_url_index = 3
     email_index = 4
+    cv_index = 5
     consultants: list[Consultant] = []
     for consultant_detail in consultant_details:
         consultant = Consultant(
@@ -234,12 +235,13 @@ def consultant_factory(
             surname=consultant_detail[surname_index],
             linkedin_profile_url=consultant_detail[linkedin_profile_url_index],
             email=consultant_detail[email_index],
+            cv=consultant_detail[cv_index],
         )
         consultants.append(consultant)
     return consultants
 
 
-async def find_available_consultants(session_id: str) -> list[Consultant]:
+async def find_available_consultants(session_id: str, extract_experiences: bool = False) -> list[Consultant]:
     """Filter the consultants based on the session state."""
 
     sql = """
@@ -262,7 +264,9 @@ WHERE CATEGORY_NAME = %(category_name)s AND CATEGORY_ITEM = ANY(%(category_items
 AND CONSULTANT_ID = ANY(%(consultant_ids)s)
 """
     consultant_details_base_sql = (
-        "select ID, GIVEN_NAME, SURNAME, LINKEDIN_PROFILE_URL, EMAIL from TB_CONSULTANT"
+        """SELECT * FROM (SELECT C.ID, C.GIVEN_NAME, C.SURNAME, C.LINKEDIN_PROFILE_URL, C.EMAIL, C.CV, STRING_AGG(S.SKILL_NAME, '@@') FROM TB_CONSULTANT C 
+INNER JOIN TB_CONSULTANT_SKILL CS ON C.ID = CS.CONSULTANT_ID INNER JOIN TB_SKILL S ON S.ID = CS.SKILL_ID
+GROUP BY C.ID, C.GIVEN_NAME, C.SURNAME, C.LINKEDIN_PROFILE_URL, C.EMAIL, C.CV) q"""
     )
     consultant_details_sql = f"""
 {consultant_details_base_sql}
@@ -301,7 +305,42 @@ where ID = ANY(%(consultant_ids)s)
     consultant_details = await select_from(
         consultant_details_sql, {"consultant_ids": consultant_ids}
     )
-    return consultant_factory(consultant_details)
+    consultants = consultant_factory(consultant_details)
+    if extract_experiences:
+        consultant_dict = {c.id: c for c in consultants}
+        await inject_consultant_experiences(consultant_ids, consultant_dict)
+    return consultants
+
+
+async def inject_consultant_experiences(consultant_ids: list[int], consultant_dict: dict[int, Consultant]):
+    """Extract the experiences of the consultants."""
+    consultant_experiences_sql = """
+SELECT CE.ID, CE.CONSULTANT_ID consultant_id, CE.TITLE, CE.LOCATION, CE.START_DATE, CE.END_DATE, C.COMPANY_NAME
+FROM TB_CONSULTANT_EXPERIENCE CE
+INNER JOIN TB_COMPANY C ON C.ID = CE.COMPANY_ID
+WHERE CE.CONSULTANT_ID = ANY(%(consultant_ids)s)
+"""
+    consultant_experiences = await select_from(
+            consultant_experiences_sql, {"consultant_ids": consultant_ids}
+        )
+    consultant_experiences_id_index = 0
+    consultant_id_index = 1
+    title_index = 2
+    location_index = 3
+    start_date_index = 4
+    end_date_index = 5
+    company_name_index = 6
+    for experience in consultant_experiences:
+        consultant_experience = ConsultantExperience(
+            id=experience[consultant_experiences_id_index],
+            consultant_id=experience[consultant_id_index],
+            title=experience[title_index],
+            location=experience[location_index],
+            start_date=experience[start_date_index],
+            end_date=experience[end_date_index],
+            company_name=experience[company_name_index]
+        )
+        consultant_dict[consultant_experience.consultant_id].experiences.append(consultant_experience)
 
 
 async def execute_script(script: str) -> State:

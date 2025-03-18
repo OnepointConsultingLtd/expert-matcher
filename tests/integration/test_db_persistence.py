@@ -111,6 +111,19 @@ async def test_filter_consultants():
     assert consultants is not None
     # assert len(consultants) > 0
 
+@pytest.mark.asyncio
+async def test_filter_consultants_with_experiences():
+    """Test filtering consultants based on the session state."""
+    session_id = "1234"
+    await provide_dummy_data(session_id)
+
+    consultants = await find_available_consultants(session_id, True)
+    assert consultants is not None
+    assert len(consultants) > 0
+    for consultant in consultants:
+        assert consultant.experiences is not None
+        assert len(consultant.experiences) > 0
+
 
 @pytest.mark.asyncio
 async def test_select_next_question():

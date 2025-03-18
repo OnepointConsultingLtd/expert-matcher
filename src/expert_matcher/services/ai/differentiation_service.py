@@ -30,7 +30,7 @@ def _prompt_factory() -> PromptTemplate:
 
 def _chain_factory() -> RunnableSequence:
     """Create a chain of functions to extract dimensions from a text"""
-    model = cfg.selected_llm.with_structured_output(DifferentiationQuestions)
+    model = cfg.llm.with_structured_output(DifferentiationQuestions)
     prompt = _prompt_factory()
     return prompt | model
 
@@ -39,10 +39,15 @@ def _prepare_input(candidates: list[Consultant], excluded_dimensions: list[str])
     """Prepare the input for the chain"""
     candidates_str = ""
     for c in candidates:
+        skills_str = "\n-".join(c.skills)
+        experiences_str = "\n-".join([str(e) for e in c.experiences])
         candidates_str += f"""ID: {c.id}
 Name: {c.given_name} {c.surname}
 LinkedIn: {c.linkedin_profile_url}
 Email: {c.email}
+CV: {c.cv}
+Skills: {skills_str}
+Experiences: {experiences_str}
 
 """
     excluded_dimensions_str = "\n- ".join(excluded_dimensions)
@@ -58,12 +63,12 @@ async def _generate_differentiation_questions(
     """Generate differentiation questions"""
     chain = _chain_factory()
     input = _prepare_input(candidates, excluded_dimensions)
-    return await chain.invoke(input)
+    return await chain.ainvoke(input)
 
 
 async def generate_differentiation_questions(session_id: str) -> DifferentiationQuestions:
     """Generate differentiation questions"""
     session_state = await get_session_state(session_id)
-    candidates = await find_available_consultants(session_id)
+    candidates = await find_available_consultants(session_id, True)
     excluded_dimensions = [q.category for q in session_state.history]
     return await _generate_differentiation_questions(candidates, excluded_dimensions)
