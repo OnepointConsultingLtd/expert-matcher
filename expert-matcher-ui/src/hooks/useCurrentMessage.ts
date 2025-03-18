@@ -7,8 +7,8 @@ export function useCurrentMessage() {
       questionSuggestions: null,
       selectedSuggestions: [],
       isLast: false,
-      hasDifferentiationQuestions: false,
-      differentiationQuestions: [],
+      hasDifferentiationQuestions: differentiationQuestions.length > 0,
+      differentiationQuestions,
     };
   }
   const currentSelectedSuggestions =

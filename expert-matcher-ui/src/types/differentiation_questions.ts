@@ -10,6 +10,10 @@ export interface Question {
   options: Option[];
 }
 
+export interface QuestionWithSelectedOptions extends Question {
+  selectedOptions: Option[];
+}
+
 interface Option {
   option: string;
   consultants: string[];
