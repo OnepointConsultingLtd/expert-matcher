@@ -111,6 +111,7 @@ async def test_filter_consultants():
     assert consultants is not None
     # assert len(consultants) > 0
 
+
 @pytest.mark.asyncio
 async def test_filter_consultants_with_experiences():
     """Test filtering consultants based on the session state."""

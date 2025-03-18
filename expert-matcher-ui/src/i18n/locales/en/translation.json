@@ -4,6 +4,7 @@
     "consultantWithCount_one": "{{count}} consultant",
     "consultantWithCount_other": "{{count}} consultants",
     "Deselect all": "Deselect all",
+    "Disconnected from websocket": "Disconnected from websocket",
     "Expert Matcher": "Expert Matcher",
     "Next": "Next",
     "Restart": "Restart",

@@ -1,6 +1,10 @@
 import pytest
-from expert_matcher.services.ai.differentiation_service import _prompt_factory, generate_differentiation_questions
+from expert_matcher.services.ai.differentiation_service import (
+    _prompt_factory,
+    generate_differentiation_questions,
+)
 from tests.integration.provider import provide_dummy_data
+
 
 def test_prompt_factory():
     prompt = _prompt_factory()
@@ -18,4 +22,4 @@ async def test_generate_differentiation_questions():
     questions = await generate_differentiation_questions(session_id)
     assert questions is not None
     assert len(questions.questions) > 0
-
+    assert len(questions.candidates) > 0

@@ -13,6 +13,7 @@ from expert_matcher.model.ws_commands import (
     MessageStatus,
     ErrorMessage,
     ClientResponse,
+    ContentType,
 )
 from expert_matcher.model.question import QuestionSuggestions
 from expert_matcher.services.db.db_persistence import (
@@ -25,6 +26,9 @@ from expert_matcher.services.db.db_persistence import (
     save_client_response,
     find_available_consultants,
     get_configuration_value,
+)
+from expert_matcher.services.ai.differentiation_service import (
+    generate_differentiation_questions,
 )
 
 
@@ -97,7 +101,7 @@ async def handle_response(sid: str, session_id: str | None, response: ClientResp
     )
     question_suggestions = await select_next_question(session_id)
     if question_suggestions.available_consultants_count < consultants_threshold:
-        await handle_limited_consultants(sid, session_id, previous_question_consultants)
+        await handle_limited_consultants(sid, session_id)
         return
 
     if question_suggestions:
@@ -111,6 +115,7 @@ async def handle_missing_session(sid: str, session_id: str):
         status=MessageStatus.ERROR,
         session_id=session_id,
         content=ErrorMessage(message="Session not found"),
+        content_type=ContentType.ERROR,
     )
     await sio.emit(WSCommand.SERVER_MESSAGE, server_message.model_dump(), room=sid)
 
@@ -139,13 +144,17 @@ async def send_state(
         question_suggestions.available_consultants_count
     )
     server_message = ServerMessage(
-        status=MessageStatus.OK, session_id=session_id, content=state.model_dump()
+        status=MessageStatus.OK, session_id=session_id, content=state.model_dump(), content_type=ContentType.HISTORY
     )
     await sio.emit(WSCommand.SERVER_MESSAGE, server_message.model_dump(), room=sid)
 
 
 async def handle_limited_consultants(
-    sid: str, session_id: str, previous_question_consultants: list[Consultant]
+    sid: str, session_id: str
 ):
-    # TODO: send message to user that there are limited consultants
-    pass
+    # send message to user that there are limited consultants
+    differentiation_questions = await generate_differentiation_questions(session_id)
+    server_message = ServerMessage(
+        status=MessageStatus.OK, session_id=session_id, content=differentiation_questions.model_dump(), content_type=ContentType.DIFFERENTIATION_QUESTIONS
+    )
+    await sio.emit(WSCommand.SERVER_MESSAGE, server_message.model_dump(), room=sid)

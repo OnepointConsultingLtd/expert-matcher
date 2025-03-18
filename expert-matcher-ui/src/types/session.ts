@@ -1,16 +1,15 @@
 export enum SessionStatus {
-    IN_PROGRESS = "in_progress",
-    COMPLETED = "completed",
+  IN_PROGRESS = 'in_progress',
+  COMPLETED = 'completed',
 }
 
 export type Session = {
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    status: SessionStatus;
-}
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  status: SessionStatus;
+};
 
 export type SessionHistory = {
-    sessions: Session[];
-}
-
+  sessions: Session[];
+};

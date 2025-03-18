@@ -19,13 +19,19 @@ class MessageStatus(StrEnum):
     ERROR = "error"
 
 
+class ContentType(StrEnum):
+    HISTORY = "history"
+    DIFFERENTIATION_QUESTIONS = "differentiation_questions"
+    ERROR = "error"
+
+
 class ServerMessage(BaseModel):
     status: MessageStatus = Field(
         default=MessageStatus.OK, description="Whether the command was successful"
     )
     session_id: str = Field(default="", description="The session id")
     content: dict = Field(default=None, description="The content of the message")
-
+    content_type: ContentType = Field(default=ContentType.HISTORY, description="The type of content in the message")
 
 class ClientResponse(BaseModel):
     session_id: str = Field(default="", description="The session id")

@@ -1,0 +1,226 @@
+{
+    "questions": [
+        {
+            "question":"What are the consultant\'s technical skills?",
+            "dimension": "technical skills",
+            "options": [
+                {
+                    "option": "C# Development",
+                    "consultants": [
+                        "louisa-ekanem@linkedin.com"
+                    ]
+                },
+                {
+                    "option": "Dynatrace Monitoring",
+                    "consultants": [
+                        "darren-miller-1035743@linkedin.com"
+                    ]
+                },
+                {
+                    "option": "ITIL and DevOps Frameworks",
+                    "consultants": [
+                        "darren-miller-1035743@linkedin.com"
+                    ]
+                },
+                {
+                    "option": "UX Research for Agile Teams",
+                    "consultants": [
+                        "louisa-ekanem@linkedin.com"
+                    ]
+                }
+            ]
+        },
+        {
+            "question": "What methodologies does the consultant utilise?",
+            "dimension": "methodologies",
+            "options": [
+                {
+                    "option": "Agile Software Development",
+                    "consultants": [
+                        "louisa-ekanem@linkedin.com"
+                    ]
+                },
+                {
+                    "option": "ITIL Framework",
+                    "consultants": [
+                        "darren-miller-1035743@linkedin.com"
+                    ]
+                },
+                {
+                    "option": "DevOps Practices",
+                    "consultants": [
+                        "darren-miller-1035743@linkedin.com"
+                    ]
+                },
+                {
+                    "option": "Scrum",
+                    "consultants": [
+                        "louisa-ekanem@linkedin.com"
+                    ]
+                }
+            ]
+        },
+        {
+            "question": "What experience does the consultant have with compliance?",
+            "dimension": "compliance experience",
+            "options": [
+                {
+                    "option": "Responsible for PCI-DSS Compliance",
+                    "consultants": [
+                        "darren-miller-1035743@linkedin.com"
+                    ]
+                },
+                {
+                    "option": "No specific compliance experience mentioned",
+                    "consultants": [
+                        "louisa-ekanem@linkedin.com"
+                    ]
+                }
+            ]
+        },
+        {
+            "question":"What is the consultant\'s experience with monitoring tools?",
+            "dimension": "monitoring tools experience",
+            "options": [
+                {
+                    "option": "Dynatrace AppMon",
+                    "consultants": [
+                        "darren-miller-1035743@linkedin.com"
+                    ]
+                },
+                {
+                    "option": "Gomez Monitoring",
+                    "consultants": [
+                        "darren-miller-1035743@linkedin.com"
+                    ]
+                },
+                {
+                    "option": "No experience with monitoring tools mentioned",
+                    "consultants": [
+                        "louisa-ekanem@linkedin.com"
+                    ]
+                }
+            ]
+        },
+        {
+            "question": "What types of teams has the consultant worked in?",
+            "dimension": "team experience",
+            "options": [
+                {
+                    "option": "Cross-Functional Teams",
+                    "consultants": [
+                        "louisa-ekanem@linkedin.com"
+                    ]
+                },
+                {
+                    "option": "Operations Support Team",
+                    "consultants": [
+                        "darren-miller-1035743@linkedin.com"
+                    ]
+                },
+                {
+                    "option": "Ecommerce Operations Team",
+                    "consultants": [
+                        "darren-miller-1035743@linkedin.com"
+                    ]
+                }
+            ]
+        }
+    ],
+    "candidates": [
+        {
+            "id": 39,
+            "given_name": "Darren",
+            "surname": "Miller",
+            "linkedin_profile_url": "https://www.linkedin.com/in/darren-miller-1035743",
+            "email": "darren-miller-1035743@linkedin.com",
+            "cv": "Over 20 years in-depth experience in designing and developing End-to-End monitoring solutions. With a full comprehensive knowledge and experience of supporting and monitoring high availability e-commerce systems, online payment systems and banking applications.  \\n\\nProduct lead & SME for the design and implementation of Dynatrace for Lloyds Banking Group to monitor the critical payment and business applications.\\n\\nCreated and established the Operations Support team for Harrods.com.\\n\\nIntroduced both the ITIL and the DevOps framework to Harrods E-commerce Operations Team. \\n\\nSuccessfully implemented Akamai CDN to Harrods.com to achieve greater international presence.\\n\\nImplemented monitoring tools Gomez and Dynatrace AppMon for Harrods.com \\n\\nKey stakeholder and vendor management skills from both development projects and operations.\\n\\nResponsible for PCI-DSS and DPA compliance.\\n\\nLead Designer for John Lewis, designing their new call centre website. Designed to enable call centre agents to quickly take customer orders over the phone, reduce the time for training and improve the rate of cross sales and up sales\\n\\nImplemented Card Authentication for John Lewis. This high level project required complex business planning to ensure that the customer checkout experience was not compromised.",
+            "skills": [],
+            "experiences": [
+                {
+                    "id": 167,
+                    "consultant_id": 39,
+                    "company_name": "Lloyds Banking Group",
+                    "location": "London, United Kingdom",
+                    "title": "Senior Technical Lead",
+                    "start_date": "2016-02-01",
+                    "end_date": null
+                },
+                {
+                    "id": 168,
+                    "consultant_id": 39,
+                    "company_name": "Harrods",
+                    "location": "London, United Kingdom",
+                    "title": "Ecommerce Operations Team Lead",
+                    "start_date": "2013-02-01",
+                    "end_date": "2016-02-01"
+                },
+                {
+                    "id": 169,
+                    "consultant_id": 39,
+                    "company_name": "John Lewis",
+                    "location": "London, United Kingdom",
+                    "title": "Group Leader, Online Application Support",
+                    "start_date": "2001-06-01",
+                    "end_date": "2013-02-01"
+                },
+                {
+                    "id": 170,
+                    "consultant_id": 39,
+                    "company_name": "Aquila Energy Ltd",
+                    "location": "London, United Kingdom",
+                    "title": "IT Indirect Retail Team Leader",
+                    "start_date": "1997-06-01",
+                    "end_date": "2001-06-01"
+                },
+                {
+                    "id": 171,
+                    "consultant_id": 39,
+                    "company_name": "UK Ministry of Defence",
+                    "location": "Commander-in-Chief Fleet",
+                    "title": "Information Systems (Technical Services)",
+                    "start_date": "1996-02-01",
+                    "end_date": "1997-06-01"
+                }
+            ]
+        },
+        {
+            "id": 38,
+            "given_name": "Louisa",
+            "surname": "Ekanem",
+            "linkedin_profile_url": "https://www.linkedin.com/in/louisa-ekanem",
+            "email": "louisa-ekanem@linkedin.com",
+            "cv":"As a Software Engineer at Lloyds Banking Group, I leverage my Bachelor\'s degree in Computer Science and my certifications in UX Research for Agile Teams and Agile Software Development: Scrum for Developers to create innovative technology solutions. I have over 4 years of experience as an IT Consultant and C# Developer, working with global calculators in Prime Brokerage at Bank of America Merrill Lynch. I am passionate about delivering high-quality software products that meet the needs of diverse stakeholders. I am also skilled in IT consulting and teamwork, and I enjoy collaborating with cross-functional teams to solve complex problems. My goal is to continue learning and growing as a software engineer, and to contribute to the success of Lloyds Banking Group and its customers.",
+            "skills": [],
+            "experiences": [
+                {
+                    "id": 164,
+                    "consultant_id": 38,
+                    "company_name": "Lloyds Banking Group",
+                    "location": "London, England, United Kingdom",
+                    "title": "Software Engineer",
+                    "start_date": "2021-06-01",
+                    "end_date": null
+                },
+                {
+                    "id": 165,
+                    "consultant_id": 38,
+                    "company_name": "FDM Group",
+                    "location": "London, England, United Kingdom",
+                    "title": "Information Technology Consultant",
+                    "start_date": "2019-08-01",
+                    "end_date": "2023-10-01"
+                },
+                {
+                    "id": 166,
+                    "consultant_id": 38,
+                    "company_name": "Bank of America Merrill Lynch",
+                    "location": "",
+                    "title": "IT Consultant/ C# Developer",
+                    "start_date": "2019-11-01",
+                    "end_date": "2021-04-01"
+                }
+            ]
+        }
+    ]
+}

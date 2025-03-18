@@ -24,7 +24,7 @@ async def select_next_question(session_id: str) -> QuestionSuggestions | None:
 SELECT C.ID CATEGORY_ID, C.NAME CATEGORY, Q.question, Q.id question_id from TB_CATEGORY_QUESTION Q
 INNER JOIN TB_CATEGORY C ON C.ID = Q.CATEGORY_ID
 WHERE ACTIVE is true
-ORDER BY order_index offset (SELECT count(*) + 1 FROM TB_SESSION_QUESTION sq
+ORDER BY order_index offset (SELECT count(*) FROM TB_SESSION_QUESTION sq
 INNER JOIN TB_SESSION s on s.id = sq.session_id
 WHERE s.session_id = %(session_id)s and sq.id in (SELECT SESSION_QUESTION_ID FROM TB_SESSION_QUESTION_RESPONSES)) LIMIT 1
 """
@@ -241,7 +241,9 @@ def consultant_factory(
     return consultants
 
 
-async def find_available_consultants(session_id: str, extract_experiences: bool = False) -> list[Consultant]:
+async def find_available_consultants(
+    session_id: str, extract_experiences: bool = False
+) -> list[Consultant]:
     """Filter the consultants based on the session state."""
 
     sql = """
@@ -263,11 +265,9 @@ select distinct CONSULTANT_ID from VW_CONSULTANT_CATEGORY_ITEM
 WHERE CATEGORY_NAME = %(category_name)s AND CATEGORY_ITEM = ANY(%(category_items)s)
 AND CONSULTANT_ID = ANY(%(consultant_ids)s)
 """
-    consultant_details_base_sql = (
-        """SELECT * FROM (SELECT C.ID, C.GIVEN_NAME, C.SURNAME, C.LINKEDIN_PROFILE_URL, C.EMAIL, C.CV, STRING_AGG(S.SKILL_NAME, '@@') FROM TB_CONSULTANT C 
+    consultant_details_base_sql = """SELECT * FROM (SELECT C.ID, C.GIVEN_NAME, C.SURNAME, C.LINKEDIN_PROFILE_URL, C.EMAIL, C.CV, STRING_AGG(S.SKILL_NAME, '@@') FROM TB_CONSULTANT C 
 INNER JOIN TB_CONSULTANT_SKILL CS ON C.ID = CS.CONSULTANT_ID INNER JOIN TB_SKILL S ON S.ID = CS.SKILL_ID
 GROUP BY C.ID, C.GIVEN_NAME, C.SURNAME, C.LINKEDIN_PROFILE_URL, C.EMAIL, C.CV) q"""
-    )
     consultant_details_sql = f"""
 {consultant_details_base_sql}
 where ID = ANY(%(consultant_ids)s)
@@ -312,7 +312,9 @@ where ID = ANY(%(consultant_ids)s)
     return consultants
 
 
-async def inject_consultant_experiences(consultant_ids: list[int], consultant_dict: dict[int, Consultant]):
+async def inject_consultant_experiences(
+    consultant_ids: list[int], consultant_dict: dict[int, Consultant]
+):
     """Extract the experiences of the consultants."""
     consultant_experiences_sql = """
 SELECT CE.ID, CE.CONSULTANT_ID consultant_id, CE.TITLE, CE.LOCATION, CE.START_DATE, CE.END_DATE, C.COMPANY_NAME
@@ -321,8 +323,8 @@ INNER JOIN TB_COMPANY C ON C.ID = CE.COMPANY_ID
 WHERE CE.CONSULTANT_ID = ANY(%(consultant_ids)s)
 """
     consultant_experiences = await select_from(
-            consultant_experiences_sql, {"consultant_ids": consultant_ids}
-        )
+        consultant_experiences_sql, {"consultant_ids": consultant_ids}
+    )
     consultant_experiences_id_index = 0
     consultant_id_index = 1
     title_index = 2
@@ -338,9 +340,11 @@ WHERE CE.CONSULTANT_ID = ANY(%(consultant_ids)s)
             location=experience[location_index],
             start_date=experience[start_date_index],
             end_date=experience[end_date_index],
-            company_name=experience[company_name_index]
+            company_name=experience[company_name_index],
         )
-        consultant_dict[consultant_experience.consultant_id].experiences.append(consultant_experience)
+        consultant_dict[consultant_experience.consultant_id].experiences.append(
+            consultant_experience
+        )
 
 
 async def execute_script(script: str) -> State:
