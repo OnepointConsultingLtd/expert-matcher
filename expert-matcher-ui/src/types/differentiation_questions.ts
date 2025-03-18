@@ -1,9 +1,10 @@
 export interface DifferentiationQuestions {
   questions: Question[];
   candidates: Candidate[];
+  state: Record<string, any>;
 }
 
-interface Question {
+export interface Question {
   question: string;
   dimension: string;
   options: Option[];

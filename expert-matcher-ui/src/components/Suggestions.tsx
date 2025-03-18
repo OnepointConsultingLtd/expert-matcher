@@ -9,17 +9,18 @@ export default function Suggestions() {
   const { addSelectedSuggestions } = useAppStore();
   const currentMessage = useCurrentMessage();
   if (!currentMessage) return null;
-  const { questionSuggestions, selectedSuggestions, isLast } = currentMessage;
+  const { questionSuggestions, selectedSuggestions, isLast, hasDifferentiationQuestions } =
+    currentMessage;
   if (!questionSuggestions) return null;
   const { suggestions_count } = questionSuggestions;
   const suggestions = questionSuggestions.suggestions;
+  if (hasDifferentiationQuestions) return null;
 
   return (
     <div className="mt-6">
       <AvailableConsultants />
       <div className="container suggestions animate-fade-down grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 max-w-full">
         {suggestions
-          .sort((a, b) => a.localeCompare(b))
           .map((suggestion, i) => {
             const isSelected = selectedSuggestions.includes(suggestion);
             return (

@@ -5,6 +5,8 @@ import Question from './Question';
 import Suggestions from './Suggestions';
 import NavigationButtons from './NavigationButtons';
 import ErrorMessage from './messages/ErrorMessage';
+import DifferentiationQuestions from './DifferentiationQuestions';
+
 export default function Body() {
   useWebsockets();
   const { connected, sending } = useAppStore();
@@ -18,6 +20,7 @@ export default function Body() {
             {sending && <Spinner />}
           </div>
           <ErrorMessage />
+          <DifferentiationQuestions />
           <Question />
           <NavigationButtons />
           <Suggestions />

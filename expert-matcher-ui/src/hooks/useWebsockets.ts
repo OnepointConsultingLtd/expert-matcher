@@ -7,7 +7,7 @@ import { getSessionId } from '../lib/sessionFunctions';
 import { safeEmit, startSession } from '../lib/websocketFunctions';
 import { ServerMessage } from '../types/ws';
 import { useTranslation } from 'react-i18next';
-import { DifferentiationQuestions } from '../types/differentiation_questions';
+import { DifferentiationQuestions, Question } from '../types/differentiation_questions';
 
 export function useWebsockets() {
   const { t } = useTranslation();
@@ -19,7 +19,7 @@ export function useWebsockets() {
     setSending,
     errorMessage,
     setErrorMessage,
-    setDifferentiationQuestions,
+    addDifferentiationQuestion,
   } = useAppStore();
 
   useEffect(() => {
@@ -51,13 +51,12 @@ export function useWebsockets() {
       setSending(false);
       if (serverMessage.status === MessageStatus.OK) {
         setSessionId(serverMessage.session_id);
-        debugger;
         switch (serverMessage.content_type) {
           case ContentType.HISTORY:
             setHistory(serverMessage.content?.history ?? []);
             break;
           case ContentType.DIFFERENTIATION_QUESTIONS:
-            setDifferentiationQuestions(serverMessage.content as DifferentiationQuestions);
+            addDifferentiationQuestion(serverMessage.content as Question);
             break;
           default:
             console.error('Unknown content type: ', serverMessage.content_type);

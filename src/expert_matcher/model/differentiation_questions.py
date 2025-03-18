@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from expert_matcher.model.consultant import Consultant
+from expert_matcher.model.state import State
 
 
 class DifferentiationQuestionOption(BaseModel):
@@ -31,4 +32,7 @@ class DifferentiationQuestionsResponse(BaseModel):
     )
     candidates: list[Consultant] = Field(
         ..., description="The candidates related to the questions"
+    )
+    state: State | None = Field(
+        default=None, description="The state of the session"
     )

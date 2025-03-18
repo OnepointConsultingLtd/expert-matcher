@@ -2,14 +2,14 @@ import { create } from 'zustand';
 import { QuestionSuggestions } from '../types/question';
 import { saveSession } from '../lib/sessionFunctions';
 import { SessionStatus } from '../types/session';
-import { DifferentiationQuestions } from '../types/differentiation_questions';
+import { DifferentiationQuestions, Question } from '../types/differentiation_questions';
 
 interface AppStoreState {
   errorMessage: string;
   currentIndex: number;
   sessionId: string;
   history: QuestionSuggestions[];
-  differentiationQuestions: DifferentiationQuestions | null;
+  differentiationQuestions: Question[];
   connected: boolean;
   sending: boolean;
   selectedSuggestions: string[];
@@ -20,12 +20,13 @@ interface AppStoreActions {
   setCurrentIndex: (currentIndex: number) => void;
   setSessionId: (sessionId: string) => void;
   setHistory: (history: QuestionSuggestions[]) => void;
-  setDifferentiationQuestions: (differentiationQuestions: DifferentiationQuestions) => void;
+  addDifferentiationQuestion: (differentiationQuestion: Question) => void;
   setConnected: (connected: boolean) => void;
   setSending: (sending: boolean) => void;
   addSelectedSuggestions: (selectedSuggestion: string) => void;
   selectAllSuggestions: () => void;
   deselectAllSuggestions: () => void;
+  clearAllSuggestions: () => void;
   previousQuestion: () => void;
   nextQuestion: () => void;
 }
@@ -35,7 +36,7 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
   currentIndex: 0,
   sessionId: '',
   history: [],
-  differentiationQuestions: null,
+  differentiationQuestions: [],
   connected: false,
   sending: false,
   selectedSuggestions: [],
@@ -54,9 +55,13 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
       const currentIndex = history.length - 1;
       return { ...state, history, currentIndex };
     }),
-  setDifferentiationQuestions: (differentiationQuestions: DifferentiationQuestions) =>
+  addDifferentiationQuestion: (differentiationQuestion: Question) =>
     set((state) => {
-      return { ...state, differentiationQuestions };
+      debugger
+      return {
+        ...state,
+        differentiationQuestions: [...state.differentiationQuestions, differentiationQuestion],
+      };
     }),
   setConnected: (connected: boolean) => set({ connected }),
   setCurrentIndex: (currentIndex: number) =>
@@ -77,6 +82,7 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
         selectedSuggestions: [...state.selectedSuggestions, selectedSuggestion],
       };
     }),
+  clearAllSuggestions: () => set({ selectedSuggestions: [] }),
   selectAllSuggestions: () =>
     set((state) => {
       const allSuggestions = state.history[state.currentIndex].suggestions;

@@ -10,8 +10,8 @@ export default function NavigationButtons() {
   const { selectAllSuggestions, deselectAllSuggestions, sending, previousQuestion, currentIndex } =
     useAppStore();
   const { handleNext } = useHandleNext();
-  const { selectedSuggestions, isLast } = useCurrentMessage();
-
+  const { selectedSuggestions, isLast, hasDifferentiationQuestions } = useCurrentMessage();
+  if (hasDifferentiationQuestions) return null;
   return (
     <div className="flex justify-between mt-6">
       <div>

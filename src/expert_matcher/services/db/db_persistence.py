@@ -54,6 +54,7 @@ INNER JOIN TB_CONSULTANT CO ON CO.ID = IA.CONSULTANT_ID
 WHERE Q.QUESTION = %(question)s
 AND IA.CONSULTANT_ID = ANY(%(consultant_ids)s) 
 GROUP BY I.ITEM
+ORDER BY I.ITEM ASC
 """
     res_suggestions = await select_from(
         sql_suggestions,
@@ -172,7 +173,8 @@ INNER JOIN TB_CATEGORY c on c.ID = ci.CATEGORY_ID
 INNER JOIN TB_CATEGORY_QUESTION cq on cq.CATEGORY_ID = c.ID
 INNER JOIN TB_SESSION_QUESTION sq on sq.CATEGORY_QUESTION_ID = cq.ID
 INNER JOIN TB_SESSION s on s.id = sq.SESSION_ID
-WHERE s.session_id = %(session_id)s and cq.ID = %(question_id)s;
+WHERE s.session_id = %(session_id)s and cq.ID = %(question_id)s
+ORDER BY 1
 """
         selected_suggestions_sql = """
 -- select selected suggestions (category items) for session and question
