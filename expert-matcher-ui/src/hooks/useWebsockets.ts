@@ -20,7 +20,7 @@ export function useWebsockets() {
     errorMessage,
     setErrorMessage,
     addDifferentiationQuestion,
-    addCandidate
+    addCandidate,
   } = useAppStore();
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export function useWebsockets() {
       const sessionId = getSessionId();
       startSession(socket.current, sessionId);
       console.info('Connected to websocket');
-      deleteErrorMessage()
+      deleteErrorMessage();
 
       setInterval(() => {
         safeEmit(socket.current, WS_EVENTS.ECHO, getSessionId());
@@ -54,7 +54,7 @@ export function useWebsockets() {
     function onServerMessage(serverMessage: ServerMessage) {
       console.info('Server message: ', serverMessage);
       setSending(false);
-      deleteErrorMessage()
+      deleteErrorMessage();
       if (serverMessage.status === MessageStatus.OK) {
         setSessionId(serverMessage.session_id);
         switch (serverMessage.content_type) {

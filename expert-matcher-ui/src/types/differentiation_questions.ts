@@ -32,6 +32,10 @@ export interface Candidate {
   photo_url_400?: string;
 }
 
+export interface CandidateWithVotes extends Candidate {
+  votes: number;
+}
+
 interface Experience {
   id: number;
   consultant_id: number;

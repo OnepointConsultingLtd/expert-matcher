@@ -354,9 +354,10 @@ WHERE CE.CONSULTANT_ID = ANY(%(consultant_ids)s)
             end_date=experience[end_date_index],
             company_name=experience[company_name_index],
         )
-        consultant_dict[consultant_experience.consultant_id].experiences.append(
-            consultant_experience
-        )
+        if consultant_experience.consultant_id in consultant_dict:
+            consultant_dict[consultant_experience.consultant_id].experiences.append(
+                consultant_experience
+            )
 
 
 async def execute_script(script: str) -> State:

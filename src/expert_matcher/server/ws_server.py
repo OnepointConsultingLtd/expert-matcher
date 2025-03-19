@@ -188,6 +188,7 @@ async def handle_limited_consultants(sid: str, session_id: str):
                 sid, session_id, f"Error during socket.io emit: {str(emit_error)}"
             )
     except Exception as e:
+        logger.exception(f"Error in handle_limited_consultants: {str(e)}")
         await send_error(
             sid, session_id, f"Error in handle_limited_consultants: {str(e)}"
         )

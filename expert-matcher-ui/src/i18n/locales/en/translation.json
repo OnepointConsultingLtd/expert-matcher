@@ -14,5 +14,7 @@
     "Please wait": "Please wait",
     "titleAddOption": "Click to add option",
     "titleRemoveOption": "Click to remove option",
+    "vote_one": "{{count}} vote",
+    "vote_other": "{{count}} votes",
     "Would you like to restart the expert matcher?": "Would you like to restart the expert matcher?"
 }

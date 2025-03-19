@@ -2,7 +2,12 @@ import { create } from 'zustand';
 import { QuestionSuggestions } from '../types/question';
 import { saveSession } from '../lib/sessionFunctions';
 import { SessionStatus } from '../types/session';
-import { Candidate, Question, QuestionWithSelectedOptions } from '../types/differentiation_questions';
+import {
+  Candidate,
+  CandidateWithVotes,
+  Question,
+  QuestionWithSelectedOptions,
+} from '../types/differentiation_questions';
 
 interface AppStoreState {
   errorMessage: string;
@@ -10,7 +15,7 @@ interface AppStoreState {
   sessionId: string;
   history: QuestionSuggestions[];
   differentiationQuestions: QuestionWithSelectedOptions[];
-  candidates: Candidate[];
+  candidates: CandidateWithVotes[];
   connected: boolean;
   sending: boolean;
   selectedSuggestions: string[];
@@ -34,6 +39,27 @@ interface AppStoreActions {
   clearAllSuggestions: () => void;
   previousQuestion: () => void;
   nextQuestion: () => void;
+}
+
+function processVoting(state: AppStoreState, currentQuestion: QuestionWithSelectedOptions, option: string, voteUp: boolean) {
+    // Find the option with consultants to vote on candidates
+    const optionWithConsultants = currentQuestion.options.find((o) => o.option === option);
+    const candidatesWithVotes = [...state.candidates]
+    if (optionWithConsultants) {
+      // Do candidate voting
+      optionWithConsultants.consultants.forEach((email) => {
+        const candidateWithVotes = candidatesWithVotes.find((c) => c.email === email);
+        if (candidateWithVotes) {
+          if (voteUp) {
+            candidateWithVotes.votes++;
+          } else {
+            candidateWithVotes.votes--;
+          }
+        }
+    });
+  }
+  // End voting
+  return candidatesWithVotes;
 }
 
 export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
@@ -75,7 +101,8 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
   clearDifferentiationQuestions: () => set({ differentiationQuestions: [], candidates: [] }),
   addCandidate: (candidate: Candidate) =>
     set((state) => {
-      return { ...state, candidates: [...state.candidates, candidate] };
+      const candidateWithVotes = { ...candidate, votes: 0 };
+      return { ...state, candidates: [...state.candidates, candidateWithVotes] };
     }),
   selectDifferentiationQuestionOption: (question: string, option: string) =>
     set((state) => {
@@ -85,14 +112,19 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
       if (questionWithSelectedOptionsIndex === -1) {
         return { ...state };
       }
+      const currentQuestion = state.differentiationQuestions[questionWithSelectedOptionsIndex];
       const selectedOptions = [
-        ...state.differentiationQuestions[questionWithSelectedOptionsIndex].selectedOptions,
+        ...currentQuestion.selectedOptions,
         { option, consultants: [] },
       ];
       const modifiedQuestion = {
-        ...state.differentiationQuestions[questionWithSelectedOptionsIndex],
+        ...currentQuestion,
         selectedOptions,
       };
+      
+      const candidatesWithVotes = processVoting(state, currentQuestion, option, true);
+
+      // End voting
       const updatedQuestions = [
         ...state.differentiationQuestions.slice(0, questionWithSelectedOptionsIndex),
         modifiedQuestion,
@@ -101,6 +133,7 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
       return {
         ...state,
         differentiationQuestions: updatedQuestions,
+        candidates: candidatesWithVotes,
       };
     }),
   removeDifferentiationQuestionOption: (question: string, option: string) =>
@@ -114,10 +147,14 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
       const selectedOptions = state.differentiationQuestions[
         questionWithSelectedOptionsIndex
       ].selectedOptions.filter((o) => o.option != option);
+      const currentQuestion = state.differentiationQuestions[questionWithSelectedOptionsIndex];
       const modifiedQuestion = {
-        ...state.differentiationQuestions[questionWithSelectedOptionsIndex],
+        ...currentQuestion,
         selectedOptions,
       };
+
+      const candidatesWithVotes = processVoting(state, currentQuestion, option, false);
+
       const updatedQuestions = [
         ...state.differentiationQuestions.slice(0, questionWithSelectedOptionsIndex),
         modifiedQuestion,
@@ -126,6 +163,7 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
       return {
         ...state,
         differentiationQuestions: updatedQuestions,
+        candidates: candidatesWithVotes,
       };
     }),
   setConnected: (connected: boolean) => set({ connected }),
