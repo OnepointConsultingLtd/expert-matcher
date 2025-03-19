@@ -11,5 +11,7 @@
     "Restart": "Restart",
     "Select all": "Select all",
     "Please wait": "Please wait",
+    "titleAddOption": "Click to add option",
+    "titleRemoveOption": "Click to remove option",
     "Would you like to restart the expert matcher?": "Would you like to restart the expert matcher?"
 }

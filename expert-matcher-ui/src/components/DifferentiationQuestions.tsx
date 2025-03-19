@@ -5,18 +5,35 @@ import { buttonStyle } from './common';
 import { useAppStore } from '../context/AppStore';
 
 function Options({ question }: { question: QuestionWithSelectedOptions }) {
-
-  const { selectDifferentiationQuestionOption, differentiationQuestions } = useAppStore();
-  const selectedOptions = differentiationQuestions.find(q => q.question === question.question)?.selectedOptions;
+  const { t } = useTranslation();
+  const {
+    selectDifferentiationQuestionOption,
+    removeDifferentiationQuestionOption,
+    differentiationQuestions,
+  } = useAppStore();
+  const selectedOptions = differentiationQuestions.find(
+    (q) => q.question === question.question
+  )?.selectedOptions;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-w-full my-2">
-      {question.options.map((option, index) => (
-        <button key={`${option.option}_${index}`} className={`${buttonStyle} ${selectedOptions?.map(o => o.option).includes(option.option) ? 'bg-teal-900' : ''}`} 
-          onClick={() => selectDifferentiationQuestionOption(question.question, option.option)}>
-          {option.option}
-        </button>
-      ))}
+      {question.options.map((option, index) => {
+        const isSelected = selectedOptions?.map((o) => o.option).includes(option.option);
+        return (
+          <button
+            key={`${option.option}_${index}`}
+            className={`${buttonStyle} ${isSelected ? 'bg-teal-900' : ''}`}
+            title={isSelected ? t('titleRemoveOption') : t('titleAddOption')}
+            onClick={() =>
+              isSelected
+                ? removeDifferentiationQuestionOption(question.question, option.option)
+                : selectDifferentiationQuestionOption(question.question, option.option)
+            }
+          >
+            {option.option}
+          </button>
+        );
+      })}
     </div>
   );
 }

@@ -22,6 +22,7 @@ interface AppStoreActions {
   setHistory: (history: QuestionSuggestions[]) => void;
   addDifferentiationQuestion: (differentiationQuestion: Question) => void;
   selectDifferentiationQuestionOption: (question: string, option: string) => void;
+  removeDifferentiationQuestionOption: (question: string, option: string) => void;
   setConnected: (connected: boolean) => void;
   setSending: (sending: boolean) => void;
   addSelectedSuggestions: (selectedSuggestion: string) => void;
@@ -60,8 +61,8 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
     set((state) => {
       const questionWithSelectedOptions = {
         ...differentiationQuestion,
-        selectedOptions: []
-      }
+        selectedOptions: [],
+      };
       return {
         ...state,
         differentiationQuestions: [...state.differentiationQuestions, questionWithSelectedOptions],
@@ -69,17 +70,53 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
     }),
   selectDifferentiationQuestionOption: (question: string, option: string) =>
     set((state) => {
-      const questionWithSelectedOptionsIndex = state.differentiationQuestions.findIndex(q => q.question === question);
-      if(questionWithSelectedOptionsIndex === -1) {
-        return {...state};
+      const questionWithSelectedOptionsIndex = state.differentiationQuestions.findIndex(
+        (q) => q.question === question
+      );
+      if (questionWithSelectedOptionsIndex === -1) {
+        return { ...state };
       }
-      const selectedOptions = [...state.differentiationQuestions[questionWithSelectedOptionsIndex].selectedOptions, {option, consultants: []}];
-      const modifiedQuestion = {...state.differentiationQuestions[questionWithSelectedOptionsIndex], selectedOptions}
-      const updatedQuestions = [...state.differentiationQuestions.slice(0, questionWithSelectedOptionsIndex), modifiedQuestion, 
-        ...state.differentiationQuestions.slice(questionWithSelectedOptionsIndex + 1)]
+      const selectedOptions = [
+        ...state.differentiationQuestions[questionWithSelectedOptionsIndex].selectedOptions,
+        { option, consultants: [] },
+      ];
+      const modifiedQuestion = {
+        ...state.differentiationQuestions[questionWithSelectedOptionsIndex],
+        selectedOptions,
+      };
+      const updatedQuestions = [
+        ...state.differentiationQuestions.slice(0, questionWithSelectedOptionsIndex),
+        modifiedQuestion,
+        ...state.differentiationQuestions.slice(questionWithSelectedOptionsIndex + 1),
+      ];
       return {
         ...state,
-        differentiationQuestions: updatedQuestions
+        differentiationQuestions: updatedQuestions,
+      };
+    }),
+  removeDifferentiationQuestionOption: (question: string, option: string) =>
+    set((state) => {
+      const questionWithSelectedOptionsIndex = state.differentiationQuestions.findIndex(
+        (q) => q.question === question
+      );
+      if (questionWithSelectedOptionsIndex === -1) {
+        return { ...state };
+      }
+      const selectedOptions = state.differentiationQuestions[
+        questionWithSelectedOptionsIndex
+      ].selectedOptions.filter((o) => o.option != option);
+      const modifiedQuestion = {
+        ...state.differentiationQuestions[questionWithSelectedOptionsIndex],
+        selectedOptions,
+      };
+      const updatedQuestions = [
+        ...state.differentiationQuestions.slice(0, questionWithSelectedOptionsIndex),
+        modifiedQuestion,
+        ...state.differentiationQuestions.slice(questionWithSelectedOptionsIndex + 1),
+      ];
+      return {
+        ...state,
+        differentiationQuestions: updatedQuestions,
       };
     }),
   setConnected: (connected: boolean) => set({ connected }),
