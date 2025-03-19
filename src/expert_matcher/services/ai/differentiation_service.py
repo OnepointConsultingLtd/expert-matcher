@@ -95,5 +95,6 @@ async def fetch_differentiation_questions(
     if response:
         return response
     response = await generate_differentiation_questions(session_id)
+    response.candidates = await find_available_consultants(session_id)
     await save_differentiation_question(session_id, response)
     return response

@@ -26,15 +26,19 @@ export function useWebsockets() {
   useEffect(() => {
     socket.current = io(websocketUrl);
 
+    function deleteErrorMessage() {
+      if (errorMessage === t('Disconnected from websocket')) {
+        setErrorMessage('');
+      }
+    }
+
     function onConnect() {
       setConnected(true);
       setSending(true);
       const sessionId = getSessionId();
       startSession(socket.current, sessionId);
       console.info('Connected to websocket');
-      if (errorMessage === t('Disconnected from websocket')) {
-        setErrorMessage('');
-      }
+      deleteErrorMessage()
 
       setInterval(() => {
         safeEmit(socket.current, WS_EVENTS.ECHO, getSessionId());
@@ -50,6 +54,7 @@ export function useWebsockets() {
     function onServerMessage(serverMessage: ServerMessage) {
       console.info('Server message: ', serverMessage);
       setSending(false);
+      deleteErrorMessage()
       if (serverMessage.status === MessageStatus.OK) {
         setSessionId(serverMessage.session_id);
         switch (serverMessage.content_type) {
@@ -89,5 +94,5 @@ export function useWebsockets() {
         socket.current.off(WS_EVENTS.SERVER_MESSAGE, onServerMessage);
       }
     };
-  }, [websocketUrl]);
+  }, [websocketUrl, errorMessage]);
 }

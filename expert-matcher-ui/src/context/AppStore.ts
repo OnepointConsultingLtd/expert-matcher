@@ -22,6 +22,7 @@ interface AppStoreActions {
   setSessionId: (sessionId: string) => void;
   setHistory: (history: QuestionSuggestions[]) => void;
   addDifferentiationQuestion: (differentiationQuestion: Question) => void;
+  clearDifferentiationQuestions: () => void;
   addCandidate: (candidate: Candidate) => void;
   selectDifferentiationQuestionOption: (question: string, option: string) => void;
   removeDifferentiationQuestionOption: (question: string, option: string) => void;
@@ -71,6 +72,7 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
         differentiationQuestions: [...state.differentiationQuestions, questionWithSelectedOptions],
       };
     }),
+  clearDifferentiationQuestions: () => set({ differentiationQuestions: [], candidates: [] }),
   addCandidate: (candidate: Candidate) =>
     set((state) => {
       return { ...state, candidates: [...state.candidates, candidate] };
