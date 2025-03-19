@@ -33,6 +33,4 @@ class DifferentiationQuestionsResponse(BaseModel):
     candidates: list[Consultant] = Field(
         ..., description="The candidates related to the questions"
     )
-    state: State | None = Field(
-        default=None, description="The state of the session"
-    )
+    state: State | None = Field(default=None, description="The state of the session")

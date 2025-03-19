@@ -7,7 +7,10 @@ from langchain_core.prompts import (
 from langchain_core.runnables import RunnableSequence
 
 from expert_matcher.config.config import cfg
-from expert_matcher.model.differentiation_questions import DifferentiationQuestions, DifferentiationQuestionsResponse
+from expert_matcher.model.differentiation_questions import (
+    DifferentiationQuestions,
+    DifferentiationQuestionsResponse,
+)
 from expert_matcher.model.consultant import Consultant
 from expert_matcher.services.db.db_persistence import (
     get_session_state,
@@ -73,7 +76,9 @@ async def generate_differentiation_questions(
     session_state = await get_session_state(session_id)
     candidates = await find_available_consultants(session_id, True)
     excluded_dimensions = [q.category for q in session_state.history]
-    questions = await _generate_differentiation_questions(candidates, excluded_dimensions)
+    questions = await _generate_differentiation_questions(
+        candidates, excluded_dimensions
+    )
     return DifferentiationQuestionsResponse(
         questions=questions.questions,
         candidates=candidates,

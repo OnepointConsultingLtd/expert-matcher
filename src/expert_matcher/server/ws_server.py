@@ -31,8 +31,9 @@ from expert_matcher.services.ai.differentiation_service import (
 
 
 sio = socketio.AsyncServer(
-    cors_allowed_origins=ws_cfg.websocket_cors_allowed_origins, logger=True,
-    max_http_buffer_size=5242880
+    cors_allowed_origins=ws_cfg.websocket_cors_allowed_origins,
+    logger=True,
+    max_http_buffer_size=5242880,
 )
 app = web.Application()
 sio.attach(app)
@@ -142,30 +143,32 @@ async def send_state(
         question_suggestions.available_consultants_count
     )
     server_message = ServerMessage(
-        status=MessageStatus.OK, session_id=session_id, content=state.model_dump(), content_type=ContentType.HISTORY
+        status=MessageStatus.OK,
+        session_id=session_id,
+        content=state.model_dump(),
+        content_type=ContentType.HISTORY,
     )
     await sio.emit(WSCommand.SERVER_MESSAGE, server_message.model_dump(), room=sid)
 
 
-async def handle_limited_consultants(
-    sid: str, session_id: str
-):
+async def handle_limited_consultants(sid: str, session_id: str):
     try:
         differentiation_questions = await generate_differentiation_questions(session_id)
-        # TODO: Remove this
-        with open("sample_differentiation_questions.json", "a") as o:
-                    o.write(differentiation_questions.model_dump_json())
-        # differentiation_questions.state = stat
         # Ensure we properly await the emit
         try:
             for question in differentiation_questions.questions:
                 server_message = ServerMessage(
-                    status=MessageStatus.OK, 
-                    session_id=session_id, 
-                    content=question.model_dump(), 
-                    content_type=ContentType.DIFFERENTIATION_QUESTIONS
+                    status=MessageStatus.OK,
+                    session_id=session_id,
+                    content=question.model_dump(),
+                    content_type=ContentType.DIFFERENTIATION_QUESTIONS,
                 )
-                await sio.emit(WSCommand.SERVER_MESSAGE, server_message.model_dump(), room=sid, callback=True)
+                await sio.emit(
+                    WSCommand.SERVER_MESSAGE,
+                    server_message.model_dump(),
+                    room=sid,
+                    callback=True,
+                )
         except Exception as emit_error:
             logger.error(f"Error during socket.io emit: {str(emit_error)}")
             raise

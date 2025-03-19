@@ -31,7 +31,10 @@ class ServerMessage(BaseModel):
     )
     session_id: str = Field(default="", description="The session id")
     content: dict = Field(default=None, description="The content of the message")
-    content_type: ContentType = Field(default=ContentType.HISTORY, description="The type of content in the message")
+    content_type: ContentType = Field(
+        default=ContentType.HISTORY, description="The type of content in the message"
+    )
+
 
 class ClientResponse(BaseModel):
     session_id: str = Field(default="", description="The session id")

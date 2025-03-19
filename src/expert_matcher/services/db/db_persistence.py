@@ -9,7 +9,11 @@ from expert_matcher.services.db.db_support import select_from, create_cursor
 from expert_matcher.model.consultant import Consultant, ConsultantExperience
 from expert_matcher.model.ws_commands import ClientResponse
 from expert_matcher.model.configuraton import Configuration
-from expert_matcher.model.differentiation_questions import DifferentiationQuestionsResponse
+from expert_matcher.model.differentiation_questions import (
+    DifferentiationQuestionsResponse,
+    DifferentiationQuestion,
+    DifferentiationQuestionOption
+)
 from expert_matcher.config.logger import logger
 
 
@@ -97,7 +101,8 @@ SELECT ID FROM TB_CATEGORY_QUESTION WHERE QUESTION = %(question)s
     )
     if len(res) == 0:
         return 0
-    return await save_session_question(session_id, res[0][0])
+    question_id = res[0][0]
+    return await save_session_question(session_id, question_id)
 
 
 async def save_session_question(session_id: str, question_id: int) -> int:
@@ -432,7 +437,9 @@ SELECT VALUE FROM TB_CONFIGURATION WHERE KEY = %(key)s
     return res[0][0]
 
 
-async def save_differentiation_question(session_id: str, differentiation_questions: DifferentiationQuestionsResponse) -> tuple[int, int, int]:
+async def save_differentiation_question(
+    session_id: str, differentiation_questions: DifferentiationQuestionsResponse
+) -> tuple[int, int, int]:
     """Save a differentiation question, its options and the associates consultants"""
     sql_question = """
 INSERT INTO TB_DIFFERENTIATION_QUESTION(QUESTION, DIMENSION, SESSION_ID)
@@ -454,31 +461,51 @@ ON CONFLICT(CONSULTANT_ID, DIFFERENTIATION_QUESTION_OPTION_ID) DO NOTHING
     sql_consultant_select = """
 SELECT ID FROM TB_CONSULTANT WHERE EMAIL = %(consultant_email)s
 """
+
     async def process(cur: AsyncCursor) -> Awaitable[int]:
         updated_questions = 0
         updated_options = 0
         updated_option_assignments = 0
         for question in differentiation_questions.questions:
             # insert question
-            await cur.execute(sql_question, {"question": question.question, "topic": question.dimension, "session_id": session_id})
+            await cur.execute(
+                sql_question,
+                {
+                    "question": question.question,
+                    "topic": question.dimension,
+                    "session_id": session_id,
+                },
+            )
             updated_questions += cur.rowcount
             rows_question = await cur.fetchone()
             if rows_question and len(rows_question) > 0:
                 question_id = rows_question[0]
                 # insert options
                 for option in question.options:
-                    await cur.execute(sql_option, {"question_id": question_id, "option": option.option})
+                    await cur.execute(
+                        sql_option,
+                        {"question_id": question_id, "option": option.option},
+                    )
                     updated_options += cur.rowcount
                     rows_option = await cur.fetchone()
                     if rows_option and len(rows_option) > 0:
                         option_id = rows_option[0]
                         # insert option assignments
                         for consultant_email in option.consultants:
-                            row_cursor = await cur.execute(sql_consultant_select, {"consultant_email": consultant_email})
+                            row_cursor = await cur.execute(
+                                sql_consultant_select,
+                                {"consultant_email": consultant_email},
+                            )
                             row_consultant = list(await row_cursor.fetchall())
                             if row_consultant and len(row_consultant) > 0:
                                 consultant_id = row_consultant[0][0]
-                                await cur.execute(sql_option_assignment, {"consultant_id": consultant_id, "option_id": option_id})
+                                await cur.execute(
+                                    sql_option_assignment,
+                                    {
+                                        "consultant_id": consultant_id,
+                                        "option_id": option_id,
+                                    },
+                                )
                                 updated_option_assignments += cur.rowcount
         return updated_questions, updated_options, updated_option_assignments
 
@@ -489,6 +516,7 @@ async def delete_differentiation_question(session_id: str) -> int:
     sql_delete_question = """
 DELETE FROM TB_DIFFERENTIATION_QUESTION WHERE SESSION_ID = %(session_id)s
 """
+
     async def process(cur: AsyncCursor) -> Awaitable[int]:
         await cur.execute(sql_delete_question, {"session_id": session_id})
         return cur.rowcount
@@ -496,3 +524,43 @@ DELETE FROM TB_DIFFERENTIATION_QUESTION WHERE SESSION_ID = %(session_id)s
     return await create_cursor(process)
 
 
+async def read_differentiation_question(session_id: str) -> DifferentiationQuestionsResponse | None:
+    sql_question = """
+SELECT Q.QUESTION, Q.DIMENSION, O.OPTION_TEXT, C.EMAIL FROM TB_DIFFERENTIATION_QUESTION Q
+INNER JOIN TB_DIFFERENTIATION_QUESTION_OPTION O ON O.DIFFERENTIATION_QUESTION_ID = Q.ID
+INNER JOIN TB_DIFFERENTIATION_QUESTION_OPTION_ASSIGNMENT A ON A.DIFFERENTIATION_QUESTION_OPTION_ID = O.ID
+INNER JOIN TB_CONSULTANT C ON C.ID = A.CONSULTANT_ID
+WHERE Q.SESSION_ID = %(session_id)s
+ORDER BY Q.QUESTION, O.OPTION_TEXT
+"""
+    res = await select_from(sql_question, {"session_id": session_id})
+    if len(res) == 0:
+        return None
+    index_question = 0
+    index_dimension = 1
+    index_option = 2
+    index_consultant = 3
+    questions: list[DifferentiationQuestion] = []
+    current_question: str = ""
+    current_option = ""
+    current_consultant = ""
+    for r in res:
+        if current_question != r[index_question]:
+            current_question = r[index_question]
+            current_option = r[index_option]
+            current_consultant = r[index_consultant]
+            option = DifferentiationQuestionOption(option=current_option, consultants=[current_consultant])
+            question = DifferentiationQuestion(question=current_question, dimension=r[index_dimension], options=[option])
+            questions.append(question)
+        else:
+            if current_option != r[index_option]:
+                current_option = r[index_option]
+                current_consultant = r[index_consultant]
+                option = DifferentiationQuestionOption(option=current_option, consultants=[current_consultant])
+                questions[-1].options.append(option)
+            elif current_consultant != r[index_consultant]:
+                current_consultant = r[index_consultant]
+                questions[-1].options[-1].consultants.append(current_consultant)
+                
+    consultants = await find_available_consultants(session_id)
+    return DifferentiationQuestionsResponse(questions=questions, candidates=consultants, state=None)

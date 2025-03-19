@@ -1,6 +1,8 @@
 from expert_matcher.services.db.db_persistence import execute_script
 from expert_matcher.config.config import cfg
-from expert_matcher.model.differentiation_questions import DifferentiationQuestionsResponse
+from expert_matcher.model.differentiation_questions import (
+    DifferentiationQuestionsResponse,
+)
 
 
 async def provide_initial_question(session_id: str):
@@ -55,6 +57,7 @@ WHERE q.id = (select id from TB_CATEGORY_QUESTION order by order_index offset 1 
 """
     )
 
+
 def provide_differentiation_questions() -> DifferentiationQuestionsResponse:
-    with open(cfg.base_folder/"docs/sample_differentiation_questions.json", "r") as f:
+    with open(cfg.base_folder / "docs/sample_differentiation_questions.json", "r") as f:
         return DifferentiationQuestionsResponse.model_validate_json(f.read())

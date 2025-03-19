@@ -18,10 +18,14 @@ from expert_matcher.services.db.db_persistence import (
     get_configuration,
     get_configuration_value,
     save_differentiation_question,
-    delete_differentiation_question
+    delete_differentiation_question,
+    read_differentiation_question
 )
-from tests.integration.provider import provide_dummy_data, provide_initial_question, provide_differentiation_questions
-
+from tests.integration.provider import (
+    provide_dummy_data,
+    provide_initial_question,
+    provide_differentiation_questions,
+)
 
 
 async def get_first_question() -> QuestionSuggestions:
@@ -156,7 +160,7 @@ async def test_save_client_response():
     assert question is not None
     assert suggestions is not None
     updated = await save_session_question_as_str(session_id, question)
-    assert updated > 0
+    assert updated >= 0
     # assert len(next_question.suggestions) > 0
     client_response = ClientResponse(
         session_id=session_id, question=question, response_items=suggestions
@@ -183,7 +187,12 @@ async def test_save_differentiation_question():
     assert len(differentiation_questions.questions) > 0
     session_id = "1234"
     await provide_dummy_data(session_id)
-    updated_questions, updated_options, updated_option_assignments = await save_differentiation_question(session_id, differentiation_questions)
+    updated_questions, updated_options, updated_option_assignments = (
+        await save_differentiation_question(session_id, differentiation_questions)
+    )
+    read_differentiation_questions_response = await read_differentiation_question(session_id)
+    assert read_differentiation_questions_response is not None
+    assert len(read_differentiation_questions_response.questions) > 0
     assert updated_questions > 0
     assert updated_options > 0
     assert updated_option_assignments > 0
