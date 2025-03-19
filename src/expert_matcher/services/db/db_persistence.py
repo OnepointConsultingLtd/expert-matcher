@@ -170,7 +170,7 @@ select cq.id, c.NAME, cq.QUESTION from TB_SESSION_QUESTION sq
 INNER JOIN TB_SESSION s on s.id = sq.SESSION_ID
 INNER JOIN TB_CATEGORY_QUESTION cq on cq.ID = sq.CATEGORY_QUESTION_ID
 INNER JOIN TB_CATEGORY c on c.ID = cq.CATEGORY_ID
-WHERE s.session_id = %(session_id)s;
+WHERE s.session_id = %(session_id)s ORDER BY cq.ORDER_INDEX;
 """
         suggestions_sql = """
 -- select suggestions (category items) for session and question

@@ -2,6 +2,7 @@ import { useCurrentMessage } from '../hooks/useCurrentMessage';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../context/AppStore';
 import AvailableConsultants from './AvailableConsultants';
+import { buttonStyle } from './common';
 
 export default function Suggestions() {
   const { t } = useTranslation();
@@ -30,7 +31,7 @@ export default function Suggestions() {
                     addSelectedSuggestions(suggestion);
                   }
                 }}
-                className={`suggestion c ${isSelected ? 'bg-teal-900' : ''}`}
+                className={`suggestion ${buttonStyle} ${isSelected ? 'bg-teal-900' : ''}`}
               >
                 <div>{suggestion}</div>
                 {suggestions_count[i] > 0 && (

@@ -96,7 +96,7 @@ async def handle_response(sid: str, session_id: str | None, response: ClientResp
         await save_client_response(session_id, response)
 
     consultants_threshold = int(
-        await get_configuration_value("consultants_threshold", "3")
+        await get_configuration_value("candidate_threshold", "3")
     )
     question_suggestions = await select_next_question(session_id)
     if question_suggestions.available_consultants_count < consultants_threshold:
@@ -137,16 +137,9 @@ async def send_state(
     state = await get_session_state(session_id)
     if not state:
         raise ValueError(f"Session {session_id} not found")
-    # overwrite the last question suggestions with the new ones
-    last_question_suggestions = state.history[-1]
-    last_question_suggestions.suggestions = question_suggestions.suggestions
-    last_question_suggestions.suggestions_count = question_suggestions.suggestions_count
-    last_question_suggestions.selected_suggestions = (
-        question_suggestions.selected_suggestions
-    )
-    last_question_suggestions.available_consultants_count = (
-        question_suggestions.available_consultants_count
-    )
+    # Replace last question if it is the same as the new one
+    if state.history[-1].id == question_suggestions.id:
+        state.history[-1] = question_suggestions
     server_message = ServerMessage(
         status=MessageStatus.OK,
         session_id=session_id,

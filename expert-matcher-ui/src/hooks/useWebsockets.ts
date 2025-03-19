@@ -60,7 +60,6 @@ export function useWebsockets() {
             addDifferentiationQuestion(serverMessage.content as Question);
             break;
           case ContentType.CANDIDATE:
-            debugger
             addCandidate(serverMessage.content as Candidate);
             break;
           default:
