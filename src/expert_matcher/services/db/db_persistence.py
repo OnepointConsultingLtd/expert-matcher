@@ -12,7 +12,7 @@ from expert_matcher.model.configuraton import Configuration
 from expert_matcher.model.differentiation_questions import (
     DifferentiationQuestionsResponse,
     DifferentiationQuestion,
-    DifferentiationQuestionOption
+    DifferentiationQuestionOption,
 )
 from expert_matcher.config.logger import logger
 
@@ -524,7 +524,9 @@ DELETE FROM TB_DIFFERENTIATION_QUESTION WHERE SESSION_ID = %(session_id)s
     return await create_cursor(process)
 
 
-async def read_differentiation_question(session_id: str) -> DifferentiationQuestionsResponse | None:
+async def read_differentiation_question(
+    session_id: str,
+) -> DifferentiationQuestionsResponse | None:
     sql_question = """
 SELECT Q.QUESTION, Q.DIMENSION, O.OPTION_TEXT, C.EMAIL FROM TB_DIFFERENTIATION_QUESTION Q
 INNER JOIN TB_DIFFERENTIATION_QUESTION_OPTION O ON O.DIFFERENTIATION_QUESTION_ID = Q.ID
@@ -549,18 +551,28 @@ ORDER BY Q.QUESTION, O.OPTION_TEXT
             current_question = r[index_question]
             current_option = r[index_option]
             current_consultant = r[index_consultant]
-            option = DifferentiationQuestionOption(option=current_option, consultants=[current_consultant])
-            question = DifferentiationQuestion(question=current_question, dimension=r[index_dimension], options=[option])
+            option = DifferentiationQuestionOption(
+                option=current_option, consultants=[current_consultant]
+            )
+            question = DifferentiationQuestion(
+                question=current_question,
+                dimension=r[index_dimension],
+                options=[option],
+            )
             questions.append(question)
         else:
             if current_option != r[index_option]:
                 current_option = r[index_option]
                 current_consultant = r[index_consultant]
-                option = DifferentiationQuestionOption(option=current_option, consultants=[current_consultant])
+                option = DifferentiationQuestionOption(
+                    option=current_option, consultants=[current_consultant]
+                )
                 questions[-1].options.append(option)
             elif current_consultant != r[index_consultant]:
                 current_consultant = r[index_consultant]
                 questions[-1].options[-1].consultants.append(current_consultant)
-                
+
     consultants = await find_available_consultants(session_id)
-    return DifferentiationQuestionsResponse(questions=questions, candidates=consultants, state=None)
+    return DifferentiationQuestionsResponse(
+        questions=questions, candidates=consultants, state=None
+    )

@@ -49,7 +49,7 @@ export default function DifferentiationQuestions() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-w-full">
         {differentiationQuestions.map((question, index) => (
-          <div key={`${question.id}-${index}`} className="dark:text-gray-100 ">
+          <div key={`${question.question}-${index}`} className="dark:text-gray-100 ">
             <p className="w-full text-sm mb-1">{question.dimension}</p>
             <p className="w-full text-xl">{question.question}</p>
             <Options question={question} />

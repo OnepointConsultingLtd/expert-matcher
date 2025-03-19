@@ -19,7 +19,7 @@ from expert_matcher.services.db.db_persistence import (
     get_configuration_value,
     save_differentiation_question,
     delete_differentiation_question,
-    read_differentiation_question
+    read_differentiation_question,
 )
 from tests.integration.provider import (
     provide_dummy_data,
@@ -190,7 +190,9 @@ async def test_save_differentiation_question():
     updated_questions, updated_options, updated_option_assignments = (
         await save_differentiation_question(session_id, differentiation_questions)
     )
-    read_differentiation_questions_response = await read_differentiation_question(session_id)
+    read_differentiation_questions_response = await read_differentiation_question(
+        session_id
+    )
     assert read_differentiation_questions_response is not None
     assert len(read_differentiation_questions_response.questions) > 0
     assert updated_questions > 0

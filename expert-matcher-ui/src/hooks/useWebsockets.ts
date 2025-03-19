@@ -7,7 +7,7 @@ import { getSessionId } from '../lib/sessionFunctions';
 import { safeEmit, startSession } from '../lib/websocketFunctions';
 import { ServerMessage } from '../types/ws';
 import { useTranslation } from 'react-i18next';
-import { DifferentiationQuestions, Question } from '../types/differentiation_questions';
+import { Question } from '../types/differentiation_questions';
 
 export function useWebsockets() {
   const { t } = useTranslation();

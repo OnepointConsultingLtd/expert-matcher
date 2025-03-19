@@ -1,7 +1,6 @@
 import { useCurrentMessage } from '../hooks/useCurrentMessage';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../context/AppStore';
-import { buttonStyle } from './common';
 import AvailableConsultants from './AvailableConsultants';
 
 export default function Suggestions() {

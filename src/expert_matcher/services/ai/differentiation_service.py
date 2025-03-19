@@ -15,6 +15,8 @@ from expert_matcher.model.consultant import Consultant
 from expert_matcher.services.db.db_persistence import (
     get_session_state,
     find_available_consultants,
+    read_differentiation_question,
+    save_differentiation_question
 )
 
 
@@ -83,3 +85,15 @@ async def generate_differentiation_questions(
         questions=questions.questions,
         candidates=candidates,
     )
+
+
+async def fetch_differentiation_questions(
+    session_id: str,
+) -> DifferentiationQuestionsResponse:
+    """Either read existing questions or generate new ones and save them"""
+    response = await read_differentiation_question(session_id)
+    if response:
+        return response
+    response = await generate_differentiation_questions(session_id)
+    await save_differentiation_question(session_id, response)
+    return response

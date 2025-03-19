@@ -26,7 +26,7 @@ from expert_matcher.services.db.db_persistence import (
     get_configuration_value,
 )
 from expert_matcher.services.ai.differentiation_service import (
-    generate_differentiation_questions,
+    fetch_differentiation_questions,
 )
 
 
@@ -153,7 +153,7 @@ async def send_state(
 
 async def handle_limited_consultants(sid: str, session_id: str):
     try:
-        differentiation_questions = await generate_differentiation_questions(session_id)
+        differentiation_questions = await fetch_differentiation_questions(session_id)
         # Ensure we properly await the emit
         try:
             for question in differentiation_questions.questions:
