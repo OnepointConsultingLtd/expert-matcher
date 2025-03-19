@@ -6,6 +6,7 @@ import Suggestions from './Suggestions';
 import NavigationButtons from './NavigationButtons';
 import ErrorMessage from './messages/ErrorMessage';
 import DifferentiationQuestions from './DifferentiationQuestions';
+import Candidates from './Candidates';
 
 export default function Body() {
   useWebsockets();
@@ -21,6 +22,7 @@ export default function Body() {
           </div>
           <ErrorMessage />
           <DifferentiationQuestions />
+          <Candidates />
           <Question />
           <NavigationButtons />
           <Suggestions />

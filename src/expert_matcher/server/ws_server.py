@@ -110,10 +110,15 @@ async def handle_response(sid: str, session_id: str | None, response: ClientResp
 
 
 async def handle_missing_session(sid: str, session_id: str):
+    await send_error(sid, session_id, "Session not found")
+
+
+async def send_error(sid: str, session_id: str, message: str):
+    logger.error(message)
     server_message = ServerMessage(
         status=MessageStatus.ERROR,
         session_id=session_id,
-        content=ErrorMessage(message="Session not found"),
+        content=ErrorMessage(message=message),
         content_type=ContentType.ERROR,
     )
     await sio.emit(WSCommand.SERVER_MESSAGE, server_message.model_dump(), room=sid)
@@ -157,6 +162,7 @@ async def handle_limited_consultants(sid: str, session_id: str):
         # Ensure we properly await the emit
         try:
             for question in differentiation_questions.questions:
+                # Emit every question
                 server_message = ServerMessage(
                     status=MessageStatus.OK,
                     session_id=session_id,
@@ -169,10 +175,26 @@ async def handle_limited_consultants(sid: str, session_id: str):
                     room=sid,
                     callback=True,
                 )
+
+            for candidate in differentiation_questions.candidates:
+                server_message = ServerMessage(
+                    status=MessageStatus.OK,
+                    session_id=session_id,
+                    content=candidate.model_dump(),
+                    content_type=ContentType.CANDIDATE,
+                )
+                await sio.emit(
+                    WSCommand.SERVER_MESSAGE,
+                    server_message.model_dump(),
+                    room=sid,
+                    callback=True,
+                )
+            logger.info(f"Sent differentiation questions to {sid}")
         except Exception as emit_error:
-            logger.error(f"Error during socket.io emit: {str(emit_error)}")
-            raise
-        logger.info(f"Sent differentiation questions to {sid}")
+            await send_error(
+                sid, session_id, f"Error during socket.io emit: {str(emit_error)}"
+            )
     except Exception as e:
-        logger.error(f"Error in handle_limited_consultants: {str(e)}")
-        raise
+        await send_error(
+            sid, session_id, f"Error in handle_limited_consultants: {str(e)}"
+        )

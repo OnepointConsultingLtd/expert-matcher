@@ -227,7 +227,7 @@ WHERE s.session_id = %(session_id)s and cq.ID = %(question_id)s;
 
 
 def consultant_factory(
-    consultant_details: list[tuple[int, str, str, str, str, str]],
+    consultant_details: list[tuple[int, str, str, str, str, str, str, str, str]],
 ) -> list[Consultant]:
     consultant_id_index = 0
     given_name_index = 1
@@ -235,6 +235,8 @@ def consultant_factory(
     linkedin_profile_url_index = 3
     email_index = 4
     cv_index = 5
+    photo_url_200_index = 7
+    photo_url_400_index = 8
     consultants: list[Consultant] = []
     for consultant_detail in consultant_details:
         consultant = Consultant(
@@ -244,6 +246,8 @@ def consultant_factory(
             linkedin_profile_url=consultant_detail[linkedin_profile_url_index],
             email=consultant_detail[email_index],
             cv=consultant_detail[cv_index],
+            photo_url_200=consultant_detail[photo_url_200_index],
+            photo_url_400=consultant_detail[photo_url_400_index],
         )
         consultants.append(consultant)
     return consultants
@@ -273,7 +277,7 @@ select distinct CONSULTANT_ID from VW_CONSULTANT_CATEGORY_ITEM
 WHERE CATEGORY_NAME = %(category_name)s AND CATEGORY_ITEM = ANY(%(category_items)s)
 AND CONSULTANT_ID = ANY(%(consultant_ids)s)
 """
-    consultant_details_base_sql = """SELECT * FROM (SELECT C.ID, C.GIVEN_NAME, C.SURNAME, C.LINKEDIN_PROFILE_URL, C.EMAIL, C.CV, STRING_AGG(S.SKILL_NAME, '@@') FROM TB_CONSULTANT C 
+    consultant_details_base_sql = """SELECT * FROM (SELECT C.ID, C.GIVEN_NAME, C.SURNAME, C.LINKEDIN_PROFILE_URL, C.EMAIL, C.CV, STRING_AGG(S.SKILL_NAME, '@@'), C.LINKEDIN_PHOTO_200, C.LINKEDIN_PHOTO_200 FROM TB_CONSULTANT C 
 INNER JOIN TB_CONSULTANT_SKILL CS ON C.ID = CS.CONSULTANT_ID INNER JOIN TB_SKILL S ON S.ID = CS.SKILL_ID
 GROUP BY C.ID, C.GIVEN_NAME, C.SURNAME, C.LINKEDIN_PROFILE_URL, C.EMAIL, C.CV) q"""
     consultant_details_sql = f"""

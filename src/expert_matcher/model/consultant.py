@@ -34,3 +34,9 @@ class Consultant(BaseModel):
     experiences: list[ConsultantExperience] = Field(
         default=[], description="The experiences of the consultant"
     )
+    photo_url_200: str | None = Field(
+        default="", description="The URL of the consultant's photo"
+    )
+    photo_url_400: str | None = Field(
+        default="", description="The URL of the consultant's photo"
+    )

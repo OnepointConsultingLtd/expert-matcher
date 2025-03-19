@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { QuestionSuggestions } from '../types/question';
 import { saveSession } from '../lib/sessionFunctions';
 import { SessionStatus } from '../types/session';
-import { Question, QuestionWithSelectedOptions } from '../types/differentiation_questions';
+import { Candidate, Question, QuestionWithSelectedOptions } from '../types/differentiation_questions';
 
 interface AppStoreState {
   errorMessage: string;
@@ -10,6 +10,7 @@ interface AppStoreState {
   sessionId: string;
   history: QuestionSuggestions[];
   differentiationQuestions: QuestionWithSelectedOptions[];
+  candidates: Candidate[];
   connected: boolean;
   sending: boolean;
   selectedSuggestions: string[];
@@ -21,6 +22,7 @@ interface AppStoreActions {
   setSessionId: (sessionId: string) => void;
   setHistory: (history: QuestionSuggestions[]) => void;
   addDifferentiationQuestion: (differentiationQuestion: Question) => void;
+  addCandidate: (candidate: Candidate) => void;
   selectDifferentiationQuestionOption: (question: string, option: string) => void;
   removeDifferentiationQuestionOption: (question: string, option: string) => void;
   setConnected: (connected: boolean) => void;
@@ -39,6 +41,7 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
   sessionId: '',
   history: [],
   differentiationQuestions: [],
+  candidates: [],
   connected: false,
   sending: false,
   selectedSuggestions: [],
@@ -67,6 +70,10 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
         ...state,
         differentiationQuestions: [...state.differentiationQuestions, questionWithSelectedOptions],
       };
+    }),
+  addCandidate: (candidate: Candidate) =>
+    set((state) => {
+      return { ...state, candidates: [...state.candidates, candidate] };
     }),
   selectDifferentiationQuestionOption: (question: string, option: string) =>
     set((state) => {

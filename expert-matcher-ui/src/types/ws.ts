@@ -6,6 +6,7 @@ export enum MessageStatus {
 export enum ContentType {
   HISTORY = 'history',
   DIFFERENTIATION_QUESTIONS = 'differentiation_questions',
+  CANDIDATE = 'candidate',
   ERROR = 'error',
 }
 

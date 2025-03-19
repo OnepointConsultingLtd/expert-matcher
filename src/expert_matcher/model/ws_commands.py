@@ -22,6 +22,7 @@ class MessageStatus(StrEnum):
 class ContentType(StrEnum):
     HISTORY = "history"
     DIFFERENTIATION_QUESTIONS = "differentiation_questions"
+    CANDIDATE = "candidate"
     ERROR = "error"
 
 

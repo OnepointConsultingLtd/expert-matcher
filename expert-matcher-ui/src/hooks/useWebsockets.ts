@@ -7,7 +7,7 @@ import { getSessionId } from '../lib/sessionFunctions';
 import { safeEmit, startSession } from '../lib/websocketFunctions';
 import { ServerMessage } from '../types/ws';
 import { useTranslation } from 'react-i18next';
-import { Question } from '../types/differentiation_questions';
+import { Question, Candidate } from '../types/differentiation_questions';
 
 export function useWebsockets() {
   const { t } = useTranslation();
@@ -20,6 +20,7 @@ export function useWebsockets() {
     errorMessage,
     setErrorMessage,
     addDifferentiationQuestion,
+    addCandidate
   } = useAppStore();
 
   useEffect(() => {
@@ -57,6 +58,10 @@ export function useWebsockets() {
             break;
           case ContentType.DIFFERENTIATION_QUESTIONS:
             addDifferentiationQuestion(serverMessage.content as Question);
+            break;
+          case ContentType.CANDIDATE:
+            debugger
+            addCandidate(serverMessage.content as Candidate);
             break;
           default:
             console.error('Unknown content type: ', serverMessage.content_type);

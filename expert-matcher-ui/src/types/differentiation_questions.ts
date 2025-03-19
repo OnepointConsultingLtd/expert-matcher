@@ -19,7 +19,7 @@ interface Option {
   consultants: string[];
 }
 
-interface Candidate {
+export interface Candidate {
   id: number;
   given_name: string;
   surname: string;
@@ -28,6 +28,8 @@ interface Candidate {
   cv: string;
   skills: string[];
   experiences: Experience[];
+  photo_url_200?: string;
+  photo_url_400?: string;
 }
 
 interface Experience {
