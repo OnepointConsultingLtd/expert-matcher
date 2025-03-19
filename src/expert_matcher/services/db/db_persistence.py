@@ -9,6 +9,7 @@ from expert_matcher.services.db.db_support import select_from, create_cursor
 from expert_matcher.model.consultant import Consultant, ConsultantExperience
 from expert_matcher.model.ws_commands import ClientResponse
 from expert_matcher.model.configuraton import Configuration
+from expert_matcher.model.differentiation_questions import DifferentiationQuestionsResponse
 from expert_matcher.config.logger import logger
 
 
@@ -429,3 +430,69 @@ SELECT VALUE FROM TB_CONFIGURATION WHERE KEY = %(key)s
     if len(res) == 0:
         return default_value
     return res[0][0]
+
+
+async def save_differentiation_question(session_id: str, differentiation_questions: DifferentiationQuestionsResponse) -> tuple[int, int, int]:
+    """Save a differentiation question, its options and the associates consultants"""
+    sql_question = """
+INSERT INTO TB_DIFFERENTIATION_QUESTION(QUESTION, DIMENSION, SESSION_ID)
+VALUES(%(question)s, %(topic)s, %(session_id)s)
+ON CONFLICT(QUESTION, DIMENSION, SESSION_ID) DO NOTHING
+RETURNING ID
+"""
+    sql_option = """
+INSERT INTO TB_DIFFERENTIATION_QUESTION_OPTION(DIFFERENTIATION_QUESTION_ID, OPTION_TEXT)
+VALUES(%(question_id)s, %(option)s)
+ON CONFLICT(DIFFERENTIATION_QUESTION_ID, OPTION_TEXT) DO NOTHING
+RETURNING ID
+"""
+    sql_option_assignment = """
+INSERT INTO TB_DIFFERENTIATION_QUESTION_OPTION_ASSIGNMENT(CONSULTANT_ID, DIFFERENTIATION_QUESTION_OPTION_ID)
+VALUES(%(consultant_id)s, %(option_id)s)
+ON CONFLICT(CONSULTANT_ID, DIFFERENTIATION_QUESTION_OPTION_ID) DO NOTHING
+"""
+    sql_consultant_select = """
+SELECT ID FROM TB_CONSULTANT WHERE EMAIL = %(consultant_email)s
+"""
+    async def process(cur: AsyncCursor) -> Awaitable[int]:
+        updated_questions = 0
+        updated_options = 0
+        updated_option_assignments = 0
+        for question in differentiation_questions.questions:
+            # insert question
+            await cur.execute(sql_question, {"question": question.question, "topic": question.dimension, "session_id": session_id})
+            updated_questions += cur.rowcount
+            rows_question = await cur.fetchone()
+            if rows_question and len(rows_question) > 0:
+                question_id = rows_question[0]
+                # insert options
+                for option in question.options:
+                    await cur.execute(sql_option, {"question_id": question_id, "option": option.option})
+                    updated_options += cur.rowcount
+                    rows_option = await cur.fetchone()
+                    if rows_option and len(rows_option) > 0:
+                        option_id = rows_option[0]
+                        # insert option assignments
+                        for consultant_email in option.consultants:
+                            row_cursor = await cur.execute(sql_consultant_select, {"consultant_email": consultant_email})
+                            row_consultant = list(await row_cursor.fetchall())
+                            if row_consultant and len(row_consultant) > 0:
+                                consultant_id = row_consultant[0][0]
+                                await cur.execute(sql_option_assignment, {"consultant_id": consultant_id, "option_id": option_id})
+                                updated_option_assignments += cur.rowcount
+        return updated_questions, updated_options, updated_option_assignments
+
+    return await create_cursor(process)
+
+
+async def delete_differentiation_question(session_id: str) -> int:
+    sql_delete_question = """
+DELETE FROM TB_DIFFERENTIATION_QUESTION WHERE SESSION_ID = %(session_id)s
+"""
+    async def process(cur: AsyncCursor) -> Awaitable[int]:
+        await cur.execute(sql_delete_question, {"session_id": session_id})
+        return cur.rowcount
+
+    return await create_cursor(process)
+
+

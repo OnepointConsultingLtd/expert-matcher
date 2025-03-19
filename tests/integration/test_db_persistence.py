@@ -17,8 +17,11 @@ from expert_matcher.services.db.db_persistence import (
     save_session_question_as_str,
     get_configuration,
     get_configuration_value,
+    save_differentiation_question,
+    delete_differentiation_question
 )
-from tests.integration.provider import provide_dummy_data, provide_initial_question
+from tests.integration.provider import provide_dummy_data, provide_initial_question, provide_differentiation_questions
+
 
 
 async def get_first_question() -> QuestionSuggestions:
@@ -171,3 +174,18 @@ async def test_get_configuration():
     for key, value in config.config.items():
         value = await get_configuration_value(key)
         assert value is not None
+
+
+@pytest.mark.asyncio
+async def test_save_differentiation_question():
+    differentiation_questions = provide_differentiation_questions()
+    assert differentiation_questions is not None
+    assert len(differentiation_questions.questions) > 0
+    session_id = "1234"
+    await provide_dummy_data(session_id)
+    updated_questions, updated_options, updated_option_assignments = await save_differentiation_question(session_id, differentiation_questions)
+    assert updated_questions > 0
+    assert updated_options > 0
+    assert updated_option_assignments > 0
+    deleted = await delete_differentiation_question(session_id)
+    assert deleted > 0

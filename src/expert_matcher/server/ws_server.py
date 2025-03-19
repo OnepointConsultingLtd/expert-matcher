@@ -6,7 +6,6 @@ from expert_matcher.server.agent_session import AgentSession
 from expert_matcher.config.config import ws_cfg
 from expert_matcher.config.logger import logger
 from expert_matcher.model.session import Session
-from expert_matcher.model.consultant import Consultant
 from expert_matcher.model.ws_commands import WSCommand
 from expert_matcher.model.ws_commands import (
     ServerMessage,
@@ -24,7 +23,6 @@ from expert_matcher.services.db.db_persistence import (
     get_session_state,
     session_exists,
     save_client_response,
-    find_available_consultants,
     get_configuration_value,
 )
 from expert_matcher.services.ai.differentiation_service import (
@@ -153,8 +151,10 @@ async def handle_limited_consultants(
     sid: str, session_id: str
 ):
     try:
-        state = await get_session_state(session_id)
         differentiation_questions = await generate_differentiation_questions(session_id)
+        # TODO: Remove this
+        with open("sample_differentiation_questions.json", "a") as o:
+                    o.write(differentiation_questions.model_dump_json())
         # differentiation_questions.state = stat
         # Ensure we properly await the emit
         try:
