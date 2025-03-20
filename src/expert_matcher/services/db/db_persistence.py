@@ -26,7 +26,7 @@ async def select_next_question(session_id: str) -> QuestionSuggestions | None:
     """Select the next question with its suggestions."""
 
     sql = """
-SELECT C.ID CATEGORY_ID, C.NAME CATEGORY, Q.question, Q.id question_id from TB_CATEGORY_QUESTION Q
+SELECT C.ID CATEGORY_ID, C.NAME CATEGORY, Q.question, Q.QUESTION_ID from VW_MEANINGFULL_QUESTIONS Q
 INNER JOIN TB_CATEGORY C ON C.ID = Q.CATEGORY_ID
 WHERE ACTIVE is true
 ORDER BY order_index offset (SELECT count(*) FROM TB_SESSION_QUESTION sq

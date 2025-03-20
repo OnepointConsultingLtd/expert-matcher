@@ -19,6 +19,7 @@ interface AppStoreState {
   connected: boolean;
   sending: boolean;
   selectedSuggestions: string[];
+  suggestionFilter: string;
 }
 
 interface AppStoreActions {
@@ -39,6 +40,7 @@ interface AppStoreActions {
   clearAllSuggestions: () => void;
   previousQuestion: () => void;
   nextQuestion: () => void;
+  setSuggestionFilter: (suggestionFilter: string) => void;
 }
 
 function processVoting(state: AppStoreState, currentQuestion: QuestionWithSelectedOptions, option: string, voteUp: boolean) {
@@ -72,6 +74,7 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
   connected: false,
   sending: false,
   selectedSuggestions: [],
+  suggestionFilter: '',
   setSessionId: (sessionId: string) =>
     set((state) => {
       saveSession({
@@ -85,7 +88,7 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
   setHistory: (history: QuestionSuggestions[]) =>
     set((state) => {
       const currentIndex = history.length - 1;
-      return { ...state, history, currentIndex };
+      return { ...state, history, currentIndex, suggestionFilter: '' };
     }),
   addDifferentiationQuestion: (differentiationQuestion: Question) =>
     set((state) => {
@@ -98,7 +101,7 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
         differentiationQuestions: [...state.differentiationQuestions, questionWithSelectedOptions],
       };
     }),
-  clearDifferentiationQuestions: () => set({ differentiationQuestions: [], candidates: [] }),
+  clearDifferentiationQuestions: () => set({ differentiationQuestions: [], candidates: [], suggestionFilter: '' }),
   addCandidate: (candidate: Candidate) =>
     set((state) => {
       const candidateWithVotes = { ...candidate, votes: 0 };
@@ -169,7 +172,7 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
   setConnected: (connected: boolean) => set({ connected }),
   setCurrentIndex: (currentIndex: number) =>
     set((state) => {
-      return { ...state, currentIndex };
+      return { ...state, currentIndex, suggestionFilter: '' };
     }),
   addSelectedSuggestions: (selectedSuggestion: string) =>
     set((state) => {
@@ -185,15 +188,19 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
         selectedSuggestions: [...state.selectedSuggestions, selectedSuggestion],
       };
     }),
-  clearAllSuggestions: () => set({ selectedSuggestions: [] }),
+  clearAllSuggestions: () => {
+    return set((state) => {
+      return { ...state, selectedSuggestions: [], suggestionFilter: '' };
+    })
+  },
   selectAllSuggestions: () =>
     set((state) => {
-      const allSuggestions = state.history[state.currentIndex].suggestions;
+      const allSuggestions = filterSuggestions(state.history[state.currentIndex].suggestions, state.suggestionFilter);
       return { ...state, selectedSuggestions: [...allSuggestions] };
     }),
   deselectAllSuggestions: () =>
     set((state) => {
-      return { ...state, selectedSuggestions: [] };
+      return { ...state, selectedSuggestions: [], suggestionFilter: '' };
     }),
   setSending: (sending: boolean) => set({ sending }),
   setErrorMessage: (errorMessage: string) => set({ errorMessage }),
@@ -204,6 +211,7 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
           ...state,
           currentIndex: state.currentIndex - 1,
           selectedSuggestions: [],
+          suggestionFilter: ''
         };
       }
       return { ...state };
@@ -215,8 +223,14 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
           ...state,
           currentIndex: state.currentIndex + 1,
           selectedSuggestions: [],
+          suggestionFilter: ''
         };
       }
       return { ...state };
     }),
+  setSuggestionFilter: (suggestionFilter: string) => set({ suggestionFilter }),
 }));
+
+function filterSuggestions(suggestions: string[], suggestionFilter: string) {
+  return suggestions.filter(s => s.length === 0 || s.toLowerCase().includes(suggestionFilter.toLowerCase()));
+}

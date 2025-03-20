@@ -1,6 +1,6 @@
 import { useWebsockets } from '../hooks/useWebsockets';
 import { useAppStore } from '../context/AppStore';
-import Spinner from './Spinner';
+import Spinner from './spinners/Spinner';
 import Question from './Question';
 import Suggestions from './Suggestions';
 import NavigationButtons from './NavigationButtons';
@@ -17,7 +17,7 @@ export default function Body() {
       <div className="body-container flex flex-row w-full">
         <div className="interaction-container flex flex-col w-full">
           <div className="flex flex-row justify-center items-center w-full">
-            {!connected && <Spinner />}
+            {!connected && <Spinner message="Connecting to server" />}
             {sending && <Spinner />}
           </div>
           <ErrorMessage />
