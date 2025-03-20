@@ -20,11 +20,14 @@ from expert_matcher.services.db.db_persistence import (
     save_differentiation_question,
     delete_differentiation_question,
     read_differentiation_question,
+    clear_differentiation_question_votes,
+    save_differentiation_question_vote
 )
 from tests.integration.provider import (
     provide_dummy_data,
     provide_initial_question,
     provide_differentiation_questions,
+    create_differentiation_question_vote
 )
 
 
@@ -202,3 +205,27 @@ async def test_save_differentiation_question():
     assert updated_option_assignments > 0
     deleted = await delete_differentiation_question(session_id)
     assert deleted > 0
+
+
+@pytest.mark.asyncio
+async def test_save_differentiation_question_vote():
+    session_id = "87654321"
+    differentiation_questions = provide_differentiation_questions()
+    await delete_differentiation_question(session_id)
+    await provide_dummy_data(session_id)
+    updated_questions, updated_options, updated_option_assignments = (
+        await save_differentiation_question(session_id, differentiation_questions)
+    )
+    assert updated_questions > 0
+    differentiation_question_votes = create_differentiation_question_vote(session_id)
+    updated = await save_differentiation_question_vote(session_id, differentiation_question_votes)
+    assert updated > 0
+    deleted = await delete_differentiation_question(session_id)
+    assert deleted > 0
+
+
+@pytest.mark.asyncio
+async def test_clear_differentiation_question_votes():
+    session_id = "87654321"
+    deleted = await clear_differentiation_question_votes(session_id)
+    assert deleted == 0

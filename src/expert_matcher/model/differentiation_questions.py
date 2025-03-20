@@ -34,3 +34,15 @@ class DifferentiationQuestionsResponse(BaseModel):
         ..., description="The candidates related to the questions"
     )
     state: State | None = Field(default=None, description="The state of the session")
+
+
+class DifferentiationQuestionVote(BaseModel):
+    session_id: str = Field(description="The session id")
+    question: str = Field(description="The question")
+    option: str = Field(description="The option")
+
+
+class DifferentiationQuestionVotes(BaseModel):
+    votes: list[DifferentiationQuestionVote] = Field(
+        description="The votes"
+    )

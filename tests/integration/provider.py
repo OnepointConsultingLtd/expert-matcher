@@ -2,6 +2,8 @@ from expert_matcher.services.db.db_persistence import execute_script
 from expert_matcher.config.config import cfg
 from expert_matcher.model.differentiation_questions import (
     DifferentiationQuestionsResponse,
+    DifferentiationQuestionVotes,
+    DifferentiationQuestionVote,
 )
 
 
@@ -61,3 +63,13 @@ WHERE q.id = (select id from TB_CATEGORY_QUESTION order by order_index offset 1 
 def provide_differentiation_questions() -> DifferentiationQuestionsResponse:
     with open(cfg.base_folder / "docs/sample_differentiation_questions.json", "r") as f:
         return DifferentiationQuestionsResponse.model_validate_json(f.read())
+
+
+def create_differentiation_question_vote(session_id: str) -> DifferentiationQuestionVotes:
+    differentiation_questions = provide_differentiation_questions()
+    votes = []
+    for question in differentiation_questions.questions:
+        for option in question.options:
+            votes.append(DifferentiationQuestionVote(session_id=session_id, question=question.question, option=option.option))
+    return DifferentiationQuestionVotes(votes=votes)
+

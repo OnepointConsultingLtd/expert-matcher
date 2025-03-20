@@ -87,6 +87,11 @@ async def client_response(sid: str, response: str):
     await handle_response(sid, client_response.session_id, client_response)
 
 
+@sio.event
+async def save_differentiation_question_vote(sid: str, session_id: str, question: str, option: str):
+    await save_differentiation_question_vote(session_id, question, option)
+
+
 async def handle_response(sid: str, session_id: str | None, response: ClientResponse):
     # if not, throw error
     if not await session_exists(session_id):

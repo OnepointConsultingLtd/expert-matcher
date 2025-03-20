@@ -13,6 +13,8 @@ from expert_matcher.model.differentiation_questions import (
     DifferentiationQuestionsResponse,
     DifferentiationQuestion,
     DifferentiationQuestionOption,
+    DifferentiationQuestionVotes,
+    DifferentiationQuestionVote,
 )
 from expert_matcher.config.logger import logger
 
@@ -581,3 +583,43 @@ ORDER BY Q.QUESTION, O.OPTION_TEXT
     return DifferentiationQuestionsResponse(
         questions=questions, candidates=consultants, state=None
     )
+
+
+async def save_differentiation_question_vote(session_id: str, differentiation_question_votes: DifferentiationQuestionVotes) -> int:
+    sql_select_option = """
+SELECT OT.ID, DQ.QUESTION FROM	TB_DIFFERENTIATION_QUESTION_OPTION OT 
+			INNER JOIN TB_DIFFERENTIATION_QUESTION DQ ON DQ.ID = OT.DIFFERENTIATION_QUESTION_ID
+			WHERE OT.OPTION_TEXT = %(option)s AND DQ.QUESTION = %(question)s
+"""
+    sql = """
+INSERT INTO
+	TB_DIFFERENTIATION_QUESTION_OPTION_SESSION_SELECTION (SESSION_ID, DIFFERENTIATION_QUESTION_OPTION_ID)
+VALUES
+	(
+		(SELECT ID FROM TB_SESSION WHERE SESSION_ID = %(session_id)s),
+		%(option_id)s
+	)
+"""
+    async def process(cur: AsyncCursor) -> Awaitable[int]:
+        changed = 0
+        for vote in differentiation_question_votes.votes:
+            await cur.execute(sql_select_option, {"question": vote.question, "option": vote.option})
+            rows_option = await cur.fetchall()
+            if rows_option and len(rows_option) > 0:
+                option_id = rows_option[0][0]
+                await cur.execute(sql, {"session_id": session_id, "option_id": option_id})
+                changed += cur.rowcount
+        return changed
+
+    return await create_cursor(process)
+
+
+async def clear_differentiation_question_votes(session_id: str) -> int:
+    sql = """
+DELETE FROM TB_DIFFERENTIATION_QUESTION_OPTION_SESSION_SELECTION WHERE SESSION_ID = %(session_id)s
+"""
+    async def process(cur: AsyncCursor) -> Awaitable[int]:
+        await cur.execute(sql, {"session_id": session_id})
+        return cur.rowcount
+    
+    return await create_cursor(process)

@@ -23,3 +23,4 @@ async def test_generate_differentiation_questions():
     assert questions is not None
     assert len(questions.questions) > 0
     assert len(questions.candidates) > 0
+
