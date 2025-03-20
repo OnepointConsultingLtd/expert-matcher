@@ -12,9 +12,8 @@ from expert_matcher.model.configuraton import Configuration
 from expert_matcher.model.differentiation_questions import (
     DifferentiationQuestionsResponse,
     DifferentiationQuestion,
-    DifferentiationQuestionOption,
+    DifferentiationQuestionOptionWithSelection,
     DifferentiationQuestionVotes,
-    DifferentiationQuestionVote,
 )
 from expert_matcher.config.logger import logger
 
@@ -535,10 +534,11 @@ async def read_differentiation_question(
     session_id: str,
 ) -> DifferentiationQuestionsResponse | None:
     sql_question = """
-SELECT Q.QUESTION, Q.DIMENSION, O.OPTION_TEXT, C.EMAIL FROM TB_DIFFERENTIATION_QUESTION Q
+SELECT Q.QUESTION, Q.DIMENSION, O.OPTION_TEXT, C.EMAIL, case when oss.id is not null then true else false end SELECTED FROM TB_DIFFERENTIATION_QUESTION Q
 INNER JOIN TB_DIFFERENTIATION_QUESTION_OPTION O ON O.DIFFERENTIATION_QUESTION_ID = Q.ID
 INNER JOIN TB_DIFFERENTIATION_QUESTION_OPTION_ASSIGNMENT A ON A.DIFFERENTIATION_QUESTION_OPTION_ID = O.ID
 INNER JOIN TB_CONSULTANT C ON C.ID = A.CONSULTANT_ID
+LEFT JOIN TB_DIFFERENTIATION_QUESTION_OPTION_SESSION_SELECTION oss on oss.DIFFERENTIATION_QUESTION_OPTION_ID = O.ID
 WHERE Q.SESSION_ID = %(session_id)s
 ORDER BY Q.QUESTION, O.OPTION_TEXT
 """
@@ -549,6 +549,7 @@ ORDER BY Q.QUESTION, O.OPTION_TEXT
     index_dimension = 1
     index_option = 2
     index_consultant = 3
+    index_selected = 4
     questions: list[DifferentiationQuestion] = []
     current_question: str = ""
     current_option = ""
@@ -558,8 +559,8 @@ ORDER BY Q.QUESTION, O.OPTION_TEXT
             current_question = r[index_question]
             current_option = r[index_option]
             current_consultant = r[index_consultant]
-            option = DifferentiationQuestionOption(
-                option=current_option, consultants=[current_consultant]
+            option = DifferentiationQuestionOptionWithSelection(
+                option=current_option, consultants=[current_consultant], selected=r[index_selected]
             )
             question = DifferentiationQuestion(
                 question=current_question,
@@ -571,13 +572,17 @@ ORDER BY Q.QUESTION, O.OPTION_TEXT
             if current_option != r[index_option]:
                 current_option = r[index_option]
                 current_consultant = r[index_consultant]
-                option = DifferentiationQuestionOption(
-                    option=current_option, consultants=[current_consultant]
+                current_selected = r[index_selected]
+                option = DifferentiationQuestionOptionWithSelection(
+                    option=current_option, consultants=[current_consultant], selected=current_selected
                 )
                 questions[-1].options.append(option)
             elif current_consultant != r[index_consultant]:
                 current_consultant = r[index_consultant]
-                questions[-1].options[-1].consultants.append(current_consultant)
+                current_selected = r[index_selected]
+                current_option = questions[-1].options[-1]
+                current_option.consultants.append(current_consultant)
+                current_option.selected = current_selected
 
     consultants = await find_available_consultants(session_id)
     return DifferentiationQuestionsResponse(
@@ -599,6 +604,7 @@ VALUES
 		(SELECT ID FROM TB_SESSION WHERE SESSION_ID = %(session_id)s),
 		%(option_id)s
 	)
+ON CONFLICT(SESSION_ID, DIFFERENTIATION_QUESTION_OPTION_ID) DO NOTHING
 """
     async def process(cur: AsyncCursor) -> Awaitable[int]:
         changed = 0
@@ -616,7 +622,7 @@ VALUES
 
 async def clear_differentiation_question_votes(session_id: str) -> int:
     sql = """
-DELETE FROM TB_DIFFERENTIATION_QUESTION_OPTION_SESSION_SELECTION WHERE SESSION_ID = %(session_id)s
+DELETE FROM TB_DIFFERENTIATION_QUESTION_OPTION_SESSION_SELECTION WHERE SESSION_ID = (SELECT ID FROM TB_SESSION WHERE SESSION_ID = %(session_id)s)
 """
     async def process(cur: AsyncCursor) -> Awaitable[int]:
         await cur.execute(sql, {"session_id": session_id})

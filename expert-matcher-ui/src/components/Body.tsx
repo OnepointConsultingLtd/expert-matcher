@@ -5,8 +5,7 @@ import Question from './Question';
 import Suggestions from './Suggestions';
 import NavigationButtons from './NavigationButtons';
 import ErrorMessage from './messages/ErrorMessage';
-import DifferentiationQuestions from './DifferentiationQuestions';
-import Candidates from './Candidates';
+import DifferentiationPanel from './differentiation/DifferentiationPanel';
 
 export default function Body() {
   useWebsockets();
@@ -21,8 +20,7 @@ export default function Body() {
             {sending && <Spinner />}
           </div>
           <ErrorMessage />
-          <DifferentiationQuestions />
-          <Candidates />
+          <DifferentiationPanel />
           <Question />
           <NavigationButtons />
           <Suggestions />

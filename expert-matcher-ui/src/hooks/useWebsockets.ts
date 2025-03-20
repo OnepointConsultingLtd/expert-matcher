@@ -19,6 +19,7 @@ export function useWebsockets() {
     setSending,
     errorMessage,
     setErrorMessage,
+    setSuccessMessage,
     addDifferentiationQuestion,
     addCandidate,
   } = useAppStore();
@@ -66,6 +67,14 @@ export function useWebsockets() {
             break;
           case ContentType.CANDIDATE:
             addCandidate(serverMessage.content as Candidate);
+            break;
+          case ContentType.VOTES_SAVED:
+            setSending(false);
+            setSuccessMessage(t('Votes saved'));
+            break;
+          case ContentType.ERROR:
+            setSending(false);
+            setErrorMessage(serverMessage.content?.message ?? 'An error occurred.');
             break;
           default:
             console.error('Unknown content type: ', serverMessage.content_type);

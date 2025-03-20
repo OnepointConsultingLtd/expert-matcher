@@ -24,6 +24,7 @@ class ContentType(StrEnum):
     DIFFERENTIATION_QUESTIONS = "differentiation_questions"
     CANDIDATE = "candidate"
     ERROR = "error"
+    VOTES_SAVED = "votes_saved"
 
 
 class ServerMessage(BaseModel):

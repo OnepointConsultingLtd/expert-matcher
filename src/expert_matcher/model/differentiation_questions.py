@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, SerializeAsAny
 from expert_matcher.model.consultant import Consultant
 from expert_matcher.model.state import State
 
@@ -10,12 +10,16 @@ class DifferentiationQuestionOption(BaseModel):
     )
 
 
+class DifferentiationQuestionOptionWithSelection(DifferentiationQuestionOption):
+    selected: bool = Field(default=False, description="Whether the option is selected")
+
+
 class DifferentiationQuestion(BaseModel):
     question: str = Field(
         description="The question to be asked to differentiate between the consultants"
     )
     dimension: str = Field(description="The dimension of the question")
-    options: list[DifferentiationQuestionOption] = Field(
+    options: SerializeAsAny[list[DifferentiationQuestionOption]] = Field(
         description="The options of the question with the consultants that match the option"
     )
 
@@ -37,12 +41,12 @@ class DifferentiationQuestionsResponse(BaseModel):
 
 
 class DifferentiationQuestionVote(BaseModel):
-    session_id: str = Field(description="The session id")
     question: str = Field(description="The question")
     option: str = Field(description="The option")
 
 
 class DifferentiationQuestionVotes(BaseModel):
+    session_id: str = Field(description="The session id")
     votes: list[DifferentiationQuestionVote] = Field(
         description="The votes"
     )

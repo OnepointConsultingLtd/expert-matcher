@@ -17,6 +17,7 @@ export interface QuestionWithSelectedOptions extends Question {
 interface Option {
   option: string;
   consultants: string[];
+  selected: boolean;
 }
 
 export interface Candidate {
@@ -44,4 +45,14 @@ interface Experience {
   title: string;
   start_date: string;
   end_date: string | null;
+}
+
+export interface DifferentiationQuestionVote {
+  question: string;
+  option: string;
+}
+
+export interface DifferentiationQuestionVotes {
+  session_id: string;
+  votes: DifferentiationQuestionVote[];
 }

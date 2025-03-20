@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { useCurrentMessage } from '../hooks/useCurrentMessage';
-import { QuestionWithSelectedOptions } from '../types/differentiation_questions';
-import { buttonStyle } from './common';
-import { useAppStore } from '../context/AppStore';
+import { useCurrentMessage } from '../../hooks/useCurrentMessage';
+import { QuestionWithSelectedOptions } from '../../types/differentiation_questions';
+import { buttonStyle } from '../common';
+import { useAppStore } from '../../context/AppStore';
 
 function Options({ question }: { question: QuestionWithSelectedOptions }) {
   const { t } = useTranslation();
@@ -40,8 +40,7 @@ function Options({ question }: { question: QuestionWithSelectedOptions }) {
 
 export default function DifferentiationQuestions() {
   const { t } = useTranslation();
-  const { hasDifferentiationQuestions, differentiationQuestions } = useCurrentMessage();
-  if (!hasDifferentiationQuestions) return null;
+  const { differentiationQuestions } = useCurrentMessage();
   return (
     <>
       <div className="dark:text-gray-100 my-5">

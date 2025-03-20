@@ -16,6 +16,7 @@ from expert_matcher.model.ws_commands import (
     ContentType,
 )
 from expert_matcher.model.question import QuestionSuggestions
+from expert_matcher.model.differentiation_questions import DifferentiationQuestionVotes
 from expert_matcher.services.db.db_persistence import (
     select_first_question,
     select_next_question,
@@ -25,6 +26,8 @@ from expert_matcher.services.db.db_persistence import (
     session_exists,
     save_client_response,
     get_configuration_value,
+    save_differentiation_question_vote,
+    clear_differentiation_question_votes
 )
 from expert_matcher.services.ai.differentiation_service import (
     fetch_differentiation_questions,
@@ -61,16 +64,19 @@ async def start_session(
     """
     Start the session by setting the main topic.
     """
-    logger.info(f"Start session {sid}")
-    agent_session = AgentSession(sid, client_session)
-    session_id = agent_session.session_id
-    if not client_session:
-        default_email = "default@email.com"
-        await save_session(Session(session_id=session_id, email=default_email))
-        question_suggestions = await select_first_question(session_id)
-        await send_question_suggestions(sid, session_id, question_suggestions)
-    else:
-        await handle_response(sid, session_id, None)
+    try:
+        logger.info(f"Start session {sid}")
+        agent_session = AgentSession(sid, client_session)
+        session_id = agent_session.session_id
+        if not client_session:
+            default_email = "default@email.com"
+            await save_session(Session(session_id=session_id, email=default_email))
+            question_suggestions = await select_first_question(session_id)
+            await send_question_suggestions(sid, session_id, question_suggestions)
+        else:
+            await handle_response(sid, session_id, None)
+    except Exception as e:
+        await send_error(sid, session_id, f"Error in start_session: {str(e)}")
 
 
 @sio.event
@@ -88,8 +94,22 @@ async def client_response(sid: str, response: str):
 
 
 @sio.event
-async def save_differentiation_question_vote(sid: str, session_id: str, question: str, option: str):
-    await save_differentiation_question_vote(session_id, question, option)
+async def save_differentiation_question_vote_ws(sid: str, differentiation_question_votes_str: str):
+    # convert differentiation_question_votes from json to DifferentiationQuestionVotes
+    try:
+        differentiation_question_votes = DifferentiationQuestionVotes.model_validate_json(differentiation_question_votes_str)
+        session_id = differentiation_question_votes.session_id
+        await clear_differentiation_question_votes(session_id)
+        await save_differentiation_question_vote(session_id, differentiation_question_votes)
+        server_message = ServerMessage(
+            status=MessageStatus.OK,
+            session_id=session_id,
+            content={"message": "Votes saved"},
+            content_type=ContentType.VOTES_SAVED,
+        )
+        await sio.emit(WSCommand.SERVER_MESSAGE, server_message.model_dump(), room=sid)
+    except Exception as e:
+        await send_error(sid, session_id, f"Error in save_differentiation_question_vote_ws: {str(e)}")
 
 
 async def handle_response(sid: str, session_id: str | None, response: ClientResponse):
@@ -201,7 +221,6 @@ async def handle_limited_consultants(sid: str, session_id: str):
                     sid, session_id, f"Error during socket.io emit: {str(emit_error)}"
                 )
         except Exception as e:
-            logger.exception(f"Error in handle_limited_consultants: {str(e)}")
             await send_error(
                 sid, session_id, f"Error in handle_limited_consultants: {str(e)}"
             )

@@ -70,6 +70,6 @@ def create_differentiation_question_vote(session_id: str) -> DifferentiationQues
     votes = []
     for question in differentiation_questions.questions:
         for option in question.options:
-            votes.append(DifferentiationQuestionVote(session_id=session_id, question=question.question, option=option.option))
-    return DifferentiationQuestionVotes(votes=votes)
+            votes.append(DifferentiationQuestionVote(question=question.question, option=option.option))
+    return DifferentiationQuestionVotes(votes=votes, session_id=session_id)
 

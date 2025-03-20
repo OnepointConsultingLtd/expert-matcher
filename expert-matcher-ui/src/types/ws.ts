@@ -7,6 +7,7 @@ export enum ContentType {
   HISTORY = 'history',
   DIFFERENTIATION_QUESTIONS = 'differentiation_questions',
   CANDIDATE = 'candidate',
+  VOTES_SAVED = 'votes_saved',
   ERROR = 'error',
 }
 
@@ -39,4 +40,5 @@ export const WS_COMMANDS = {
   START_SESSION: 'start_session',
   CLIENT_RESPONSE: 'client_response',
   ECHO: 'echo',
+  SAVE_DIFFERENTIATION_QUESTION_VOTE: 'save_differentiation_question_vote_ws',
 };

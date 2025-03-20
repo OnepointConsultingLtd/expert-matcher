@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { useCurrentMessage } from '../hooks/useCurrentMessage';
-import { CandidateWithVotes } from '../types/differentiation_questions';
+import { useCurrentMessage } from '../../hooks/useCurrentMessage';
+import { CandidateWithVotes } from '../../types/differentiation_questions';
 import { VscAccount } from 'react-icons/vsc';
 import { IoIosContact } from 'react-icons/io';
 
@@ -37,9 +37,7 @@ function CadidateCard({ candidate }: { candidate: CandidateWithVotes }) {
   return (
     <div key={candidate.id} className="flex flex-col gap-2">
       <div className="text-2xl">{name}</div>
-      <CandidatePhoto
-        candidate={candidate}
-      />
+      <CandidatePhoto candidate={candidate} />
       <div className="text-xl pl-1">{t('vote_other', { count: candidate.votes })}</div>
       {linkedin_profile_url && (
         <div className="flex flex-row gap-2 items-center text-xl">
@@ -58,10 +56,9 @@ function CadidateCard({ candidate }: { candidate: CandidateWithVotes }) {
   );
 }
 
-export default function Candidates() {
+export default function DifferentiationCandidates() {
   const { t } = useTranslation();
-  const { hasDifferentiationQuestions, candidates } = useCurrentMessage();
-  if (!hasDifferentiationQuestions) return null;
+  const { candidates } = useCurrentMessage();
   return (
     <div className="dark:text-gray-100 mt-4">
       <p className="w-full text-xl">{t('Candidates')}</p>
