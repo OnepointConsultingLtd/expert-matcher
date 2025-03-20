@@ -1,6 +1,12 @@
 import { useTranslation } from 'react-i18next';
 
-const Spinner = ({ className = `h-24 w-24`, message = "Please wait" }: { className?: string, message?: string }) => {
+const Spinner = ({
+  className = `h-24 w-24`,
+  message = 'Please wait',
+}: {
+  className?: string;
+  message?: string;
+}) => {
   const { t } = useTranslation();
 
   return (

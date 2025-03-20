@@ -1,5 +1,6 @@
 import socketio
 from aiohttp import web
+import asyncio
 
 from expert_matcher.config.config import ws_cfg
 from expert_matcher.server.agent_session import AgentSession
@@ -29,6 +30,8 @@ from expert_matcher.services.ai.differentiation_service import (
     fetch_differentiation_questions,
 )
 
+# Add this at the module level (top of file with other imports)
+limited_consultants_lock = asyncio.Lock()
 
 sio = socketio.AsyncServer(
     cors_allowed_origins=ws_cfg.websocket_cors_allowed_origins,
@@ -99,7 +102,11 @@ async def handle_response(sid: str, session_id: str | None, response: ClientResp
         await get_configuration_value("candidate_threshold", "3")
     )
     question_suggestions = await select_next_question(session_id)
-    if question_suggestions.available_consultants_count < consultants_threshold:
+    if (
+        question_suggestions is None
+        or question_suggestions.available_consultants_count < consultants_threshold
+        or question_suggestions.suggestions_count == 0
+    ):
         await handle_limited_consultants(sid, session_id)
         return
 
@@ -150,45 +157,46 @@ async def send_state(
 
 
 async def handle_limited_consultants(sid: str, session_id: str):
-    try:
-        differentiation_questions = await fetch_differentiation_questions(session_id)
-        # Ensure we properly await the emit
+    async with limited_consultants_lock:  # This ensures only one execution at a time
         try:
-            for question in differentiation_questions.questions:
-                # Emit every question
-                server_message = ServerMessage(
-                    status=MessageStatus.OK,
-                    session_id=session_id,
-                    content=question.model_dump(),
-                    content_type=ContentType.DIFFERENTIATION_QUESTIONS,
-                )
-                await sio.emit(
-                    WSCommand.SERVER_MESSAGE,
-                    server_message.model_dump(),
-                    room=sid,
-                    callback=True,
-                )
+            logger.info(f"Fetching differentiation questions for {session_id}")
+            differentiation_questions = await fetch_differentiation_questions(session_id)
+            try:
+                for question in differentiation_questions.questions:
+                    # Emit every question
+                    server_message = ServerMessage(
+                        status=MessageStatus.OK,
+                        session_id=session_id,
+                        content=question.model_dump(),
+                        content_type=ContentType.DIFFERENTIATION_QUESTIONS,
+                    )
+                    await sio.emit(
+                        WSCommand.SERVER_MESSAGE,
+                        server_message.model_dump(),
+                        room=sid,
+                        callback=True,
+                    )
 
-            for candidate in differentiation_questions.candidates:
-                server_message = ServerMessage(
-                    status=MessageStatus.OK,
-                    session_id=session_id,
-                    content=candidate.model_dump(),
-                    content_type=ContentType.CANDIDATE,
+                for candidate in differentiation_questions.candidates:
+                    server_message = ServerMessage(
+                        status=MessageStatus.OK,
+                        session_id=session_id,
+                        content=candidate.model_dump(),
+                        content_type=ContentType.CANDIDATE,
+                    )
+                    await sio.emit(
+                        WSCommand.SERVER_MESSAGE,
+                        server_message.model_dump(),
+                        room=sid,
+                        callback=True,
+                    )
+                logger.info(f"Sent differentiation questions to {sid}")
+            except Exception as emit_error:
+                await send_error(
+                    sid, session_id, f"Error during socket.io emit: {str(emit_error)}"
                 )
-                await sio.emit(
-                    WSCommand.SERVER_MESSAGE,
-                    server_message.model_dump(),
-                    room=sid,
-                    callback=True,
-                )
-            logger.info(f"Sent differentiation questions to {sid}")
-        except Exception as emit_error:
+        except Exception as e:
+            logger.exception(f"Error in handle_limited_consultants: {str(e)}")
             await send_error(
-                sid, session_id, f"Error during socket.io emit: {str(emit_error)}"
+                sid, session_id, f"Error in handle_limited_consultants: {str(e)}"
             )
-    except Exception as e:
-        logger.exception(f"Error in handle_limited_consultants: {str(e)}")
-        await send_error(
-            sid, session_id, f"Error in handle_limited_consultants: {str(e)}"
-        )

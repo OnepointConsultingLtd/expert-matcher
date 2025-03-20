@@ -43,21 +43,26 @@ interface AppStoreActions {
   setSuggestionFilter: (suggestionFilter: string) => void;
 }
 
-function processVoting(state: AppStoreState, currentQuestion: QuestionWithSelectedOptions, option: string, voteUp: boolean) {
-    // Find the option with consultants to vote on candidates
-    const optionWithConsultants = currentQuestion.options.find((o) => o.option === option);
-    const candidatesWithVotes = [...state.candidates]
-    if (optionWithConsultants) {
-      // Do candidate voting
-      optionWithConsultants.consultants.forEach((email) => {
-        const candidateWithVotes = candidatesWithVotes.find((c) => c.email === email);
-        if (candidateWithVotes) {
-          if (voteUp) {
-            candidateWithVotes.votes++;
-          } else {
-            candidateWithVotes.votes--;
-          }
+function processVoting(
+  state: AppStoreState,
+  currentQuestion: QuestionWithSelectedOptions,
+  option: string,
+  voteUp: boolean
+) {
+  // Find the option with consultants to vote on candidates
+  const optionWithConsultants = currentQuestion.options.find((o) => o.option === option);
+  const candidatesWithVotes = [...state.candidates];
+  if (optionWithConsultants) {
+    // Do candidate voting
+    optionWithConsultants.consultants.forEach((email) => {
+      const candidateWithVotes = candidatesWithVotes.find((c) => c.email === email);
+      if (candidateWithVotes) {
+        if (voteUp) {
+          candidateWithVotes.votes++;
+        } else {
+          candidateWithVotes.votes--;
         }
+      }
     });
   }
   // End voting
@@ -101,7 +106,8 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
         differentiationQuestions: [...state.differentiationQuestions, questionWithSelectedOptions],
       };
     }),
-  clearDifferentiationQuestions: () => set({ differentiationQuestions: [], candidates: [], suggestionFilter: '' }),
+  clearDifferentiationQuestions: () =>
+    set({ differentiationQuestions: [], candidates: [], suggestionFilter: '' }),
   addCandidate: (candidate: Candidate) =>
     set((state) => {
       const candidateWithVotes = { ...candidate, votes: 0 };
@@ -116,15 +122,12 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
         return { ...state };
       }
       const currentQuestion = state.differentiationQuestions[questionWithSelectedOptionsIndex];
-      const selectedOptions = [
-        ...currentQuestion.selectedOptions,
-        { option, consultants: [] },
-      ];
+      const selectedOptions = [...currentQuestion.selectedOptions, { option, consultants: [] }];
       const modifiedQuestion = {
         ...currentQuestion,
         selectedOptions,
       };
-      
+
       const candidatesWithVotes = processVoting(state, currentQuestion, option, true);
 
       // End voting
@@ -191,11 +194,14 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
   clearAllSuggestions: () => {
     return set((state) => {
       return { ...state, selectedSuggestions: [], suggestionFilter: '' };
-    })
+    });
   },
   selectAllSuggestions: () =>
     set((state) => {
-      const allSuggestions = filterSuggestions(state.history[state.currentIndex].suggestions, state.suggestionFilter);
+      const allSuggestions = filterSuggestions(
+        state.history[state.currentIndex].suggestions,
+        state.suggestionFilter
+      );
       return { ...state, selectedSuggestions: [...allSuggestions] };
     }),
   deselectAllSuggestions: () =>
@@ -211,7 +217,7 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
           ...state,
           currentIndex: state.currentIndex - 1,
           selectedSuggestions: [],
-          suggestionFilter: ''
+          suggestionFilter: '',
         };
       }
       return { ...state };
@@ -223,7 +229,7 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
           ...state,
           currentIndex: state.currentIndex + 1,
           selectedSuggestions: [],
-          suggestionFilter: ''
+          suggestionFilter: '',
         };
       }
       return { ...state };
@@ -232,5 +238,7 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
 }));
 
 function filterSuggestions(suggestions: string[], suggestionFilter: string) {
-  return suggestions.filter(s => s.length === 0 || s.toLowerCase().includes(suggestionFilter.toLowerCase()));
+  return suggestions.filter(
+    (s) => s.length === 0 || s.toLowerCase().includes(suggestionFilter.toLowerCase())
+  );
 }

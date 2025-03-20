@@ -183,7 +183,7 @@ async def test_get_configuration():
 @pytest.mark.asyncio
 async def test_save_differentiation_question():
     differentiation_questions = provide_differentiation_questions()
-    
+
     assert differentiation_questions is not None
     assert len(differentiation_questions.questions) > 0
     session_id = "1234"
