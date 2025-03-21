@@ -8,6 +8,9 @@ import { useState } from 'react';
 import { scrollToElement } from '../../lib/scrollSupport';
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { GoTrophy } from 'react-icons/go';
+
+const iconClass = "h-7 w-7 mr-2";
 
 function OptionalLink({ href, children }: { href: string; children: React.ReactNode }) {
   if (!href) {
@@ -47,12 +50,15 @@ function CandidateCv({ candidate }: { candidate: CandidateWithVotes }) {
             const newExpanded = !cvExpanded
             setCvExpanded(newExpanded)
             if (newExpanded) {
-              setTimeout(() => {
-                scrollToElement(document.getElementById(`${candidate.id}`))
-              }, 400)
+              const elementId = document.getElementById(`${candidate.id}`)
+              if(elementId) {
+                setTimeout(() => {
+                  scrollToElement(elementId)
+                }, 400)
+              }
             }
           }}>
-          <TbFileCv className="h-7 w-7 mr-2" />
+          <TbFileCv className={iconClass} />
           {t('CV')}
         </button>
         <div className={`text-sm overflow-hidden transition-all duration-300 ease-in-out ${cvExpanded ? "max-h-[1000px]" : "max-h-0"}`}>
@@ -62,14 +68,14 @@ function CandidateCv({ candidate }: { candidate: CandidateWithVotes }) {
     </>)
 }
 
-function CadidateCard({ candidate }: { candidate: CandidateWithVotes }) {
+function CadidateCard({ candidate, index }: { candidate: CandidateWithVotes, index: number }) {
 
   const { t } = useTranslation();
   const name = `${candidate.given_name} ${candidate.surname}`;
   const { linkedin_profile_url } = candidate;
   return (
     <div key={candidate.id} className="flex flex-col gap-2">
-      <div className="text-2xl">{name}</div>
+      <div className="flex flex-row items-center text-2xl gap-2">{name} {index === 0 && <GoTrophy className={iconClass} />}</div>
       <CandidatePhoto candidate={candidate} />
       <div className="text-xl pl-1">{t('vote_other', { count: candidate.votes })}</div>
       {linkedin_profile_url && (
@@ -80,7 +86,7 @@ function CadidateCard({ candidate }: { candidate: CandidateWithVotes }) {
             rel="noopener noreferrer"
             className="flex flex-row items-center transition duration-300 ease-in-out hover:underline"
           >
-            <IoIosContact className="h-7 w-7 mr-2" />
+            <IoIosContact className={iconClass} />
             {t('Online profile')}
           </a>
         </div>
@@ -99,8 +105,8 @@ export default function DifferentiationCandidates() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-w-full">
         {candidates
           .sort((a, b) => b.votes - a.votes)
-          .map((candidate) => (
-            <CadidateCard key={candidate.id} candidate={candidate} />
+          .map((candidate, index) => (
+            <CadidateCard key={candidate.id} candidate={candidate} index={index} />
           ))}
       </div>
     </div>
