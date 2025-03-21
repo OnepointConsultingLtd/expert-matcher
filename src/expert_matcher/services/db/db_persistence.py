@@ -594,7 +594,7 @@ async def save_differentiation_question_vote(session_id: str, differentiation_qu
     sql_select_option = """
 SELECT OT.ID, DQ.QUESTION FROM	TB_DIFFERENTIATION_QUESTION_OPTION OT 
 			INNER JOIN TB_DIFFERENTIATION_QUESTION DQ ON DQ.ID = OT.DIFFERENTIATION_QUESTION_ID
-			WHERE OT.OPTION_TEXT = %(option)s AND DQ.QUESTION = %(question)s
+			WHERE OT.OPTION_TEXT = %(option)s AND DQ.QUESTION = %(question)s AND DQ.SESSION_ID = %(session_id)s
 """
     sql = """
 INSERT INTO
@@ -609,12 +609,14 @@ ON CONFLICT(SESSION_ID, DIFFERENTIATION_QUESTION_OPTION_ID) DO NOTHING
     async def process(cur: AsyncCursor) -> Awaitable[int]:
         changed = 0
         for vote in differentiation_question_votes.votes:
-            await cur.execute(sql_select_option, {"question": vote.question, "option": vote.option})
+            await cur.execute(sql_select_option, {"question": vote.question, "option": vote.option, "session_id": session_id})
             rows_option = await cur.fetchall()
             if rows_option and len(rows_option) > 0:
                 option_id = rows_option[0][0]
                 await cur.execute(sql, {"session_id": session_id, "option_id": option_id})
                 changed += cur.rowcount
+            else:
+                logger.warning(f"Option not found for vote {vote.question} {vote.option} in session {session_id}")
         return changed
 
     return await create_cursor(process)
