@@ -3,6 +3,11 @@ import { useCurrentMessage } from '../../hooks/useCurrentMessage';
 import { CandidateWithVotes } from '../../types/differentiation_questions';
 import { VscAccount } from 'react-icons/vsc';
 import { IoIosContact } from 'react-icons/io';
+import { TbFileCv } from "react-icons/tb";
+import { useState } from 'react';
+import { scrollToElement } from '../../lib/scrollSupport';
+import Markdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 function OptionalLink({ href, children }: { href: string; children: React.ReactNode }) {
   if (!href) {
@@ -30,7 +35,35 @@ function CandidatePhoto({ candidate }: { candidate: CandidateWithVotes }) {
   );
 }
 
+function CandidateCv({ candidate }: { candidate: CandidateWithVotes }) {
+  const { t } = useTranslation();
+  const [cvExpanded, setCvExpanded] = useState(false);
+
+  return (
+    <>
+      {candidate.cv && <div>
+        <button id={`${candidate.id}`} className="flex flex-row items-center transition duration-300 ease-in-out hover:underline"
+          onClick={() => {
+            const newExpanded = !cvExpanded
+            setCvExpanded(newExpanded)
+            if (newExpanded) {
+              setTimeout(() => {
+                scrollToElement(document.getElementById(`${candidate.id}`))
+              }, 400)
+            }
+          }}>
+          <TbFileCv className="h-7 w-7 mr-2" />
+          {t('CV')}
+        </button>
+        <div className={`text-sm overflow-hidden transition-all duration-300 ease-in-out ${cvExpanded ? "max-h-[1000px]" : "max-h-0"}`}>
+          <Markdown remarkPlugins={[remarkGfm]}>{candidate.cv}</Markdown>
+        </div>
+      </div>}
+    </>)
+}
+
 function CadidateCard({ candidate }: { candidate: CandidateWithVotes }) {
+
   const { t } = useTranslation();
   const name = `${candidate.given_name} ${candidate.surname}`;
   const { linkedin_profile_url } = candidate;
@@ -52,6 +85,7 @@ function CadidateCard({ candidate }: { candidate: CandidateWithVotes }) {
           </a>
         </div>
       )}
+      <CandidateCv candidate={candidate} />
     </div>
   );
 }

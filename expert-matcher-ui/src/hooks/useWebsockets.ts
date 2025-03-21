@@ -56,32 +56,40 @@ export function useWebsockets() {
       console.info('Server message: ', serverMessage);
       setSending(false);
       deleteErrorMessage();
-      if (serverMessage.status === MessageStatus.OK) {
-        setSessionId(serverMessage.session_id);
-        switch (serverMessage.content_type) {
-          case ContentType.HISTORY:
-            setHistory(serverMessage.content?.history ?? []);
-            break;
-          case ContentType.DIFFERENTIATION_QUESTIONS:
-            addDifferentiationQuestion(serverMessage.content as Question);
-            break;
-          case ContentType.CANDIDATE:
-            addCandidate(serverMessage.content as Candidate);
-            break;
-          case ContentType.VOTES_SAVED:
-            setSending(false);
-            setSuccessMessage(t('Votes saved'));
-            break;
-          case ContentType.ERROR:
-            setSending(false);
-            setErrorMessage(serverMessage.content?.message ?? 'An error occurred.');
-            break;
-          default:
-            console.error('Unknown content type: ', serverMessage.content_type);
-        }
-      } else {
-        console.error('Server message: ', serverMessage);
-        setErrorMessage('An error occurred.');
+      switch (serverMessage.status) {
+        case MessageStatus.OK:
+          setSessionId(serverMessage.session_id);
+          switch (serverMessage.content_type) {
+            case ContentType.HISTORY:
+              setHistory(serverMessage.content?.history ?? []);
+              break;
+            case ContentType.DIFFERENTIATION_QUESTIONS:
+              addDifferentiationQuestion(serverMessage.content as Question);
+              break;
+            case ContentType.CANDIDATE:
+              addCandidate(serverMessage.content as Candidate);
+              break;
+            case ContentType.VOTES_SAVED:
+              setSending(false);
+              setSuccessMessage(t('Votes saved'));
+              break;
+            case ContentType.ERROR:
+              debugger
+              setSending(false);
+              setErrorMessage(serverMessage.content?.message ?? t('An error occurred.'));
+              break;
+            default:
+              console.error('Unknown content type: ', serverMessage.content_type);
+          }
+          break;
+        case MessageStatus.ERROR:
+          setSending(false);
+          setErrorMessage(serverMessage.content?.message ?? t('An error occurred.'));
+          break;
+        default:
+          const error = t('Unknown status', {status: serverMessage.status})
+          console.error(error);
+          setErrorMessage(error);
       }
     }
 

@@ -1,4 +1,5 @@
 {
+    "An error occurred.": "An error occurred. Please try again later.",
     "availableConsultants_one": "{{count}} available consultant",
     "availableConsultants_other": "{{count}} available consultants",
     "Candidates": "Candidates",
@@ -19,6 +20,7 @@
     "stepOf": "Step {{step}} of {{total}}",
     "titleAddOption": "Click to add option",
     "titleRemoveOption": "Click to remove option",
+    "Unknown status": "Unknown status: {{status}}",
     "vote_one": "{{count}} vote",
     "vote_other": "{{count}} votes",
     "Votes saved": "Votes saved",

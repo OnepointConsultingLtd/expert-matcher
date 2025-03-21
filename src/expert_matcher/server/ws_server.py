@@ -150,7 +150,7 @@ async def send_error(sid: str, session_id: str, message: str):
     server_message = ServerMessage(
         status=MessageStatus.ERROR,
         session_id=session_id,
-        content=ErrorMessage(message=message),
+        content=ErrorMessage(message=message).model_dump(),
         content_type=ContentType.ERROR,
     )
     await sio.emit(WSCommand.SERVER_MESSAGE, server_message.model_dump(), room=sid)

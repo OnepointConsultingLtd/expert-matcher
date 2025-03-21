@@ -106,6 +106,9 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
         ...differentiationQuestion,
         selectedOptions: differentiationQuestion.options.filter((o) => o.selected),
       };
+      if(state.differentiationQuestions.some(dq => dq.question === differentiationQuestion.question)) {
+        return {...state};
+      }
       return {
         ...state,
         differentiationQuestions: [...state.differentiationQuestions, questionWithSelectedOptions],
@@ -115,6 +118,10 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
     set({ differentiationQuestions: [], candidates: [], suggestionFilter: '' }),
   addCandidate: (candidate: Candidate) =>
     set((state) => {
+      const { email } = candidate
+      if(state.candidates.some(c => c.email === email)) {
+        return {...state};
+      }
       const candidateWithVotes = { ...candidate, votes: 0 };
       const differentiationQuestions = state.differentiationQuestions
       for(const question of differentiationQuestions) {
