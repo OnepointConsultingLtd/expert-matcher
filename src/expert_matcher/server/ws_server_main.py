@@ -9,8 +9,10 @@ from expert_matcher.server.ws_server import app
 
 routes = web.RouteTableDef()
 
+UI_DIST_FOLDER = ws_cfg.ui_folder / "dist"
+
 FILE_INDEX = "index.html"
-PATH_INDEX = ws_cfg.ui_folder / FILE_INDEX
+PATH_INDEX = UI_DIST_FOLDER / FILE_INDEX
 INDEX_LINKS = ["/", "/admin"]
 
 
@@ -19,7 +21,7 @@ async def get_index(_: web.Request) -> web.Response:
 
 
 def overwrite_ui_properties():
-    file = ws_cfg.ui_folder / "index.html"
+    file = UI_DIST_FOLDER / "index.html"
     assert file.exists(), f"File {file} does not exist"
     content = file.read_text(encoding="utf-8")
     content = re.sub(r"127\.0\.0\.1", cfg.ui_domain, content)
@@ -41,7 +43,7 @@ def run_server():
     app.add_routes(routes)
     for folder in ["images", "assets"]:
         app.router.add_static(
-            f"/{folder}", path=(ws_cfg.ui_folder / folder).as_posix(), name=folder
+            f"/{folder}", path=(UI_DIST_FOLDER / folder).as_posix(), name=folder
         )
 
     loop = asyncio.new_event_loop()
