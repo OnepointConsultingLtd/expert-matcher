@@ -6,9 +6,15 @@ This project can be used to progressively ask questions about expert skills and 
 
 In order to start the project execute:
 
-```bash
+```powershell
 uv venv
 .venv\Scripts\activate
+uv sync
+```
+
+```bash
+uv venv
+source .venv/bin/activate
 uv sync
 ```
 

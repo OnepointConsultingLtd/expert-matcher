@@ -44,6 +44,9 @@ class Config:
 
     llm = ChatOpenAI(model=model, api_key=api_key)
 
+    ui_domain = os.getenv("UI_DOMAIN", "localhost")
+    ui_port = int(os.getenv("UI_PORT", 8090))
+
 
 class WebsocketConfig:
     websocket_server = os.getenv("WEBSOCKET_SERVER", "0.0.0.0")

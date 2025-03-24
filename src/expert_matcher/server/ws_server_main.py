@@ -1,9 +1,10 @@
 import asyncio
 import os
+import re
 
 from aiohttp import web
 
-from expert_matcher.config.config import ws_cfg
+from expert_matcher.config.config import ws_cfg, cfg
 from expert_matcher.server.ws_server import app
 
 routes = web.RouteTableDef()
@@ -17,12 +18,22 @@ async def get_index(_: web.Request) -> web.Response:
     return web.FileResponse(PATH_INDEX)
 
 
+def overwrite_ui_properties():
+    file = ws_cfg.ui_folder / "index.html"
+    assert file.exists(), f"File {file} does not exist"
+    content = file.read_text(encoding="utf-8")
+    content = re.sub(r"127\.0\.0\.1", cfg.ui_domain, content)
+    content = re.sub(r"8090", str(cfg.ui_port), content)
+    file.write_text(content, encoding="utf-8")
+
+
 def run_server():
     # Compile the client app using vite
     original_dir = os.getcwd()
     os.chdir(ws_cfg.ui_folder)
     os.system("npm run build")
     os.chdir(original_dir)
+    overwrite_ui_properties()
 
     # Setup the routes for the web application
     for url in INDEX_LINKS:
