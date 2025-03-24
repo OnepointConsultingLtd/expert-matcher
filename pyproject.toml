@@ -15,6 +15,7 @@ dependencies = [
     "aiohttp>=3.10.11",
     "langchain>=0.0.27",
     "langchain-openai>=0.3.9",
+    "tomli>=2.2.1",
 ]
 requires-python = ">=3.12"
 
