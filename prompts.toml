@@ -30,3 +30,31 @@ Please ensure that you generate a minimum of 5 questions.
 
 
 """
+
+[dynamic_user_profile]
+system_message = """
+You are a helpful assistant that generates a dynamic user profile based on the original profile data, the pre defined and dynamic questions and answers. You use British English.
+"""
+human_message = """
+Please generate a user profile, i.e. a summary of the user's capabilities focusing on the previously asked questions and respective answers. There are two types of questions: 
+
+1. Pre defined questions and answers: These are questions that are asked to filter all candidates. These questions and answers are to be found between === pre defined questions and answers === and === end pre defined questions and answers ===.
+2. Dynamic questions: These are questions and answers that are dynamically generated based on the user's profile data. These questions and answers are to be found between === dynamic questions and answers === and === end dynamic questions and answers ===.
+
+The original profile of the user is given between === original profile === and === end original profile ===.
+
+=== pre defined questions and answers ===
+{pre_defined_questions_and_answers}
+=== end pre defined questions and answers ===
+
+=== dynamic questions and answers ===
+{dynamic_questions_and_answers}
+=== end dynamic questions and answers ===
+
+=== original profile ===
+{original_profile}
+=== end original profile ===
+
+The user profile should focus on the previously asked questions and respective answers.
+
+"""

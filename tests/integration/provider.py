@@ -16,7 +16,7 @@ insert into tb_session(session_id, user_email) values('{session_id}', 'anon{sess
 
 insert into TB_SESSION_QUESTION(SESSION_ID, CATEGORY_QUESTION_ID)
 values((select id from TB_SESSION where SESSION_ID='{session_id}'), 
-(select id from TB_CATEGORY_QUESTION order by order_index limit 1));
+(select id from VW_SAFE_CATEGORY_QUESTIONS order by order_index limit 1));
         """
     )
 
@@ -30,31 +30,38 @@ async def provide_dummy_data(session_id: str):
 
 insert into TB_SESSION_QUESTION(SESSION_ID, CATEGORY_QUESTION_ID)
 values((select id from TB_SESSION where SESSION_ID='{session_id}'), 
-(select id from TB_CATEGORY_QUESTION order by order_index offset 1 limit 1));
+(select id from VW_SAFE_CATEGORY_QUESTIONS order by order_index offset 1 limit 1));
+
+insert into TB_SESSION_QUESTION_RESPONSES(SESSION_QUESTION_ID, CATEGORY_ITEM_ID)
+select (select sq.id from TB_SESSION_QUESTION sq
+where SESSION_ID = ((select id from TB_SESSION where SESSION_ID='{session_id}')) 
+and CATEGORY_QUESTION_ID = (select id from VW_SAFE_CATEGORY_QUESTIONS order by order_index limit 1)), id from TB_CATEGORY_ITEM where category_id = (select C.id from TB_CATEGORY C 
+INNER JOIN TB_CATEGORY_QUESTION q on C.id = q.CATEGORY_ID
+WHERE q.id = (select id from VW_SAFE_CATEGORY_QUESTIONS order by order_index limit 1));
+
+-- insert into TB_SESSION_QUESTION_RESPONSES(SESSION_QUESTION_ID, CATEGORY_ITEM_ID)
+-- values((select sq.id from TB_SESSION_QUESTION sq
+-- where SESSION_ID = ((select id from TB_SESSION where SESSION_ID='{session_id}')) 
+-- and CATEGORY_QUESTION_ID = (select id from VW_SAFE_CATEGORY_QUESTIONS order by order_index limit 1)), 
+-- (select id from TB_CATEGORY_ITEM where category_id = (select C.id from TB_CATEGORY C 
+-- INNER JOIN TB_CATEGORY_QUESTION q on C.id = q.CATEGORY_ID
+-- WHERE q.id = (select id from VW_SAFE_CATEGORY_QUESTIONS order by order_index limit 1)) limit 1));
 
 insert into TB_SESSION_QUESTION_RESPONSES(SESSION_QUESTION_ID, CATEGORY_ITEM_ID)
 values((select sq.id from TB_SESSION_QUESTION sq
 where SESSION_ID = ((select id from TB_SESSION where SESSION_ID='{session_id}')) 
-and CATEGORY_QUESTION_ID = (select id from TB_CATEGORY_QUESTION order by order_index limit 1)), 
+and CATEGORY_QUESTION_ID = (select id from VW_SAFE_CATEGORY_QUESTIONS order by order_index offset 1 limit 1)), 
 (select id from TB_CATEGORY_ITEM where category_id = (select C.id from TB_CATEGORY C 
 INNER JOIN TB_CATEGORY_QUESTION q on C.id = q.CATEGORY_ID
-WHERE q.id = (select id from TB_CATEGORY_QUESTION order by order_index limit 1)) limit 1));
+WHERE q.id = (select id from VW_SAFE_CATEGORY_QUESTIONS order by order_index offset 1 limit 1)) limit 1));
 
 insert into TB_SESSION_QUESTION_RESPONSES(SESSION_QUESTION_ID, CATEGORY_ITEM_ID)
 values((select sq.id from TB_SESSION_QUESTION sq
 where SESSION_ID = ((select id from TB_SESSION where SESSION_ID='{session_id}')) 
-and CATEGORY_QUESTION_ID = (select id from TB_CATEGORY_QUESTION order by order_index offset 1 limit 1)), 
+and CATEGORY_QUESTION_ID = (select id from VW_SAFE_CATEGORY_QUESTIONS order by order_index offset 1 limit 1)), 
 (select id from TB_CATEGORY_ITEM where category_id = (select C.id from TB_CATEGORY C 
 INNER JOIN TB_CATEGORY_QUESTION q on C.id = q.CATEGORY_ID
-WHERE q.id = (select id from TB_CATEGORY_QUESTION order by order_index offset 1 limit 1)) limit 1));
-
-insert into TB_SESSION_QUESTION_RESPONSES(SESSION_QUESTION_ID, CATEGORY_ITEM_ID)
-values((select sq.id from TB_SESSION_QUESTION sq
-where SESSION_ID = ((select id from TB_SESSION where SESSION_ID='{session_id}')) 
-and CATEGORY_QUESTION_ID = (select id from TB_CATEGORY_QUESTION order by order_index offset 1 limit 1)), 
-(select id from TB_CATEGORY_ITEM where category_id = (select C.id from TB_CATEGORY C 
-INNER JOIN TB_CATEGORY_QUESTION q on C.id = q.CATEGORY_ID
-WHERE q.id = (select id from TB_CATEGORY_QUESTION order by order_index offset 1 limit 1)) offset 1 limit 1));
+WHERE q.id = (select id from VW_SAFE_CATEGORY_QUESTIONS order by order_index offset 1 limit 1)) offset 1 limit 1));
 
 """
     )

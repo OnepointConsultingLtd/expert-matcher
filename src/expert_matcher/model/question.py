@@ -16,3 +16,12 @@ class QuestionSuggestions(BaseModel):
     available_consultants_count: int = Field(
         description="The number of consultants available for the question"
     )
+
+
+class QuestionAnswer(BaseModel):
+    question: str = Field(description="The question")
+    answer: str = Field(description="The answer")
+
+    def __str__(self):
+        return f"""{self.question}
+{self.answer}"""

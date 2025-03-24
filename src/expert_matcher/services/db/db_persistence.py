@@ -2,7 +2,7 @@ from typing import Awaitable
 
 from psycopg import AsyncCursor
 
-from expert_matcher.model.question import QuestionSuggestions
+from expert_matcher.model.question import QuestionSuggestions, QuestionAnswer
 from expert_matcher.model.session import Session
 from expert_matcher.model.state import State
 from expert_matcher.services.db.db_support import select_from, create_cursor
@@ -260,7 +260,7 @@ async def find_available_consultants(
     """Filter the consultants based on the session state."""
 
     sql = """
--- select categories that has already been picked up in a session
+-- select categories that have already been picked up in a session
 select cq.order_index, c.NAME, STRING_AGG(ci.ITEM, '@@') CATEGORY_ITEMS from TB_SESSION s
 INNER JOIN TB_SESSION_QUESTION sq ON sq.SESSION_ID = s.ID
 INNER JOIN TB_CATEGORY_QUESTION cq ON cq.ID = sq.CATEGORY_QUESTION_ID
@@ -631,3 +631,46 @@ DELETE FROM TB_DIFFERENTIATION_QUESTION_OPTION_SESSION_SELECTION WHERE SESSION_I
         return cur.rowcount
     
     return await create_cursor(process)
+
+
+async def find_question_answers(sql:str, session_id: str, email: str) -> list[QuestionAnswer]:
+    res = await select_from(sql, {"session_id": session_id, "email": email})
+    return [QuestionAnswer(question=r[0], answer=r[1]) for r in res]
+
+
+async def find_consultant_related_questions(session_id: str, email: str) -> list[QuestionAnswer]:
+    sql = """
+SELECT
+	Q.QUESTION,
+	CI.ITEM ANSWER
+FROM
+	TB_SESSION_QUESTION_RESPONSES QR
+	INNER JOIN TB_SESSION_QUESTION SQ ON SQ.ID = QR.SESSION_QUESTION_ID
+	INNER JOIN TB_CATEGORY_QUESTION Q ON Q.ID = SQ.CATEGORY_QUESTION_ID
+	INNER JOIN TB_SESSION S ON S.ID = SQ.SESSION_ID
+	INNER JOIN PUBLIC.TB_CATEGORY_ITEM CI ON CI.ID = QR.CATEGORY_ITEM_ID
+	INNER JOIN TB_CONSULTANT_CATEGORY_ITEM_ASSIGNMENT IA ON IA.CATEGORY_ITEM_ID = CI.ID
+	INNER JOIN TB_CONSULTANT C ON C.ID = IA.CONSULTANT_ID
+WHERE
+	S.SESSION_ID = %(session_id)s
+	AND C.EMAIL = %(email)s;
+"""
+    return await find_question_answers(sql, session_id, email)
+
+
+async def find_consultant_related_questions(session_id: str, email: str) -> list[QuestionAnswer]:
+    sql = """
+SELECT
+	DQ.QUESTION,
+	QO.OPTION_TEXT
+FROM
+	TB_DIFFERENTIATION_QUESTION DQ
+	INNER JOIN TB_DIFFERENTIATION_QUESTION_OPTION QO ON QO.DIFFERENTIATION_QUESTION_ID = DQ.ID
+	INNER JOIN TB_DIFFERENTIATION_QUESTION_OPTION_ASSIGNMENT OA ON OA.DIFFERENTIATION_QUESTION_OPTION_ID = QO.ID
+	INNER JOIN TB_CONSULTANT C ON C.ID = OA.CONSULTANT_ID
+	INNER JOIN PUBLIC.TB_DIFFERENTIATION_QUESTION_OPTION_SESSION_SELECTION SS ON SS.DIFFERENTIATION_QUESTION_OPTION_ID = QO.ID
+WHERE
+	DQ.SESSION_ID = %(session_id)s
+	AND C.EMAIL = %(email)s;
+"""
+    return await find_question_answers(sql, session_id, email)

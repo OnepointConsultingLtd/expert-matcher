@@ -81,6 +81,8 @@ async def generate_differentiation_questions(
     questions = await _generate_differentiation_questions(
         candidates, excluded_dimensions
     )
+    for question in questions.questions:
+        question.options = [option for option in question.options if len(option.consultants) > 0]
     return DifferentiationQuestionsResponse(
         questions=questions.questions,
         candidates=candidates,
@@ -95,6 +97,8 @@ async def fetch_differentiation_questions(
     if response:
         return response
     response = await generate_differentiation_questions(session_id)
+    with open(cfg.base_folder / "docs/sample_differentiation_questions.json", "w") as f:
+        f.write(response.model_dump_json())
     response.candidates = await find_available_consultants(session_id)
     await save_differentiation_question(session_id, response)
     return response
