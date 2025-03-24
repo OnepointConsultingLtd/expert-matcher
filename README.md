@@ -22,6 +22,16 @@ uv sync
 
 The environment variables can be found in this file: [.env_local](.env_local)
 
+## Before you run
+
+Please execute:
+
+```bash
+cd expert-matcher-ui
+npm install
+npm run build
+```
+
 ## Running
 
 ```bash

@@ -33,6 +33,7 @@ def run_server():
     # Compile the client app using vite
     original_dir = os.getcwd()
     os.chdir(ws_cfg.ui_folder)
+    os.system("npm install")
     os.system("npm run build")
     os.chdir(original_dir)
     overwrite_ui_properties()
