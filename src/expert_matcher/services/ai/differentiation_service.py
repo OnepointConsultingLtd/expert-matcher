@@ -1,9 +1,4 @@
-from langchain_core.prompts import (
-    PromptTemplate,
-    ChatPromptTemplate,
-    SystemMessagePromptTemplate,
-    HumanMessagePromptTemplate,
-)
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableSequence
 
 from expert_matcher.config.config import cfg
@@ -18,19 +13,12 @@ from expert_matcher.services.db.db_persistence import (
     read_differentiation_question,
     save_differentiation_question,
 )
+from expert_matcher.services.ai.prompt_factory_support import prompt_factory
 
 
-def _prompt_factory() -> PromptTemplate:
+def _prompt_factory() -> ChatPromptTemplate:
     """Create a prompt template for a specific key"""
-    prompt_dimensions = cfg.prompt_templates["differentiation_questions"]
-    human_message = prompt_dimensions["human_message"]
-    system_message = prompt_dimensions["system_message"]
-    return ChatPromptTemplate(
-        messages=[
-            SystemMessagePromptTemplate(prompt=PromptTemplate(template=system_message)),
-            HumanMessagePromptTemplate(prompt=PromptTemplate(template=human_message)),
-        ]
-    )
+    return prompt_factory("differentiation_questions")
 
 
 def _chain_factory() -> RunnableSequence:
@@ -82,7 +70,9 @@ async def generate_differentiation_questions(
         candidates, excluded_dimensions
     )
     for question in questions.questions:
-        question.options = [option for option in question.options if len(option.consultants) > 0]
+        question.options = [
+            option for option in question.options if len(option.consultants) > 0
+        ]
     return DifferentiationQuestionsResponse(
         questions=questions.questions,
         candidates=candidates,

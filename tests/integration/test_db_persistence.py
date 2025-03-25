@@ -21,13 +21,17 @@ from expert_matcher.services.db.db_persistence import (
     delete_differentiation_question,
     read_differentiation_question,
     clear_differentiation_question_votes,
-    save_differentiation_question_vote
+    save_differentiation_question_vote,
+    find_emails_in_session,
+    find_consultant_related_questions,
+    find_consultant_related_differentiation_question_answers,
+    find_consultant_details,
 )
 from tests.integration.provider import (
     provide_dummy_data,
     provide_initial_question,
     provide_differentiation_questions,
-    create_differentiation_question_vote
+    create_differentiation_question_vote,
 )
 
 
@@ -218,7 +222,9 @@ async def test_save_differentiation_question_vote():
     )
     assert updated_questions > 0
     differentiation_question_votes = create_differentiation_question_vote(session_id)
-    updated = await save_differentiation_question_vote(session_id, differentiation_question_votes)
+    updated = await save_differentiation_question_vote(
+        session_id, differentiation_question_votes
+    )
     assert updated > 0
     deleted = await delete_differentiation_question(session_id)
     assert deleted > 0
@@ -229,3 +235,39 @@ async def test_clear_differentiation_question_votes():
     session_id = "87654321"
     deleted = await clear_differentiation_question_votes(session_id)
     assert deleted == 0
+
+
+async def prepare_emails_and_session() -> tuple[list[str], str]:
+    session_id = "1234"
+    await provide_dummy_data(session_id)
+    emails = await find_emails_in_session(session_id)
+    assert emails is not None
+    assert len(emails) > 0
+    return emails, session_id
+
+
+@pytest.mark.asyncio
+async def test_find_consultant_related_questions():
+    emails, session_id = await prepare_emails_and_session()
+    questions = await find_consultant_related_questions(session_id, emails[0])
+    assert questions is not None
+    assert len(questions) > 0
+
+
+@pytest.mark.asyncio
+async def test_find_consultant_related_differentiation_question_answers():
+    emails, session_id = await prepare_emails_and_session()
+    answers = await find_consultant_related_differentiation_question_answers(
+        emails[0], session_id
+    )
+    assert answers is not None
+
+
+@pytest.mark.asyncio
+async def test_find_consultant_details():
+    emails, _ = await prepare_emails_and_session()
+    consultant = await find_consultant_details(emails[0])
+    assert consultant is not None
+    assert consultant.email == emails[0]
+    assert consultant.experiences is not None
+    assert len(consultant.experiences) > 0

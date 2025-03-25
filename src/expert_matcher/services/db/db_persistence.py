@@ -15,7 +15,18 @@ from expert_matcher.model.differentiation_questions import (
     DifferentiationQuestionOptionWithSelection,
     DifferentiationQuestionVotes,
 )
-from expert_matcher.config.logger import logger
+from expert_matcher.model.consultant_factory import (
+    consultant_factory,
+    consultant_experience_factory,
+)
+from expert_matcher.model.dynamic_consultant_profile import (
+    DynamicConsultantProfileResponse,
+)
+
+
+consultant_details_base_sql = """SELECT * FROM (SELECT C.ID, C.GIVEN_NAME, C.SURNAME, C.LINKEDIN_PROFILE_URL, C.EMAIL, C.CV, STRING_AGG(S.SKILL_NAME, '@@') SKILLS, C.LINKEDIN_PHOTO_200, C.LINKEDIN_PHOTO_200 FROM TB_CONSULTANT C 
+INNER JOIN TB_CONSULTANT_SKILL CS ON C.ID = CS.CONSULTANT_ID INNER JOIN TB_SKILL S ON S.ID = CS.SKILL_ID
+GROUP BY C.ID, C.GIVEN_NAME, C.SURNAME, C.LINKEDIN_PROFILE_URL, C.EMAIL, C.CV) q"""
 
 
 async def select_first_question(session_id: str) -> QuestionSuggestions | None:
@@ -227,33 +238,6 @@ WHERE s.session_id = %(session_id)s and cq.ID = %(question_id)s;
     return await create_cursor(process)
 
 
-def consultant_factory(
-    consultant_details: list[tuple[int, str, str, str, str, str, str, str, str]],
-) -> list[Consultant]:
-    consultant_id_index = 0
-    given_name_index = 1
-    surname_index = 2
-    linkedin_profile_url_index = 3
-    email_index = 4
-    cv_index = 5
-    photo_url_200_index = 7
-    photo_url_400_index = 8
-    consultants: list[Consultant] = []
-    for consultant_detail in consultant_details:
-        consultant = Consultant(
-            id=consultant_detail[consultant_id_index],
-            given_name=consultant_detail[given_name_index],
-            surname=consultant_detail[surname_index],
-            linkedin_profile_url=consultant_detail[linkedin_profile_url_index],
-            email=consultant_detail[email_index],
-            cv=consultant_detail[cv_index],
-            photo_url_200=consultant_detail[photo_url_200_index],
-            photo_url_400=consultant_detail[photo_url_400_index],
-        )
-        consultants.append(consultant)
-    return consultants
-
-
 async def find_available_consultants(
     session_id: str, extract_experiences: bool = False
 ) -> list[Consultant]:
@@ -278,9 +262,7 @@ select distinct CONSULTANT_ID from VW_CONSULTANT_CATEGORY_ITEM
 WHERE CATEGORY_NAME = %(category_name)s AND CATEGORY_ITEM = ANY(%(category_items)s)
 AND CONSULTANT_ID = ANY(%(consultant_ids)s)
 """
-    consultant_details_base_sql = """SELECT * FROM (SELECT C.ID, C.GIVEN_NAME, C.SURNAME, C.LINKEDIN_PROFILE_URL, C.EMAIL, C.CV, STRING_AGG(S.SKILL_NAME, '@@'), C.LINKEDIN_PHOTO_200, C.LINKEDIN_PHOTO_200 FROM TB_CONSULTANT C 
-INNER JOIN TB_CONSULTANT_SKILL CS ON C.ID = CS.CONSULTANT_ID INNER JOIN TB_SKILL S ON S.ID = CS.SKILL_ID
-GROUP BY C.ID, C.GIVEN_NAME, C.SURNAME, C.LINKEDIN_PROFILE_URL, C.EMAIL, C.CV) q"""
+
     consultant_details_sql = f"""
 {consultant_details_base_sql}
 where ID = ANY(%(consultant_ids)s)
@@ -560,7 +542,9 @@ ORDER BY Q.QUESTION, O.OPTION_TEXT
             current_option = r[index_option]
             current_consultant = r[index_consultant]
             option = DifferentiationQuestionOptionWithSelection(
-                option=current_option, consultants=[current_consultant], selected=r[index_selected]
+                option=current_option,
+                consultants=[current_consultant],
+                selected=r[index_selected],
             )
             question = DifferentiationQuestion(
                 question=current_question,
@@ -574,7 +558,9 @@ ORDER BY Q.QUESTION, O.OPTION_TEXT
                 current_consultant = r[index_consultant]
                 current_selected = r[index_selected]
                 option = DifferentiationQuestionOptionWithSelection(
-                    option=current_option, consultants=[current_consultant], selected=current_selected
+                    option=current_option,
+                    consultants=[current_consultant],
+                    selected=current_selected,
                 )
                 questions[-1].options.append(option)
             elif current_consultant != r[index_consultant]:
@@ -590,7 +576,9 @@ ORDER BY Q.QUESTION, O.OPTION_TEXT
     )
 
 
-async def save_differentiation_question_vote(session_id: str, differentiation_question_votes: DifferentiationQuestionVotes) -> int:
+async def save_differentiation_question_vote(
+    session_id: str, differentiation_question_votes: DifferentiationQuestionVotes
+) -> int:
     sql_select_option = """
 SELECT OT.ID, DQ.QUESTION FROM	TB_DIFFERENTIATION_QUESTION_OPTION OT 
 			INNER JOIN TB_DIFFERENTIATION_QUESTION DQ ON DQ.ID = OT.DIFFERENTIATION_QUESTION_ID
@@ -606,17 +594,29 @@ VALUES
 	)
 ON CONFLICT(SESSION_ID, DIFFERENTIATION_QUESTION_OPTION_ID) DO NOTHING
 """
+
     async def process(cur: AsyncCursor) -> Awaitable[int]:
         changed = 0
         for vote in differentiation_question_votes.votes:
-            await cur.execute(sql_select_option, {"question": vote.question, "option": vote.option, "session_id": session_id})
+            await cur.execute(
+                sql_select_option,
+                {
+                    "question": vote.question,
+                    "option": vote.option,
+                    "session_id": session_id,
+                },
+            )
             rows_option = await cur.fetchall()
             if rows_option and len(rows_option) > 0:
                 option_id = rows_option[0][0]
-                await cur.execute(sql, {"session_id": session_id, "option_id": option_id})
+                await cur.execute(
+                    sql, {"session_id": session_id, "option_id": option_id}
+                )
                 changed += cur.rowcount
             else:
-                logger.warning(f"Option not found for vote {vote.question} {vote.option} in session {session_id}")
+                logger.warning(
+                    f"Option not found for vote {vote.question} {vote.option} in session {session_id}"
+                )
         return changed
 
     return await create_cursor(process)
@@ -626,19 +626,38 @@ async def clear_differentiation_question_votes(session_id: str) -> int:
     sql = """
 DELETE FROM TB_DIFFERENTIATION_QUESTION_OPTION_SESSION_SELECTION WHERE SESSION_ID = (SELECT ID FROM TB_SESSION WHERE SESSION_ID = %(session_id)s)
 """
+
     async def process(cur: AsyncCursor) -> Awaitable[int]:
         await cur.execute(sql, {"session_id": session_id})
         return cur.rowcount
-    
+
     return await create_cursor(process)
 
 
-async def find_question_answers(sql:str, session_id: str, email: str) -> list[QuestionAnswer]:
+async def find_question_answers(
+    sql: str, session_id: str, email: str
+) -> list[QuestionAnswer]:
     res = await select_from(sql, {"session_id": session_id, "email": email})
     return [QuestionAnswer(question=r[0], answer=r[1]) for r in res]
 
 
-async def find_consultant_related_questions(session_id: str, email: str) -> list[QuestionAnswer]:
+async def find_emails_in_session(session_id: str) -> list[str]:
+    sql = """
+SELECT distinct email FROM TB_CONSULTANT c
+INNER JOIN TB_CONSULTANT_CATEGORY_ITEM_ASSIGNMENT ia on ia.consultant_id = c.id
+INNER JOIN TB_CATEGORY_ITEM ci on ci.id = ia.category_item_id
+INNER JOIN tb_session_question_responses qr ON qr.category_item_id = ci.id
+INNER JOIN TB_SESSION_QUESTION sq on sq.id = qr.session_question_id
+INNER JOIN TB_SESSION s on s.id = sq.session_id
+where s.session_id = %(session_id)s
+"""
+    res = await select_from(sql, {"session_id": session_id})
+    return [r[0] for r in res]
+
+
+async def find_consultant_related_questions(
+    session_id: str, email: str
+) -> list[QuestionAnswer]:
     sql = """
 SELECT
 	Q.QUESTION,
@@ -658,7 +677,9 @@ WHERE
     return await find_question_answers(sql, session_id, email)
 
 
-async def find_consultant_related_questions(session_id: str, email: str) -> list[QuestionAnswer]:
+async def find_consultant_related_differentiation_question_answers(
+    session_id: str, email: str
+) -> list[QuestionAnswer]:
     sql = """
 SELECT
 	DQ.QUESTION,
@@ -674,3 +695,40 @@ WHERE
 	AND C.EMAIL = %(email)s;
 """
     return await find_question_answers(sql, session_id, email)
+
+
+async def find_consultant_details(email: str) -> Consultant | None:
+    sql_experience = """
+SELECT ce.id, ce.consultant_id, ce.title, ce.location, co.company_name, ce.start_date, ce.end_date FROM TB_CONSULTANT_EXPERIENCE ce
+INNER JOIN TB_CONSULTANT C ON c.id = ce.consultant_id
+INNER JOIN TB_COMPANY CO ON co.id = ce.company_id
+WHERE c.email = %(email)s
+"""
+    sql_consultant_details = consultant_details_base_sql + " WHERE email = %(email)s"
+    res_consultant_details = await select_from(sql_consultant_details, {"email": email})
+    if len(res_consultant_details) == 0:
+        return None
+    consultants = consultant_factory(res_consultant_details)
+    res_experience = await select_from(sql_experience, {"email": email})
+    consultant = consultants[0]
+    consultant.experiences = consultant_experience_factory(res_experience)
+    return consultant
+
+
+async def find_dynamic_consultant_profile(
+    session_id: str, email: str
+) -> DynamicConsultantProfileResponse | None:
+    question_answers = await find_consultant_related_questions(session_id, email)
+    differentiation_question_answers = (
+        await find_consultant_related_differentiation_question_answers(
+            session_id, email
+        )
+    )
+    consultant_details = await find_consultant_details(email)
+    if not consultant_details:
+        return None
+    return DynamicConsultantProfileResponse(
+        question_answers=question_answers,
+        differentiation_question_answers=differentiation_question_answers,
+        consultant=consultant_details,
+    )

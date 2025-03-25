@@ -55,6 +55,7 @@ The original profile of the user is given between === original profile === and =
 {original_profile}
 === end original profile ===
 
-The user profile should focus on the previously asked questions and respective answers.
+The user profile should focus on the previously asked questions and respective answers and give a summary about why the user is
+a good fit for the job based on the pre defined questions and answers and the dynamic questions and answers.
 
 """

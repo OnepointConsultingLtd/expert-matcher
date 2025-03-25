@@ -1,0 +1,144 @@
+{
+    "question_answers": [
+        {
+            "question": "Which geographical location or region do you prefer the consultant to have experience in?",
+            "answer": "London, England"
+        },
+        {
+            "question": "Which industry experience are you seeking in a consultant?",
+            "answer": "Computer Software"
+        },
+        {
+            "question": "Which industry experience are you seeking in a consultant?",
+            "answer": "Information Technology & Services"
+        },
+        {
+            "question": "What specific job titles or positions would you like the consultant to have held in their career?",
+            "answer": "Consultant (Architecture)"
+        },
+        {
+            "question": "What specific job titles or positions would you like the consultant to have held in their career?",
+            "answer": "Architecture Consultant"
+        },
+        {
+            "question": "How many years of professional experience are you looking for in a consultant?",
+            "answer": "15+ years"
+        },
+        {
+            "question": "How many years of professional experience are you looking for in a consultant?",
+            "answer": "16+ years"
+        },
+        {
+            "question": "How many years of professional experience are you looking for in a consultant?",
+            "answer": "20+ years"
+        },
+        {
+            "question": "How many years of professional experience are you looking for in a consultant?",
+            "answer": "25+ years"
+        },
+        {
+            "question": "Are there specific companies or types of organizations you prefer the consultant to have experience with?",
+            "answer": "OSSCube UK Ltd"
+        },
+        {
+            "question": "Are there specific companies or types of organizations you prefer the consultant to have experience with?",
+            "answer": "Kemp Little Consulting LLP"
+        },
+        {
+            "question": "Are there specific companies or types of organizations you prefer the consultant to have experience with?",
+            "answer": "Reliance Jio Infocomm Ltd"
+        },
+        {
+            "question": "Are there specific companies or types of organizations you prefer the consultant to have experience with?",
+            "answer": "Network Rail"
+        },
+        {
+            "question": "What company size or number of employees do you prefer the consultant to have experience working with?",
+            "answer": "11-50 employees"
+        },
+        {
+            "question": "What company size or number of employees do you prefer the consultant to have experience working with?",
+            "answer": "51-200 employees"
+        },
+        {
+            "question": "What company size or number of employees do you prefer the consultant to have experience working with?",
+            "answer": "201-500 employees"
+        },
+        {
+            "question": "What company size or number of employees do you prefer the consultant to have experience working with?",
+            "answer": "501-1000 employees"
+        },
+        {
+            "question": "What company size or number of employees do you prefer the consultant to have experience working with?",
+            "answer": "More than 1000 employees"
+        }
+    ],
+    "differentiation_question_answers": [
+        {
+            "question": "What types of compliance standards do the consultants have experience with?",
+            "answer": "GDPR"
+        },
+        {
+            "question":"What are the consultants' approaches to team leadership?",
+            "answer": "Motivational team building"
+        }
+    ],
+    "consultant": {
+        "id": 69,
+        "given_name": "Shashin",
+        "surname": "Shah",
+        "linkedin_profile_url": "https://www.linkedin.com/in/shashinbshah",
+        "email": "shashinbshah@linkedin.com",
+        "cv":"A fellow of the British Computer Society, a creative and influential leader with over 35 years of experience in delivering business aligned Technology Strategies, Architectures and Systems across a diverse range of industries and markets. A motivational team builder and an excellent communicator with a proven track record of enthusing and energising teams to deliver technical solutions to meet corporate business needs.\\n\\nHighly experienced in roles including  IT Director, Design Authority, Head of Architecture, Programme Director and leading teams of architects and designers within technically challenging and demanding environments.                                                  \\n\\nI spend my days listening to companies who've got complex digital challenges they need to overcome to deliver critical business outcomes. These range from providing the best possible customer service and experience, to optimising operational efficiencies, staying on the right side of compliance, and innovating with AI, blockchain, cloud, sensors, low code, and more. They are looking for unbiased and sound advice they can trust.\\n\\nAll these organisations have a common desire to utilise the power of digital to stay competitive and deliver value to their customers, colleagues and partners. They are all on a journey of becoming digital and data driven but are faced with legacy systems, regulatory pressures, competition, multitude of applications and platforms, and are often overcome with the huge choices that modern digital technology can offer. That's when we come alive.\\n\\nI ve built a team in London and Pune over 15 years that loves to roll up its sleeves and get embroiled in these challenges. We're good listeners, analytical thinkers, collaborators — and ultimately problem solvers.\\n\\nI've always believed that technology and data are there to improve people's lives and not an end in themselves — I keep everyone focused on that goal. My aim is to see humanity thrive through good business, using the very best that technology can offer.\\n\\nWe've enjoyed solving complex data and technology problems for the likes of Flight Centre, Meggitt, Vision Express, TUI, Autovista, Carphone Warehouse, AOL Broadband, Tesco Telecom and Travis Perkins, hopefully making the lives of their staff, customers, and partners better than they otherwise might have been.\\n",
+        "skills": [],
+        "experiences": [
+            {
+                "id": 306,
+                "consultant_id": 69,
+                "company_name": "Onepoint",
+                "location": "London",
+                "title": "Founder & CEO",
+                "start_date": "2005-01-01",
+                "end_date": null
+            },
+            {
+                "id": 307,
+                "consultant_id": 69,
+                "company_name": "OSSCube UK Ltd",
+                "location": "",
+                "title": "Managing Director",
+                "start_date": "2010-10-01",
+                "end_date": "2018-09-01"
+            },
+            {
+                "id": 308,
+                "consultant_id": 69,
+                "company_name": "Kemp Little Consulting LLP",
+                "location": "London, United Kingdom",
+                "title": "Associate",
+                "start_date": "2014-01-01",
+                "end_date": "2018-01-01"
+            },
+            {
+                "id": 309,
+                "consultant_id": 69,
+                "company_name": "Reliance Jio Infocomm Ltd",
+                "location": "Mumbai Area, India",
+                "title": "Interim Programme Director for Customer Experience",
+                "start_date": "2015-04-01",
+                "end_date": "2015-08-01"
+            },
+            {
+                "id": 310,
+                "consultant_id": 69,
+                "company_name": "Network Rail",
+                "location": "United Kingdom",
+                "title": "Architecture Consultant",
+                "start_date": "2014-10-01",
+                "end_date": "2015-03-01"
+            }
+        ],
+        "photo_url_200": "https://media.licdn.com/dms/image/v2/D4E03AQEEBDoAz1mbaA/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1725447261446?e=1747872000&v=beta&t=NxMFVDXi0Yr2a5boHpOk6gGmFQwEAOZf3JXGLVMck3s",
+        "photo_url_400": "https://media.licdn.com/dms/image/v2/D4E03AQEEBDoAz1mbaA/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1725447261446?e=1747872000&v=beta&t=NxMFVDXi0Yr2a5boHpOk6gGmFQwEAOZf3JXGLVMck3s"
+    }
+}

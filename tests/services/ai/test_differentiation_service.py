@@ -22,4 +22,3 @@ async def test_generate_differentiation_questions():
     questions = await generate_differentiation_questions(session_id)
     assert questions is not None
     assert len(questions.questions) > 0
-

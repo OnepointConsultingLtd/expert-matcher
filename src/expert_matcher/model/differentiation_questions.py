@@ -47,6 +47,4 @@ class DifferentiationQuestionVote(BaseModel):
 
 class DifferentiationQuestionVotes(BaseModel):
     session_id: str = Field(description="The session id")
-    votes: list[DifferentiationQuestionVote] = Field(
-        description="The votes"
-    )
+    votes: list[DifferentiationQuestionVote] = Field(description="The votes")

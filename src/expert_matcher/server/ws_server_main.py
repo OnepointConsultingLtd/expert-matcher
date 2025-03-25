@@ -6,6 +6,10 @@ from aiohttp import web
 
 from expert_matcher.config.config import ws_cfg, cfg
 from expert_matcher.server.ws_server import app
+from expert_matcher.services.ai.dynamic_consultant_profile_service import (
+    generate_dynamic_consultant_profile,
+)
+from expert_matcher.config.logger import logger
 
 routes = web.RouteTableDef()
 
@@ -18,6 +22,24 @@ INDEX_LINKS = ["/", "/admin"]
 
 async def get_index(_: web.Request) -> web.Response:
     return web.FileResponse(PATH_INDEX)
+
+
+@routes.get("/dynamic-profile/{session_id}")
+async def get_dynamic_profile(request: web.Request) -> web.Response:
+    try:
+        session_id = request.match_info.get("session_id", None)
+        if not session_id:
+            return web.json_response({"error": "Session ID is required"}, status=400)
+        email = request.rel_url.query.get("email", None)
+        if not email:
+            return web.json_response({"error": "Email is required"}, status=400)
+        dynamic_profile = await generate_dynamic_consultant_profile(session_id, email)
+        if not dynamic_profile:
+            return web.json_response({"error": "Dynamic profile not found"}, status=404)
+        return web.json_response(dynamic_profile.model_dump())
+    except Exception as e:
+        logger.exception("Error generating dynamic profile: %s")
+        return web.json_response({"error": str(e)}, status=500)
 
 
 def overwrite_ui_properties():

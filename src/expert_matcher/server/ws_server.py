@@ -27,7 +27,7 @@ from expert_matcher.services.db.db_persistence import (
     save_client_response,
     get_configuration_value,
     save_differentiation_question_vote,
-    clear_differentiation_question_votes
+    clear_differentiation_question_votes,
 )
 from expert_matcher.services.ai.differentiation_service import (
     fetch_differentiation_questions,
@@ -94,13 +94,21 @@ async def client_response(sid: str, response: str):
 
 
 @sio.event
-async def save_differentiation_question_vote_ws(sid: str, differentiation_question_votes_str: str):
+async def save_differentiation_question_vote_ws(
+    sid: str, differentiation_question_votes_str: str
+):
     # convert differentiation_question_votes from json to DifferentiationQuestionVotes
     try:
-        differentiation_question_votes = DifferentiationQuestionVotes.model_validate_json(differentiation_question_votes_str)
+        differentiation_question_votes = (
+            DifferentiationQuestionVotes.model_validate_json(
+                differentiation_question_votes_str
+            )
+        )
         session_id = differentiation_question_votes.session_id
         await clear_differentiation_question_votes(session_id)
-        await save_differentiation_question_vote(session_id, differentiation_question_votes)
+        await save_differentiation_question_vote(
+            session_id, differentiation_question_votes
+        )
         server_message = ServerMessage(
             status=MessageStatus.OK,
             session_id=session_id,
@@ -109,7 +117,9 @@ async def save_differentiation_question_vote_ws(sid: str, differentiation_questi
         )
         await sio.emit(WSCommand.SERVER_MESSAGE, server_message.model_dump(), room=sid)
     except Exception as e:
-        await send_error(sid, session_id, f"Error in save_differentiation_question_vote_ws: {str(e)}")
+        await send_error(
+            sid, session_id, f"Error in save_differentiation_question_vote_ws: {str(e)}"
+        )
 
 
 async def handle_response(sid: str, session_id: str | None, response: ClientResponse):
@@ -185,7 +195,9 @@ async def handle_limited_consultants(sid: str, session_id: str):
     async with limited_consultants_lock:  # This ensures only one execution at a time
         try:
             logger.info(f"Fetching differentiation questions for {session_id}")
-            differentiation_questions = await fetch_differentiation_questions(session_id)
+            differentiation_questions = await fetch_differentiation_questions(
+                session_id
+            )
             try:
                 for question in differentiation_questions.questions:
                     # Emit every question

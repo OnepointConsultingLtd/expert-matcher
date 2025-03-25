@@ -5,6 +5,9 @@ from expert_matcher.model.differentiation_questions import (
     DifferentiationQuestionVotes,
     DifferentiationQuestionVote,
 )
+from expert_matcher.model.dynamic_consultant_profile import (
+    DynamicConsultantProfileResponse,
+)
 
 
 async def provide_initial_question(session_id: str):
@@ -72,11 +75,20 @@ def provide_differentiation_questions() -> DifferentiationQuestionsResponse:
         return DifferentiationQuestionsResponse.model_validate_json(f.read())
 
 
-def create_differentiation_question_vote(session_id: str) -> DifferentiationQuestionVotes:
+def create_differentiation_question_vote(
+    session_id: str,
+) -> DifferentiationQuestionVotes:
     differentiation_questions = provide_differentiation_questions()
     votes = []
     for question in differentiation_questions.questions:
         for option in question.options:
-            votes.append(DifferentiationQuestionVote(question=question.question, option=option.option))
+            votes.append(
+                DifferentiationQuestionVote(
+                    question=question.question, option=option.option
+                )
+            )
     return DifferentiationQuestionVotes(votes=votes, session_id=session_id)
 
+
+def provide_dynamic_consultant_profile_response() -> DynamicConsultantProfileResponse:
+    return DynamicConsultantProfileResponse.model_validate_json((cfg.base_folder / "docs/dynamic_consultant_profile_response.json").read_text("utf-8"))
