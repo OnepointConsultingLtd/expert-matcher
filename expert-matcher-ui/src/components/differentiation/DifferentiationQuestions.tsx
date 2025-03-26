@@ -39,13 +39,9 @@ function Options({ question }: { question: QuestionWithSelectedOptions }) {
 }
 
 export default function DifferentiationQuestions() {
-  const { t } = useTranslation();
   const { differentiationQuestions } = useCurrentMessage();
   return (
     <>
-      <div className="dark:text-gray-100 my-5">
-        <p className="w-full text-xl">{t('differentiationQuestionsIntro')}</p>
-      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-w-full">
         {differentiationQuestions.map((question, index) => (
           <div key={`${question.question}-${index}`} className="dark:text-gray-100 ">

@@ -7,6 +7,7 @@ from expert_matcher.server.agent_session import AgentSession
 from expert_matcher.config.config import ws_cfg
 from expert_matcher.config.logger import logger
 from expert_matcher.model.session import Session
+from expert_matcher.model.state import State
 from expert_matcher.model.ws_commands import WSCommand
 from expert_matcher.model.ws_commands import (
     ServerMessage,
@@ -182,6 +183,10 @@ async def send_state(
     # Replace last question if it is the same as the new one
     if state.history[-1].id == question_suggestions.id:
         state.history[-1] = question_suggestions
+    await send_state_to_client(sid, session_id, state)
+    
+
+async def send_state_to_client(sid: str, session_id: str, state: State):
     server_message = ServerMessage(
         status=MessageStatus.OK,
         session_id=session_id,
@@ -215,6 +220,7 @@ async def handle_limited_consultants(sid: str, session_id: str):
                     )
 
                 for candidate in differentiation_questions.candidates:
+                    # Emit every candidate
                     server_message = ServerMessage(
                         status=MessageStatus.OK,
                         session_id=session_id,
@@ -228,6 +234,11 @@ async def handle_limited_consultants(sid: str, session_id: str):
                         callback=True,
                     )
                 logger.info(f"Sent differentiation questions to {sid}")
+
+                state = await get_session_state(session_id)
+                if state:
+                    await send_state_to_client(sid, session_id, state)
+                
             except Exception as emit_error:
                 await send_error(
                     sid, session_id, f"Error during socket.io emit: {str(emit_error)}"

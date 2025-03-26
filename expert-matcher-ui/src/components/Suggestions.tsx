@@ -9,12 +9,12 @@ export default function Suggestions() {
   const { addSelectedSuggestions, suggestionFilter, setSuggestionFilter } = useAppStore();
   const currentMessage = useCurrentMessage();
   if (!currentMessage) return null;
-  const { questionSuggestions, selectedSuggestions, isLast, hasDifferentiationQuestions } =
+  const { questionSuggestions, selectedSuggestions, isLast, displayRegularQuestions } =
     currentMessage;
   if (!questionSuggestions) return null;
   const { suggestions_count } = questionSuggestions;
   const suggestions = questionSuggestions.suggestions;
-  if (hasDifferentiationQuestions) return null;
+  if (!displayRegularQuestions) return null;
 
   return (
     <div className="mt-0">

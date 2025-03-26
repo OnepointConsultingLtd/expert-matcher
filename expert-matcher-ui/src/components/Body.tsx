@@ -1,11 +1,9 @@
 import { useWebsockets } from '../hooks/useWebsockets';
 import { useAppStore } from '../context/AppStore';
 import Spinner from './spinners/Spinner';
-import Question from './Question';
-import Suggestions from './Suggestions';
-import NavigationButtons from './NavigationButtons';
 import ErrorMessage from './messages/ErrorMessage';
 import DifferentiationPanel from './differentiation/DifferentiationPanel';
+import QuestionsPanel from './questions/QuestionsPanel';
 
 export default function Body() {
   useWebsockets();
@@ -20,10 +18,8 @@ export default function Body() {
             {sending && <Spinner />}
           </div>
           <ErrorMessage />
+          <QuestionsPanel />
           <DifferentiationPanel />
-          <Question />
-          <NavigationButtons />
-          <Suggestions />
         </div>
         <div className="progress-container flex flex-col"></div>
       </div>

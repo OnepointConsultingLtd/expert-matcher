@@ -126,7 +126,7 @@ export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOver
     }),
   setHistory: (history: QuestionSuggestions[]) =>
     set((state) => {
-      const currentIndex = history.length - 1;
+      const currentIndex = history.length - 1 + (state.differentiationQuestions.length > 0 ? 1 : 0);
       return { ...state, history, currentIndex, suggestionFilter: '' };
     }),
   addDifferentiationQuestion: (differentiationQuestion: Question) =>
@@ -277,18 +277,23 @@ export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOver
           currentIndex: state.currentIndex - 1,
           selectedSuggestions: [],
           suggestionFilter: '',
+          successMessage: '',
+          errorMessage: '',
         };
       }
       return { ...state };
     }),
   nextQuestion: () =>
     set((state) => {
-      if (state.currentIndex < state.history.length - 1) {
+      if (state.differentiationQuestions.length === 0 ? 
+        state.currentIndex < state.history.length - 1 : state.currentIndex < state.history.length) {
         return {
           ...state,
           currentIndex: state.currentIndex + 1,
           selectedSuggestions: [],
           suggestionFilter: '',
+          successMessage: '',
+          errorMessage: '',
         };
       }
       return { ...state };

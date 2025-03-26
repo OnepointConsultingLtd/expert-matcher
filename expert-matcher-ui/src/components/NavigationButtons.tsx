@@ -5,37 +5,46 @@ import { useHandleNext } from '../hooks/useHandleNext';
 import { MdOutlineArrowForwardIos, MdOutlineArrowBackIos } from 'react-icons/md';
 import { useCurrentMessage } from '../hooks/useCurrentMessage';
 
-export default function NavigationButtons() {
+function SelectButtons() {
   const { t } = useTranslation();
   const {
     selectAllSuggestions,
     deselectAllSuggestions,
     sending,
+  } = useAppStore();
+  const { isLast } = useCurrentMessage();
+  return (
+    <div>
+      <button
+        className={buttonStyle}
+        onClick={() => deselectAllSuggestions()}
+        disabled={sending || !isLast}
+      >
+        {t('Deselect all')}
+      </button>
+      <button
+        className={`${buttonStyle} ml-2`}
+        onClick={() => selectAllSuggestions()}
+        disabled={sending || !isLast}
+      >
+        {t('Select all')}
+      </button>
+    </div>
+  )
+}
+
+export default function NavigationButtons() {
+  const { t } = useTranslation();
+  const {
+    sending,
     previousQuestion,
     currentIndex,
-    history,
   } = useAppStore();
   const { handleNext } = useHandleNext();
-  const { selectedSuggestions, isLast, hasDifferentiationQuestions } = useCurrentMessage();
-  if (hasDifferentiationQuestions) return null;
+  const { selectedSuggestions, historyLength, hasDifferentiationQuestions } = useCurrentMessage();
   return (
-    <div className="flex justify-between mt-6">
-      <div>
-        <button
-          className={buttonStyle}
-          onClick={() => deselectAllSuggestions()}
-          disabled={sending || !isLast}
-        >
-          {t('Deselect all')}
-        </button>
-        <button
-          className={`${buttonStyle} ml-2`}
-          onClick={() => selectAllSuggestions()}
-          disabled={sending || !isLast}
-        >
-          {t('Select all')}
-        </button>
-      </div>
+    <div className={`flex ${!hasDifferentiationQuestions ? "justify-between" : "justify-end"} mt-6`}>
+      {!hasDifferentiationQuestions && <SelectButtons />}
       <div className="flex flex-col">
         <div className="flex flex-row">
           <button
@@ -55,9 +64,9 @@ export default function NavigationButtons() {
             <span className="hidden md:inline">{t('Next')}</span>
           </button>
         </div>
-        {history?.length > 0 && (
+        {historyLength > 0 && (
           <div className="flex flex-row justify-center mt-1 text-sm">
-            {t('stepOf', { step: currentIndex + 1, total: history?.length })}
+            {t('stepOf', { step: currentIndex + 1, total: historyLength })}
           </div>
         )}
       </div>

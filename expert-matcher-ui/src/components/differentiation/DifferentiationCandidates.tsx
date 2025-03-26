@@ -4,7 +4,7 @@ import { CandidateWithVotes } from '../../types/differentiation_questions';
 import { VscAccount } from 'react-icons/vsc';
 import { IoIosContact } from 'react-icons/io';
 import { TbFileCv } from 'react-icons/tb';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { scrollToElement } from '../../lib/scrollSupport';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -71,7 +71,7 @@ function CandidateCv({ candidate }: { candidate: CandidateWithVotes }) {
             {t('CV')}
           </button>
           <div
-            className={`text-sm overflow-hidden transition-all duration-300 ease-in-out ${cvExpanded ? 'max-h-[1000px]' : 'max-h-0'}`}
+            className={`text-sm overflow-hidden transition-all duration-300 ease-in-out ml-1 ${cvExpanded ? 'max-h-[1000px]' : 'max-h-0'}`}
           >
             <Markdown remarkPlugins={[remarkGfm]}>{candidate.cv}</Markdown>
           </div>
@@ -90,6 +90,10 @@ function ExpertMatcherProfile({ candidate }: { candidate: CandidateWithVotes }) 
   }
   const { given_name, surname } = candidate;
 
+  useEffect(() => {
+    mdCache.current.clear();
+  }, [candidate.votes]);
+  
   return (
     <div className="flex flex-row gap-2 items-center text-xl">
       <button onClick={() => {
@@ -102,10 +106,10 @@ function ExpertMatcherProfile({ candidate }: { candidate: CandidateWithVotes }) 
             overlaySetContent(mdCache.current.get(candidate.id)!);
           } else {
             getExpertMatcherProfile(candidate.email)
-            .then((data: DynamicConsultantProfile) => {
-              const { profile, matching_items } = data;
-              const photoMd = candidate.photo_url_200 ? `![${title}](${candidate.photo_url_200} "${title}")` : '';
-              const markdown = `${photoMd}
+              .then((data: DynamicConsultantProfile) => {
+                const { profile, matching_items } = data;
+                const photoMd = candidate.photo_url_200 ? `![${title}](${candidate.photo_url_200} "${title}")` : '';
+                const markdown = `${photoMd}
               
 ${t("vote", { count: candidate.votes })}
               
@@ -114,10 +118,10 @@ ${profile}
 ### Relevant Questions
 ${matching_items.map((item) => `- ${item.question}: ${item.answer}`).join('\n')}
             `;
-              mdCache.current.set(candidate.id, markdown);
-              overlaySetContent(markdown);
-            })
-            .catch((error) => {
+                mdCache.current.set(candidate.id, markdown);
+                overlaySetContent(markdown);
+              })
+              .catch((error) => {
                 overlaySetError(t('Error fetching expert matcher profile', { error: error.message }));
               });
           }
