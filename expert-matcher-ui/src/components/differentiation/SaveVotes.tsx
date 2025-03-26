@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useSendDifferentiationQuestionVotes } from '../../hooks/useSendDifferentiationQuestionVotes';
 import { buttonStyle } from '../common';
+import { scrollToTop } from '../../lib/scrollSupport';
 
 export default function SaveVotes() {
   const { sendDifferentiationQuestionVotes, votes, setSending } =
@@ -9,6 +10,7 @@ export default function SaveVotes() {
   const handleSaveVotes = () => {
     setSending(true);
     sendDifferentiationQuestionVotes();
+    scrollToTop();
   };
   return (
     <div className="flex flex-row justify-center items-center mt-3">

@@ -22,6 +22,7 @@ from expert_matcher.model.consultant_factory import (
 from expert_matcher.model.dynamic_consultant_profile import (
     DynamicConsultantProfileResponse,
 )
+from expert_matcher.config.logger import logger
 
 
 consultant_details_base_sql = """SELECT * FROM (SELECT C.ID, C.GIVEN_NAME, C.SURNAME, C.LINKEDIN_PROFILE_URL, C.EMAIL, C.CV, STRING_AGG(S.SKILL_NAME, '@@') SKILLS, C.LINKEDIN_PHOTO_200, C.LINKEDIN_PHOTO_200 FROM TB_CONSULTANT C 
