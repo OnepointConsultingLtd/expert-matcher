@@ -74,7 +74,6 @@ export function useWebsockets() {
               setSuccessMessage(t('Votes saved'));
               break;
             case ContentType.ERROR:
-              debugger;
               setSending(false);
               setErrorMessage(serverMessage.content?.message ?? t('An error occurred.'));
               break;

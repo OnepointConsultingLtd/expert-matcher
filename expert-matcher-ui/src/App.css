@@ -20,7 +20,7 @@
         font-size: var(--text-lg);
     }
 
-    p {
+    .overlay-content p {
         font-size: var(--text-base);
         margin-bottom: 1rem;
     }
