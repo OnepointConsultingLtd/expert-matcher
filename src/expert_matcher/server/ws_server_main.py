@@ -19,27 +19,34 @@ FILE_INDEX = "index.html"
 PATH_INDEX = UI_DIST_FOLDER / FILE_INDEX
 INDEX_LINKS = ["/", "/admin"]
 
+CORS_HEADERS = {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "*"}
+
 
 async def get_index(_: web.Request) -> web.Response:
     return web.FileResponse(PATH_INDEX)
 
 
-@routes.get("/dynamic-profile/{session_id}")
+@routes.options("/api/dynamic-profile/{session_id}")
+async def get_dynamic_profile_options(_: web.Request) -> web.Response:
+    return web.json_response({"message": "Accept all hosts"}, headers=CORS_HEADERS)
+
+
+@routes.get("/api/dynamic-profile/{session_id}")
 async def get_dynamic_profile(request: web.Request) -> web.Response:
     try:
         session_id = request.match_info.get("session_id", None)
         if not session_id:
-            return web.json_response({"error": "Session ID is required"}, status=400)
+            return web.json_response({"error": "Session ID is required"}, status=400, headers=CORS_HEADERS)
         email = request.rel_url.query.get("email", None)
         if not email:
-            return web.json_response({"error": "Email is required"}, status=400)
+            return web.json_response({"error": "Email is required"}, status=400, headers=CORS_HEADERS)
         dynamic_profile = await generate_dynamic_consultant_profile(session_id, email)
         if not dynamic_profile:
             return web.json_response({"error": "Dynamic profile not found"}, status=404)
-        return web.json_response(dynamic_profile.model_dump())
+        return web.json_response(dynamic_profile.model_dump(), headers=CORS_HEADERS)
     except Exception as e:
         logger.exception("Error generating dynamic profile: %s")
-        return web.json_response({"error": str(e)}, status=500)
+        return web.json_response({"error": str(e)}, status=500, headers=CORS_HEADERS)
 
 
 def overwrite_ui_properties():

@@ -74,7 +74,7 @@ export function useWebsockets() {
               setSuccessMessage(t('Votes saved'));
               break;
             case ContentType.ERROR:
-              debugger
+              debugger;
               setSending(false);
               setErrorMessage(serverMessage.content?.message ?? t('An error occurred.'));
               break;
@@ -87,7 +87,7 @@ export function useWebsockets() {
           setErrorMessage(serverMessage.content?.message ?? t('An error occurred.'));
           break;
         default:
-          const error = t('Unknown status', {status: serverMessage.status})
+          const error = t('Unknown status', { status: serverMessage.status });
           console.error(error);
           setErrorMessage(error);
       }

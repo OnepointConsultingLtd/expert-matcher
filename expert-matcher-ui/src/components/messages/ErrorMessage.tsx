@@ -1,6 +1,6 @@
 import { useAppStore } from '../../context/AppStore';
 
-function renderMessage(
+export function renderMessage(
   message: string,
   bgColor: string,
   borderColor: string,

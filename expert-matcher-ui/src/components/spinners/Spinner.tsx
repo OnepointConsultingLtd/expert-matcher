@@ -17,7 +17,7 @@ const Spinner = ({
         title={t('Please wait')}
         className={className}
       />
-      <div className="text-sm">{t(message)}</div>
+      <div className="text-sm mt-2">{t(message)}</div>
     </div>
   );
 };

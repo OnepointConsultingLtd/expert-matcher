@@ -10,11 +10,13 @@
       content="Onepoint Expert Matcher™"
     />
     <script>
-      const server = "127.0.0.1";
+      const server = "localhost";
       const port = 8090;
+      const protocol = window.location.protocol;
+      const wsProtocol = protocol === 'https' ? 'wss' : 'ws';
       window.expertMatcherConfig = {
-        websocketUrl: `ws://${server}:${port}`,
-        reportUrl: `http://${server}:${port}`,
+        websocketUrl: `${wsProtocol}://${server}:${port}`,
+        reportUrl: `${protocol}//${server}:${port}`,
       };
     </script>
   </head>

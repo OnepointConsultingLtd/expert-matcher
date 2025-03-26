@@ -1,3 +1,46 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* Then add your custom base styles */
+@layer base {
+    h1 {
+        font-size: var(--text-3xl);
+    }
+
+    h2 {
+        font-size: var(--text-2xl);
+    }
+
+    h3 {
+        font-size: var(--text-xl);
+    }
+
+    h4 {
+        font-size: var(--text-lg);
+    }
+
+    p {
+        font-size: var(--text-base);
+        margin-bottom: 1rem;
+    }
+
+    ul {
+        margin-bottom: 1rem;
+    }
+
+    li {
+        list-style-type: '- ';
+        margin-left: 0.5rem;
+    }
+
+    a {
+        color: var(--primary);
+        text-decoration: underline;
+    }
+
+    .overlay-content img {
+        float: inline-end;
+        margin: 1rem;
+    }
+}

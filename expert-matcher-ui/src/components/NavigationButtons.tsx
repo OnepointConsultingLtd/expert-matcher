@@ -55,9 +55,11 @@ export default function NavigationButtons() {
             <span className="hidden md:inline">{t('Next')}</span>
           </button>
         </div>
-        {history?.length > 0 && <div className="flex flex-row justify-center mt-1 text-sm">
-          {t('stepOf', { step: currentIndex + 1, total: history?.length })}
-        </div>}
+        {history?.length > 0 && (
+          <div className="flex flex-row justify-center mt-1 text-sm">
+            {t('stepOf', { step: currentIndex + 1, total: history?.length })}
+          </div>
+        )}
       </div>
     </div>
   );

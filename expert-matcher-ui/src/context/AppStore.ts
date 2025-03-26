@@ -23,6 +23,23 @@ interface AppStoreState {
   suggestionFilter: string;
 }
 
+interface MarkdownOverlayProps {
+  overlayIsOpen: boolean;
+  overlayContent: string;
+  overlayTitle?: string;
+  overlayEmail?: string;
+  overlayError?: string;
+}
+
+interface MarkdownOverlayActions {
+  overlaySetTitle: (title: string) => void;
+  overlaySetContent: (content: string) => void;
+  overlaySetEmail: (email: string) => void;
+  overlaySetOpen: () => void;
+  overlaySetClose: () => void;
+  overlaySetError: (error: string) => void;
+}
+
 interface AppStoreActions {
   setErrorMessage: (errorMessage: string) => void;
   setSuccessMessage: (successMessage: string) => void;
@@ -73,7 +90,7 @@ function processVoting(
   return candidatesWithVotes;
 }
 
-export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
+export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOverlayProps & MarkdownOverlayActions>((set) => ({
   errorMessage: '',
   successMessage: '',
   currentIndex: 0,
@@ -85,6 +102,18 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
   sending: false,
   selectedSuggestions: [],
   suggestionFilter: '',
+
+  overlayIsOpen: false,
+  overlayContent: '',
+  overlayTitle: '',
+  overlayEmail: '',
+  overlayError: '',
+  overlaySetOpen: () => set({ overlayIsOpen: true }),
+  overlaySetClose: () => set({ overlayIsOpen: false, overlayContent: '', overlayTitle: '', overlayEmail: '', overlayError: '' }),
+  overlaySetTitle: (title: string) => set({ overlayTitle: title }),
+  overlaySetContent: (content: string) => set({ overlayContent: content }),
+  overlaySetEmail: (email: string) => set({ overlayEmail: email }),
+  overlaySetError: (error: string) => set({ overlayError: error }),
   setSessionId: (sessionId: string) =>
     set((state) => {
       saveSession({
@@ -106,8 +135,12 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
         ...differentiationQuestion,
         selectedOptions: differentiationQuestion.options.filter((o) => o.selected),
       };
-      if(state.differentiationQuestions.some(dq => dq.question === differentiationQuestion.question)) {
-        return {...state};
+      if (
+        state.differentiationQuestions.some(
+          (dq) => dq.question === differentiationQuestion.question
+        )
+      ) {
+        return { ...state };
       }
       return {
         ...state,
@@ -118,16 +151,16 @@ export const useAppStore = create<AppStoreState & AppStoreActions>((set) => ({
     set({ differentiationQuestions: [], candidates: [], suggestionFilter: '' }),
   addCandidate: (candidate: Candidate) =>
     set((state) => {
-      const { email } = candidate
-      if(state.candidates.some(c => c.email === email)) {
-        return {...state};
+      const { email } = candidate;
+      if (state.candidates.some((c) => c.email === email)) {
+        return { ...state };
       }
       const candidateWithVotes = { ...candidate, votes: 0 };
-      const differentiationQuestions = state.differentiationQuestions
-      for(const question of differentiationQuestions) {
-        for(const option of question.options) {
-          if(option.selected) {
-            if(option.consultants.some(email => email === candidate.email)) {
+      const differentiationQuestions = state.differentiationQuestions;
+      for (const question of differentiationQuestions) {
+        for (const option of question.options) {
+          if (option.selected) {
+            if (option.consultants.some((email) => email === candidate.email)) {
               candidateWithVotes.votes += 1;
             }
           }
