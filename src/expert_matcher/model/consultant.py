@@ -40,6 +40,9 @@ class Consultant(BaseModel):
     photo_url_400: str | None = Field(
         default="", description="The URL of the consultant's photo"
     )
+    cv_summary: str | None = Field(
+        default="", description="The summary of the consultant's CV"
+    )
 
     def __str__(self):
         return f"""
@@ -49,4 +52,5 @@ LinkedIn: {self.linkedin_profile_url}
 CV: {self.cv}
 Skills: {"\n- ".join(self.skills)}
 Experiences: {"\n- ".join([str(e) for e in self.experiences])}
+CV Summary: {self.cv_summary}
 """

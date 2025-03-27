@@ -45,11 +45,11 @@ function CandidatePhoto({ candidate }: { candidate: CandidateWithVotes }) {
 
 function CandidateCv({ candidate }: { candidate: CandidateWithVotes }) {
   const { t } = useTranslation();
-  const [cvExpanded, setCvExpanded] = useState(false);
+  const [cvExpanded, setCvExpanded] = useState(true);
 
   return (
     <>
-      {candidate.cv && (
+      {candidate.cv_summary && (
         <div>
           <button
             id={`${candidate.id}`}
@@ -73,7 +73,7 @@ function CandidateCv({ candidate }: { candidate: CandidateWithVotes }) {
           <div
             className={`text-sm overflow-hidden transition-all duration-300 ease-in-out ml-1 ${cvExpanded ? 'max-h-[1000px]' : 'max-h-0'}`}
           >
-            <Markdown remarkPlugins={[remarkGfm]}>{candidate.cv}</Markdown>
+            <Markdown remarkPlugins={[remarkGfm]}>{candidate.cv_summary}</Markdown>
           </div>
         </div>
       )}
@@ -158,6 +158,13 @@ function OnlineProfile({ candidate }: { candidate: CandidateWithVotes }) {
   );
 }
 
+function VoteDisplay({ candidate }: { candidate: CandidateWithVotes }) {
+  const { t } = useTranslation();
+  return (
+    <div className="text-xl pl-1">{t('vote_other', { count: candidate.votes })}</div>
+  );
+}
+
 function CadidateCard({ candidate, maxVote }: { candidate: CandidateWithVotes; maxVote: number }) {
   const { t } = useTranslation();
   const name = `${candidate.given_name} ${candidate.surname}`;
@@ -168,7 +175,7 @@ function CadidateCard({ candidate, maxVote }: { candidate: CandidateWithVotes; m
         {candidate.votes > 0 && candidate.votes === maxVote && <GoTrophy className={iconClass} title={t('Best match')} />}
       </div>
       <CandidatePhoto candidate={candidate} />
-      <div className="text-xl pl-1">{t('vote_other', { count: candidate.votes })}</div>
+      <VoteDisplay candidate={candidate} />
       <ExpertMatcherProfile candidate={candidate} />
       <OnlineProfile candidate={candidate} />
       <CandidateCv candidate={candidate} />

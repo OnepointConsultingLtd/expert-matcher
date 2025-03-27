@@ -3,7 +3,7 @@ from expert_matcher.config.logger import logger
 
 
 def consultant_factory(
-    consultant_details: list[tuple[int, str, str, str, str, str, str, str, str]],
+    consultant_details: list[tuple[int, str, str, str, str, str, str, str, str, str]],
 ) -> list[Consultant]:
     consultant_id_index = 0
     given_name_index = 1
@@ -13,6 +13,7 @@ def consultant_factory(
     cv_index = 5
     photo_url_200_index = 7
     photo_url_400_index = 8
+    cv_summary_index = 9
     consultants: list[Consultant] = []
     for consultant_detail in consultant_details:
         consultant = Consultant(
@@ -24,6 +25,7 @@ def consultant_factory(
             cv=consultant_detail[cv_index],
             photo_url_200=consultant_detail[photo_url_200_index],
             photo_url_400=consultant_detail[photo_url_400_index],
+            cv_summary=consultant_detail[cv_summary_index],
         )
         consultants.append(consultant)
     return consultants

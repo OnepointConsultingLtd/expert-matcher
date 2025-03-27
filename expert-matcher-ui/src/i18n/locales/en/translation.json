@@ -8,7 +8,7 @@
     "consultantWithCount_one": "{{count}} consultant",
     "consultantWithCount_other": "{{count}} consultants",
     "Deselect all": "Deselect all",
-    "differentiationQuestionsIntro": "Here are some questions to help you find the right expert. Click on the options to rank the candidates.",
+    "differentiationQuestionsIntro": "Here are some questions to help you find the right expert. Click on the options to vote and rank the candidates.",
     "Disconnected from websocket": "Disconnected from websocket",
     "Error fetching expert matcher profile": "Error fetching expert matcher profile: {{error}}",
     "Expert Matcher": "Expert Matcher",

@@ -31,6 +31,7 @@ export interface Candidate {
   experiences: Experience[];
   photo_url_200?: string;
   photo_url_400?: string;
+  cv_summary?: string;
 }
 
 export interface CandidateWithVotes extends Candidate {
