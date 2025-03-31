@@ -30,7 +30,7 @@ potential_answers:
 - C++
 - C
 
-Please ensure that you generate a minimum of 5 questions.
+Please ensure that you generate a minimum of {min_questions} questions.
 
 === candidates ===
 {candidates}

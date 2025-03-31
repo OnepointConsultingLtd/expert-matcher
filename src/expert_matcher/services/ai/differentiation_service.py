@@ -12,6 +12,7 @@ from expert_matcher.services.db.db_persistence import (
     find_available_consultants,
     read_differentiation_question,
     save_differentiation_question,
+    get_configuration_value
 )
 from expert_matcher.services.ai.prompt_factory_support import prompt_factory
 
@@ -28,7 +29,7 @@ def _chain_factory() -> RunnableSequence:
     return prompt | model
 
 
-def _prepare_input(candidates: list[Consultant], excluded_dimensions: list[str]) -> str:
+async def _prepare_input(candidates: list[Consultant], excluded_dimensions: list[str]) -> str:
     """Prepare the input for the chain"""
     candidates_str = ""
     for c in candidates:
@@ -43,10 +44,12 @@ Skills: {skills_str}
 Experiences: {experiences_str}
 
 """
+    min_questions = await get_configuration_value("min_questions", "10")
     excluded_dimensions_str = "\n- ".join(excluded_dimensions)
     return {
         "candidates": candidates_str,
         "excluded_dimensions": excluded_dimensions_str,
+        "min_questions": min_questions,
     }
 
 
@@ -55,7 +58,7 @@ async def _generate_differentiation_questions(
 ) -> DifferentiationQuestions:
     """Generate differentiation questions"""
     chain = _chain_factory()
-    input = _prepare_input(candidates, excluded_dimensions)
+    input = await _prepare_input(candidates, excluded_dimensions)
     return await chain.ainvoke(input)
 
 
