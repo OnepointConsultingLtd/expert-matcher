@@ -47,6 +47,9 @@ class Config:
     ui_domain = os.getenv("UI_DOMAIN", "localhost")
     ui_port = int(os.getenv("UI_PORT", 8090))
 
+    wkhtmltopdf_binary = Path(os.getenv("WKHTMLTOPDF_BINARY"))
+    assert wkhtmltopdf_binary.exists(), f"Cannot find {wkhtmltopdf_binary}"
+
 
 class WebsocketConfig:
     websocket_server = os.getenv("WEBSOCKET_SERVER", "0.0.0.0")

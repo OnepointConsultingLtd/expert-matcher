@@ -67,8 +67,9 @@ def generate_pdf(response: DifferentiationQuestionsResponse, session_id: str) ->
     response.candidates = consultants_with_votes
     html = render_candidate_report(response)
     target_file = PDF_PATH / f"report_{session_id}.pdf"
+    config = pdfkit.configuration(wkhtmltopdf=cfg.wkhtmltopdf_binary.as_posix())
     pdfkit.from_string(
-        html, target_file.as_posix(), options={"enable-local-file-access": ""}
+        html, target_file.as_posix(), configuration=config, options={"enable-local-file-access": ""}
     )
     return target_file
 
