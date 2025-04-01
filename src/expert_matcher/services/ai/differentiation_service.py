@@ -12,7 +12,7 @@ from expert_matcher.services.db.db_persistence import (
     find_available_consultants,
     read_differentiation_question,
     save_differentiation_question,
-    get_configuration_value
+    get_configuration_value,
 )
 from expert_matcher.services.ai.prompt_factory_support import prompt_factory
 
@@ -29,7 +29,9 @@ def _chain_factory() -> RunnableSequence:
     return prompt | model
 
 
-async def _prepare_input(candidates: list[Consultant], excluded_dimensions: list[str]) -> str:
+async def _prepare_input(
+    candidates: list[Consultant], excluded_dimensions: list[str]
+) -> str:
     """Prepare the input for the chain"""
     candidates_str = ""
     for c in candidates:
@@ -88,10 +90,12 @@ async def fetch_differentiation_questions(
     """Either read existing questions or generate new ones and save them"""
     response = await read_differentiation_question(session_id)
     if response:
+        (cfg.base_folder / "docs/sample_differentiation_questions.json").write_text(
+            response.model_dump_json()
+        )
         return response
     response = await generate_differentiation_questions(session_id)
-    # with open(cfg.base_folder / "docs/sample_differentiation_questions.json", "w") as f:
-    #     f.write(response.model_dump_json())
     response.candidates = await find_available_consultants(session_id)
     await save_differentiation_question(session_id, response)
+    response.questions = sorted(response.questions, key=lambda x: x.question)
     return response

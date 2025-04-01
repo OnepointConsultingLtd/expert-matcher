@@ -569,9 +569,10 @@ ORDER BY Q.QUESTION, O.OPTION_TEXT
             elif current_consultant != r[index_consultant]:
                 current_consultant = r[index_consultant]
                 current_selected = r[index_selected]
-                current_option = questions[-1].options[-1]
-                current_option.consultants.append(current_consultant)
-                current_option.selected = current_selected
+                current_option_object = questions[-1].options[-1]
+                current_option_object.consultants.append(current_consultant)
+                current_option_object.selected = current_selected
+                current_option = current_option_object.option
 
     consultants = await find_available_consultants(session_id)
     return DifferentiationQuestionsResponse(

@@ -10,8 +10,8 @@ export default function DifferentiationPanel() {
   if (displayRegularQuestions || sending) return null;
   return (
     <>
-      <DifferentiationQuestions />
       <SaveVotes />
+      <DifferentiationQuestions />
       <DifferentiationCandidates />
     </>
   );

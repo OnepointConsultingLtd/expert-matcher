@@ -19,7 +19,6 @@ export function useWebsockets() {
     setSending,
     errorMessage,
     setErrorMessage,
-    setSuccessMessage,
     addDifferentiationQuestion,
     addCandidate,
   } = useAppStore();
@@ -71,7 +70,6 @@ export function useWebsockets() {
               break;
             case ContentType.VOTES_SAVED:
               setSending(false);
-              setSuccessMessage(t('Votes saved'));
               break;
             case ContentType.ERROR:
               setSending(false);

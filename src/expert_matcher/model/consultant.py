@@ -1,5 +1,6 @@
 import datetime
 from pydantic import BaseModel, Field
+from collections import defaultdict
 
 
 class ConsultantExperience(BaseModel):
@@ -54,3 +55,17 @@ Skills: {"\n- ".join(self.skills)}
 Experiences: {"\n- ".join([str(e) for e in self.experiences])}
 CV Summary: {self.cv_summary}
 """
+
+
+class VotedOn(BaseModel):
+    question: str = Field(description="The question")
+    dimension: str = Field(description="The dimension of the question")
+    option: str = Field(description="The option")
+
+
+class ConsultantWithVotes(Consultant):
+    votes: int = Field(default=0, description="The votes of the consultant")
+    voted_on: dict[str, list[VotedOn]] = Field(
+        default=defaultdict(list),
+        description="The questions the consultant has voted on",
+    )

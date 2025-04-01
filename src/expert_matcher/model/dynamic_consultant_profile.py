@@ -18,8 +18,11 @@ class MatchingItem(BaseModel):
 {self.reasoning}
 """
 
+
 class DynamicConsultantProfile(BaseModel):
-    profile: str = Field(description="The profile summary of the consultant in markdown format with the most important facts highlighted in bold characters.")
+    profile: str = Field(
+        description="The profile summary of the consultant in markdown format with the most important facts highlighted in bold characters."
+    )
     matching_items: list[MatchingItem] = Field(
         description="The items that match the selected answers to the questions"
     )

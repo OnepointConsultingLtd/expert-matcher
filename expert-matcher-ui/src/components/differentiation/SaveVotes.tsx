@@ -1,25 +1,30 @@
 import { useTranslation } from 'react-i18next';
 import { useSendDifferentiationQuestionVotes } from '../../hooks/useSendDifferentiationQuestionVotes';
 import { buttonStyle } from '../common';
-import { scrollToTop } from '../../lib/scrollSupport';
+import { HiOutlineDocumentReport } from 'react-icons/hi';
+import { getSessionId } from '../../lib/sessionFunctions';
 
 export default function SaveVotes() {
-  const { sendDifferentiationQuestionVotes, votes, setSending } =
-    useSendDifferentiationQuestionVotes();
+
+  const reportUrl = window.expertMatcherConfig.reportUrl; 
+  const { votes } = useSendDifferentiationQuestionVotes();
   const { t } = useTranslation();
-  const handleSaveVotes = () => {
-    setSending(true);
-    sendDifferentiationQuestionVotes();
-    scrollToTop();
-  };
+  const sessionId = getSessionId();
+
+  if (!sessionId || !votes) return null;
+
+  const url = `${reportUrl}/api/report-consultants/${sessionId}`;
+
   return (
-    <div className="flex flex-row justify-center items-center mt-3">
-      <button
-        className={`${buttonStyle} w-full !text-center`}
-        onClick={handleSaveVotes}
-        disabled={votes === 0}
-      >
+    <div className="flex flex-row justify-between items-center mt-6 mb-3">
+      <div className={`${buttonStyle}`}>
         {t('saveVotes', { count: votes })}
+      </div>
+      <button 
+        className={`${buttonStyle} flex flex-row items-center gap-2`}
+        onClick={() => window.open(url, '_blank')}
+      >
+        <HiOutlineDocumentReport className="w-6 h-6"/> {t('Download report')}
       </button>
     </div>
   );

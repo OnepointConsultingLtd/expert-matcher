@@ -184,7 +184,7 @@ async def send_state(
     if state.history[-1].id == question_suggestions.id:
         state.history[-1] = question_suggestions
     await send_state_to_client(sid, session_id, state)
-    
+
 
 async def send_state_to_client(sid: str, session_id: str, state: State):
     server_message = ServerMessage(
@@ -238,7 +238,7 @@ async def handle_limited_consultants(sid: str, session_id: str):
                 state = await get_session_state(session_id)
                 if state:
                     await send_state_to_client(sid, session_id, state)
-                
+
             except Exception as emit_error:
                 await send_error(
                     sid, session_id, f"Error during socket.io emit: {str(emit_error)}"

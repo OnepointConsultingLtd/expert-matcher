@@ -9,6 +9,7 @@ from expert_matcher.model.dynamic_consultant_profile import (
 )
 from expert_matcher.config.config import cfg
 
+
 def _prompt_factory() -> ChatPromptTemplate:
     """Create a prompt template for a specific key"""
     return prompt_factory("dynamic_user_profile")
@@ -24,21 +25,28 @@ def _chain_factory() -> RunnableSequence:
 async def generate_dynamic_consultant_profile(
     session_id: str, email: str
 ) -> DynamicConsultantProfile | None:
-    dynamic_consultant_profile_response = (
-        await find_dynamic_consultant_profile(session_id, email)
+    dynamic_consultant_profile_response = await find_dynamic_consultant_profile(
+        session_id, email
     )
     if not dynamic_consultant_profile_response:
         return None
-    return await generate_dynamic_consultant_profile_from_db(dynamic_consultant_profile_response)
+    return await generate_dynamic_consultant_profile_from_db(
+        dynamic_consultant_profile_response
+    )
 
-    
+
 async def generate_dynamic_consultant_profile_from_db(
-    dynamic_consultant_profile_response: DynamicConsultantProfileResponse
+    dynamic_consultant_profile_response: DynamicConsultantProfileResponse,
 ) -> DynamicConsultantProfile:
-    
-    question_answers_str = "\n".join([str(qa) for qa in dynamic_consultant_profile_response.question_answers])
+
+    question_answers_str = "\n".join(
+        [str(qa) for qa in dynamic_consultant_profile_response.question_answers]
+    )
     differentiation_question_answers_str = "\n".join(
-        [str(qa) for qa in dynamic_consultant_profile_response.differentiation_question_answers]
+        [
+            str(qa)
+            for qa in dynamic_consultant_profile_response.differentiation_question_answers
+        ]
     )
     consultant_details_str = str(dynamic_consultant_profile_response.consultant)
 

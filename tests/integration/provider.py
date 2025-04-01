@@ -91,4 +91,8 @@ def create_differentiation_question_vote(
 
 
 def provide_dynamic_consultant_profile_response() -> DynamicConsultantProfileResponse:
-    return DynamicConsultantProfileResponse.model_validate_json((cfg.base_folder / "docs/dynamic_consultant_profile_response.json").read_text("utf-8"))
+    return DynamicConsultantProfileResponse.model_validate_json(
+        (cfg.base_folder / "docs/dynamic_consultant_profile_response.json").read_text(
+            "utf-8"
+        )
+    )

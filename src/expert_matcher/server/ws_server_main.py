@@ -3,12 +3,14 @@ import os
 import re
 
 from aiohttp import web
+from typing import Callable, Awaitable
 
 from expert_matcher.config.config import ws_cfg, cfg
 from expert_matcher.server.ws_server import app
 from expert_matcher.services.ai.dynamic_consultant_profile_service import (
     generate_dynamic_consultant_profile,
 )
+from expert_matcher.services.pdf.candidate_report import generate_candidate_report
 from expert_matcher.config.logger import logger
 
 routes = web.RouteTableDef()
@@ -26,6 +28,14 @@ async def get_index(_: web.Request) -> web.Response:
     return web.FileResponse(PATH_INDEX)
 
 
+async def handle_error(func: Awaitable) -> Awaitable:
+    try:
+        return await func()
+    except Exception as e:
+        logger.exception("Error in %s: %s", func.__name__, e)
+        return web.json_response({"error": str(e)}, status=500, headers=CORS_HEADERS)
+
+
 @routes.options("/api/dynamic-profile/{session_id}")
 async def get_dynamic_profile_options(_: web.Request) -> web.Response:
     return web.json_response({"message": "Accept all hosts"}, headers=CORS_HEADERS)
@@ -33,20 +43,45 @@ async def get_dynamic_profile_options(_: web.Request) -> web.Response:
 
 @routes.get("/api/dynamic-profile/{session_id}")
 async def get_dynamic_profile(request: web.Request) -> web.Response:
-    try:
+    async def _get_dynamic_profile():
         session_id = request.match_info.get("session_id", None)
         if not session_id:
-            return web.json_response({"error": "Session ID is required"}, status=400, headers=CORS_HEADERS)
+            return web.json_response(
+                {"error": "Session ID is required"}, status=400, headers=CORS_HEADERS
+            )
         email = request.rel_url.query.get("email", None)
         if not email:
-            return web.json_response({"error": "Email is required"}, status=400, headers=CORS_HEADERS)
+            return web.json_response(
+                {"error": "Email is required"}, status=400, headers=CORS_HEADERS
+            )
         dynamic_profile = await generate_dynamic_consultant_profile(session_id, email)
         if not dynamic_profile:
             return web.json_response({"error": "Dynamic profile not found"}, status=404)
         return web.json_response(dynamic_profile.model_dump(), headers=CORS_HEADERS)
-    except Exception as e:
-        logger.exception("Error generating dynamic profile: %s")
-        return web.json_response({"error": str(e)}, status=500, headers=CORS_HEADERS)
+
+    return await handle_error(_get_dynamic_profile)
+
+
+@routes.options("/api/report-consultants/{session_id}")
+async def get_report_consultants_options(_: web.Request) -> web.Response:
+    return web.json_response({"message": "Accept all hosts"}, headers=CORS_HEADERS)
+
+
+@routes.get("/api/report-consultants/{session_id}")
+async def get_report_consultants(request: web.Request) -> web.Response:
+    async def _get_report_consultants():
+        session_id = request.match_info.get("session_id", None)
+        if not session_id:
+            return web.json_response({"error": "Session ID is required"}, status=400)
+        report_path = await generate_candidate_report(session_id)
+        return web.FileResponse(
+            report_path,
+            headers={
+                "CONTENT-DISPOSITION": f'attachment; filename="{report_path.name}"'
+            },
+        )
+
+    return await handle_error(_get_report_consultants)
 
 
 def overwrite_ui_properties():
