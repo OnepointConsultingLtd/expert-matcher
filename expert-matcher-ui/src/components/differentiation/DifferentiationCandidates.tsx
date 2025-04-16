@@ -15,7 +15,7 @@ import { useAppStore } from '../../context/AppStore';
 import { getExpertMatcherProfile } from '../../lib/apiClient';
 import { DynamicConsultantProfile } from '../../types/dynamic_consultant_profile';
 
-const candidateTextCss = 'flex flex-row items-center transition duration-300 ease-in-out hover:underline';
+const candidateTextCss = 'flex flex-row items-center transition duration-300 ease-in-out hover:underline underline cursor-pointer';
 
 function OptionalLink({ href, children }: { href: string; children: React.ReactNode }) {
   if (!href) {
@@ -93,43 +93,43 @@ function ExpertMatcherProfile({ candidate }: { candidate: CandidateWithVotes }) 
   useEffect(() => {
     mdCache.current.clear();
   }, [candidate.votes]);
-  
-  return (
-    <div className="flex flex-row gap-2 items-center text-xl">
-      <button onClick={() => {
-        const title = `${given_name} ${surname}`;
-        overlaySetTitle(title);
-        overlaySetContent(``);
-        overlaySetOpen();
-        if (candidate.email) {
-          if (mdCache.current.has(candidate.id)) {
-            overlaySetContent(mdCache.current.get(candidate.id)!);
-          } else {
-            getExpertMatcherProfile(candidate.email)
-              .then((data: DynamicConsultantProfile) => {
-                const { profile, matching_items } = data;
-                const photoMd = candidate.photo_url_200 ? `![${title}](${candidate.photo_url_200} "${title}")` : '';
-                const markdown = `${photoMd}
-              
+
+  function handleClick() {
+
+    const title = `${given_name} ${surname}`;
+    overlaySetTitle(title);
+    overlaySetContent(``);
+    overlaySetOpen();
+    if (candidate.email) {
+      if (mdCache.current.has(candidate.id)) {
+        overlaySetContent(mdCache.current.get(candidate.id)!);
+      } else {
+        getExpertMatcherProfile(candidate.email)
+          .then((data: DynamicConsultantProfile) => {
+            const { profile, matching_items } = data;
+            const photoMd = candidate.photo_url_200 ? `![${title}](${candidate.photo_url_200} "${title}")` : '';
+            const markdown = `${photoMd}
+            
 ${t("vote", { count: candidate.votes })}
-              
+            
 ${profile}
 
 ### Relevant Questions
 ${matching_items.map((item) => `- ${item.question}: ${item.answer}`).join('\n')}
-            `;
-                mdCache.current.set(candidate.id, markdown);
-                overlaySetContent(markdown);
-              })
-              .catch((error) => {
-                overlaySetError(t('Error fetching expert matcher profile', { error: error.message }));
-              });
-          }
-        }
+          `;
+            mdCache.current.set(candidate.id, markdown);
+            overlaySetContent(markdown);
+          })
+          .catch((error) => {
+            overlaySetError(t('Error fetching expert matcher profile', { error: error.message }));
+          });
+      }
+    }
+  }
 
-      }}
-        className={candidateTextCss}
-      >
+  return (
+    <div className="flex flex-row gap-2 items-center text-xl">
+      <button onClick={handleClick} className={candidateTextCss}>
         <GrUserExpert className={`${iconClass} ml-1`} />
         {t('Expert matcher profile')}
       </button>
