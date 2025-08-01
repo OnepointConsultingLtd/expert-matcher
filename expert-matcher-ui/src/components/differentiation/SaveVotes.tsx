@@ -6,14 +6,13 @@ import { getSessionId } from '../../lib/sessionFunctions';
 
 export default function SaveVotes() {
 
-  const reportUrl = window.expertMatcherConfig.reportUrl; 
   const { votes } = useSendDifferentiationQuestionVotes();
   const { t } = useTranslation();
   const sessionId = getSessionId();
 
   if (!sessionId || !votes) return null;
 
-  const url = `${reportUrl}/api/report-consultants/${sessionId}`;
+  const url = `/api/report-consultants/${sessionId}`;
 
   return (
     <div className="flex flex-row justify-between items-center mt-6 mb-3">
