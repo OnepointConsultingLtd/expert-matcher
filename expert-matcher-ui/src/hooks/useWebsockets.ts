@@ -42,7 +42,7 @@ export function useWebsockets() {
 
       setInterval(() => {
         safeEmit(socket.current, WS_EVENTS.ECHO, getSessionId());
-      }, 60000);
+      }, 120 * 1000);
     }
 
     function onDisconnect() {
