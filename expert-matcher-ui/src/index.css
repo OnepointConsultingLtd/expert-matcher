@@ -1,2 +1,9 @@
 @import url("css/layout.css");
 @import url("css/dialogue.css");
+
+body, p, div, button, input, select, textarea {
+    font-family: "Manrope", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}

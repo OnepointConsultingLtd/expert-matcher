@@ -3,6 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/webp" href="/favicon.webp" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Onepoint Expert Matcher™</title>
     <meta
@@ -66,15 +69,20 @@
       content="Onepoint Consulting Ltd"
     />
     <script>
-      const server = "localhost";
-      const port = 8090;
-      const protocol = window.location.protocol;
+      const server = "expertmatcher.onepointltd.ai";
+      const port = 443;
+      const protocol = 'https'
       const wsProtocol = protocol === 'https' ? 'wss' : 'ws';
       window.expertMatcherConfig = {
         websocketUrl: `${wsProtocol}://${server}:${port}`,
         reportUrl: `${protocol}//${server}:${port}`,
       };
     </script>
+
+
+
+
+
   </head>
   <body>
     <div id="root" class="flex flex-col 

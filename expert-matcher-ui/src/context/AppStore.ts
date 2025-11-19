@@ -68,6 +68,11 @@ interface AppStoreActions {
   setSuggestionFilter: (suggestionFilter: string) => void;
 }
 
+interface DarkModeStoreState {
+  darkMode: boolean;
+  setDarkMode: (darkMode: boolean) => void;
+}
+
 function processVoting(
   state: AppStoreState,
   currentQuestion: QuestionWithSelectedOptions,
@@ -115,7 +120,7 @@ function processDifferentiationQuestionVotes(differentiationQuestions: QuestionW
   }
 }
 
-export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOverlayProps & MarkdownOverlayActions>()(
+export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOverlayProps & MarkdownOverlayActions & DarkModeStoreState>()(
   subscribeWithSelector((set) => ({
     errorMessage: '',
     successMessage: '',
@@ -128,12 +133,13 @@ export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOver
     sending: false,
     selectedSuggestions: [],
     suggestionFilter: '',
-
+    
     overlayIsOpen: false,
     overlayContent: '',
     overlayTitle: '',
     overlayEmail: '',
     overlayError: '',
+    darkMode: true,
     overlaySetOpen: () => set({ overlayIsOpen: true }),
     overlaySetClose: () => set({ overlayIsOpen: false, overlayContent: '', overlayTitle: '', overlayEmail: '', overlayError: '' }),
     overlaySetTitle: (title: string) => set({ overlayTitle: title }),
@@ -327,6 +333,7 @@ export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOver
         return { ...state };
       }),
     setSuggestionFilter: (suggestionFilter: string) => set({ suggestionFilter }),
+    setDarkMode: (darkMode: boolean) => set({ darkMode }),
   }))
 );
 
