@@ -1,0 +1,1 @@
+node .\scripts\replace_script_section_local.js
