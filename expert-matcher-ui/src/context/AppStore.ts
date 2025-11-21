@@ -73,6 +73,19 @@ interface DarkModeStoreState {
   setDarkMode: (darkMode: boolean) => void;
 }
 
+const DARK_MODE_STORAGE_KEY = 'expert-matcher-dark-mode';
+
+function getInitialDarkMode(): boolean {
+  const stored = localStorage.getItem(DARK_MODE_STORAGE_KEY);
+  if (stored !== null) {
+    return stored === 'true';
+  }
+  if (typeof window !== 'undefined') {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  return true; // Default fallback
+}
+
 function processVoting(
   state: AppStoreState,
   currentQuestion: QuestionWithSelectedOptions,
@@ -133,13 +146,13 @@ export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOver
     sending: false,
     selectedSuggestions: [],
     suggestionFilter: '',
-    
+
     overlayIsOpen: false,
     overlayContent: '',
     overlayTitle: '',
     overlayEmail: '',
     overlayError: '',
-    darkMode: true,
+    darkMode: getInitialDarkMode(),
     overlaySetOpen: () => set({ overlayIsOpen: true }),
     overlaySetClose: () => set({ overlayIsOpen: false, overlayContent: '', overlayTitle: '', overlayEmail: '', overlayError: '' }),
     overlaySetTitle: (title: string) => set({ overlayTitle: title }),
@@ -319,7 +332,7 @@ export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOver
       }),
     nextQuestion: () =>
       set((state) => {
-        if (state.differentiationQuestions.length === 0 ? 
+        if (state.differentiationQuestions.length === 0 ?
           state.currentIndex < state.history.length - 1 : state.currentIndex < state.history.length) {
           return {
             ...state,
@@ -333,7 +346,17 @@ export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOver
         return { ...state };
       }),
     setSuggestionFilter: (suggestionFilter: string) => set({ suggestionFilter }),
-    setDarkMode: (darkMode: boolean) => set({ darkMode }),
+    setDarkMode: (darkMode: boolean) => {
+      // Save to localStorage
+      localStorage.setItem(DARK_MODE_STORAGE_KEY, String(darkMode));
+      // Apply to DOM
+      if (darkMode) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+      set({ darkMode });
+    },
   }))
 );
 

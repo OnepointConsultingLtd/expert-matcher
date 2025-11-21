@@ -1,38 +1,35 @@
 import { useEffect } from "react";
 import { useAppStore } from "../context/AppStore";
 
+const DARK_MODE_STORAGE_KEY = 'expert-matcher-dark-mode';
 
 export function useDarkMode() {
   const { darkMode, setDarkMode } = useAppStore();
 
   useEffect(() => {
-    // Check initial state
-    const checkDarkMode = () => {
-      // Method 1: Check system preference
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Ensure DOM class matches the store state on mount
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
 
-      // Method 2: Check if dark class exists on document/html (if using class-based dark mode)
-      const hasDarkClass = document.documentElement.classList.contains('dark');
-
-      // Use either method or combine them
-      setDarkMode(prefersDark || hasDarkClass);
-    };
-
-    checkDarkMode();
-
-    // Listen for changes in system preference
+    // Listen for changes in system preference (only if no user preference is saved)
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e: MediaQueryListEvent) => setDarkMode(e.matches);
+    const handleChange = (e: MediaQueryListEvent) => {
+      const hasUserPreference = localStorage.getItem(DARK_MODE_STORAGE_KEY) !== null;
+      if (!hasUserPreference) {
+        setDarkMode(e.matches);
+      }
+    };
 
     // Modern browsers
     mediaQuery.addEventListener('change', handleChange);
 
-    // Fallback for older browsers
-    // mediaQuery.addListener(handleChange);
-
     return () => {
       mediaQuery.removeEventListener('change', handleChange);
     };
-  }, []);
+  }, [darkMode, setDarkMode]);
+
   return { darkMode, setDarkMode }
 }
