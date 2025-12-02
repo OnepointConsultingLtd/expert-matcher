@@ -5,7 +5,7 @@ import { useAppStore } from '../context/AppStore';
 
 export default function Header() {
   const { t } = useTranslation();
-  const imageAlt = t('D-Well logo');
+  const imageAlt = t('Expert Matcher logo');
   const { darkMode, setDarkMode } = useAppStore();
 
   return (
