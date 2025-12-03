@@ -5,7 +5,7 @@ export async function getExpertMatcherProfile(email: string): Promise<DynamicCon
     // const reportUrl = window.expertMatcherConfig.reportUrl;
     const sessionId = getSessionId();
     debugger
-    const url = `/api/dynamic-profile/${sessionId}?email=${email}`;
+    const url = `${window.expertMatcherConfig.reportUrl}/api/dynamic-profile/${sessionId}?email=${email}`;
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

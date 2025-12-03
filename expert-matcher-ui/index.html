@@ -75,9 +75,10 @@
       const wsProtocol = protocol === 'https' ? 'wss' : 'ws';
       window.expertMatcherConfig = {
         websocketUrl: `${wsProtocol}://${server}:${port}`,
-        reportUrl: `${protocol}//${server}:${port}`,
+        reportUrl: `${protocol}://${server}:${port}`,
       };
     </script>
+
 
 
 
