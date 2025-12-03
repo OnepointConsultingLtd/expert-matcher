@@ -3,7 +3,7 @@ import { useCurrentMessage } from '../hooks/useCurrentMessage';
 import { useAppStore } from '../context/AppStore';
 function TitleDisplay({message}: {message: string}) {
   return (
-    <div className="dark:text-gray-100 w-full text-2xl">
+    <div className="text-[#07000d] dark:text-[#fafffe] w-full text-3xl py-6">
       <p>{message}</p>
     </div>
   );

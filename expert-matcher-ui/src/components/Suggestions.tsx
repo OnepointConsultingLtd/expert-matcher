@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../context/AppStore';
 import AvailableConsultants from './AvailableConsultants';
 import { buttonStyle } from './common';
+import { FiSearch } from 'react-icons/fi';
 
 export default function Suggestions() {
   const { t } = useTranslation();
@@ -18,13 +19,16 @@ export default function Suggestions() {
 
   return (
     <div className="mt-0">
-      <div className="flex flex-row justify-left mb-2">
+      <div className="flex flex-row justify-left mb-6 border border-[#636565] rounded-md p-2 gap-2 max-w-1/2">
+        <span className="text-gray-[#636565] my-auto pointer-events-none">
+            <FiSearch className="w-4 h-4" aria-hidden="true" />
+        </span>
         <input
           type="search"
           value={suggestionFilter}
           onChange={(e) => setSuggestionFilter(e.target.value)}
           placeholder={t('Search suggestions')}
-          className="border-2 border-gray-300 rounded-md p-2 w-full max-w-1/2"
+          className="w-full focus:outline-none bg-transparent"
         ></input>
       </div>
       <AvailableConsultants />
@@ -41,11 +45,11 @@ export default function Suggestions() {
                     addSelectedSuggestions(suggestion);
                   }
                 }}
-                className={`suggestion ${buttonStyle} ${isSelected ? 'bg-teal-900' : ''}`}
+                className={`suggestion p-2 ${buttonStyle} ${isSelected ? 'bg-[#9A19FF] border border-[#9A19FF] text-[#fafffe]' : 'border border-[#636565] dark:border-[#fafffe]'}`}
               >
                 <div>{suggestion}</div>
                 {suggestions_count[i] > 0 && (
-                  <div className={`text-sm ${isSelected ? 'text-white' : 'text-gray-300'}`}>
+                  <div className={`text-sm ${isSelected ? 'text-[#fafffe]' : 'text-[#636565] dark:text-[#fafffe]'}`}>
                     {t('consultantWithCount', { count: suggestions_count[i] })}
                   </div>
                 )}
