@@ -14,12 +14,12 @@ export default function Header() {
         <div className="flex flex-row items-end">
           <img
             className="w-52 lg:w-72"
-            src={darkMode ? "/images/expertmatcher-white.png" : "/images/expertmatcher.png"}
+            src={darkMode ? "/images/expertmatcher-white.png" : "/images/expertmatcher-black.png"}
             alt={imageAlt}
           />
         </div>
         <div className='flex items-center'>
-          <button
+          {/* <button
             onClick={() => setDarkMode(!darkMode)}
             className="p-2 rounded-full cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 mr-4"
             aria-label="Toggle Dark Mode"
@@ -29,7 +29,7 @@ export default function Header() {
             ) : (
               <LuMoon className="w-6 h-6 text-slate-600" />
             )}
-          </button>
+          </button> */}
           <HamburgerMenu />
         </div>
       </div>

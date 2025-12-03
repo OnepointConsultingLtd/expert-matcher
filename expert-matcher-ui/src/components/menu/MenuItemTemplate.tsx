@@ -12,11 +12,11 @@ export default function MenuItemTemplate({
   const { t } = useTranslation();
   return (
     <div
-      className="menu-item flex flex-row cursor-pointer w-full hover:bg-gray-50 dark:hover:bg-gray-600 py-4"
+      className="menu-item w-full flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-[#38333d] transition-colors duration-200 cursor-pointer"
       onClick={func}
     >
-      <div className="w-12">{children}</div>
-      <div className="pt-1 pl-2">
+      <div className="">{children}</div>
+      <div className="pl-4">
         <button>{t(title)}</button>
       </div>
     </div>

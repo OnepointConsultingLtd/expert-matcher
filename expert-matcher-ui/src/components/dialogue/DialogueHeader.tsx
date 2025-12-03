@@ -19,7 +19,7 @@ export default function DialogueHeader({
   return (
     <section className={`flex flex-row justify-between pl-8 pr-6 pt-8 ${className}`}>
       {children}
-      <IoCloseOutline className="close-icon" onClick={onClose} />
+      <IoCloseOutline className="close-icon cursor-pointer" onClick={onClose} />
     </section>
   );
 }

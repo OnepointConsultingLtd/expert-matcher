@@ -36,7 +36,7 @@ export default function MarkdownOverlay () {
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.5 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black z-40"
+            className="fixed inset-0 bg-[#07000d] z-40"
             onClick={overlaySetClose}
           />
 
@@ -48,11 +48,11 @@ export default function MarkdownOverlay () {
             transition={{ type: 'spring', duration: 0.5 }}
             className="fixed inset-4 md:inset-10 z-50 overflow-hidden flex flex-col"
           >
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl flex flex-col max-h-full">
+            <div className="bg-[#fafffe] dark:bg-gray-800 rounded-lg shadow-xl flex flex-col max-h-full">
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
                 {overlayTitle && (
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-[#fafffe]">
                     {overlayTitle}
                   </h2>
                 )}

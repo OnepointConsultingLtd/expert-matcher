@@ -15,8 +15,8 @@ export default function SaveVotes() {
   const url = `/api/report-consultants/${sessionId}`;
 
   return (
-    <div className="flex flex-row justify-between items-center mt-6 mb-3">
-      <div className={`${buttonStyle}`}>
+    <div className="flex flex-row justify-between items-center mt-6">
+      <div className="text-sm">
         {t('saveVotes', { count: votes })}
       </div>
       <button 

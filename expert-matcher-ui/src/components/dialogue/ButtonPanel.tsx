@@ -12,8 +12,7 @@ export default function ButtonPanel({
       <button
         data-close-modal={true}
         onClick={onOk}
-        className="button-ok border border-solid border-[#0084d7] hover:border-[#055D94] py-2.5 text-base font-medium text-[#0084d7] hover:text-[#055D94] focus:ring-4 focus:outline-none focus:ring-blue-300
-            text-center uppercase w-20 disabled:opacity-50 disabled:cursor-not-allowed dark:text-gray-100 dark:border-white dark:hover:text-gray-50"
+        className={`cursor-pointer hover:scale-101 transition duration-300 hover:underline ease-in-out disabled:opacity-50 disabled:cursor-not-allowed border border-solid border-[#9A19FF] dark:border-[#fafffe] px-4 py-2 text-base font-medium text-[#9A19FF] dark:text-[#fafffe] focus:ring-4 focus:outline-none focus:ring-[#9A19FF33] rounded-lg text-center disabled:opacity-50 disabled:cursor-not-allowed`}
         disabled={disabled}
       >
         {okText}

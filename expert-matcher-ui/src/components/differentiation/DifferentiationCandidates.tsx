@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useCurrentMessage } from '../../hooks/useCurrentMessage';
 import { CandidateWithVotes } from '../../types/differentiation_questions';
 import { VscAccount } from 'react-icons/vsc';
-import { IoIosContact } from 'react-icons/io';
+import { IoIosContact, IoIosGlobe } from 'react-icons/io';
 import { TbFileCv } from 'react-icons/tb';
 import { useEffect, useRef, useState } from 'react';
 import { scrollToElement } from '../../lib/scrollSupport';
@@ -14,6 +14,15 @@ import { iconClass } from '../common';
 import { useAppStore } from '../../context/AppStore';
 import { getExpertMatcherProfile } from '../../lib/apiClient';
 import { DynamicConsultantProfile } from '../../types/dynamic_consultant_profile';
+
+const isDarkTheme = true;
+
+const lightModeColor = "#07000D";
+const darkModeColor = "#FAFFFE";
+
+const activeStrokeColor = isDarkTheme 
+    ? darkModeColor 
+    : lightModeColor;
 
 const candidateTextCss = 'flex flex-row items-center transition duration-300 ease-in-out hover:underline underline cursor-pointer';
 
@@ -32,7 +41,7 @@ function CandidatePhoto({ candidate }: { candidate: CandidateWithVotes }) {
   if (candidate.photo_url_400) {
     return (
       <OptionalLink href={candidate.linkedin_profile_url}>
-        <img src={candidate.photo_url_400} alt={name ?? ''} className="w-full" />
+        <img src={candidate.photo_url_400} alt={name ?? ''} className="w-20 rounded-full aspect-square object-cover" />
       </OptionalLink>
     );
   }
@@ -51,7 +60,7 @@ function CandidateCv({ candidate }: { candidate: CandidateWithVotes }) {
     <>
       {candidate.cv_summary && (
         <div>
-          <button
+          {/* <button
             id={`${candidate.id}`}
             className={candidateTextCss}
             onClick={() => {
@@ -69,9 +78,9 @@ function CandidateCv({ candidate }: { candidate: CandidateWithVotes }) {
           >
             <TbFileCv className={iconClass} />
             {t('CV')}
-          </button>
+          </button> */}
           <div
-            className={`text-sm overflow-hidden transition-all duration-300 ease-in-out ml-1 ${cvExpanded ? 'max-h-[1000px]' : 'max-h-0'}`}
+            className={`text-base overflow-hidden transition-all duration-300 ease-in-out ml-1 ${cvExpanded ? 'max-h-[1000px]' : 'max-h-0'}`}
           >
             <Markdown remarkPlugins={[remarkGfm]}>{candidate.cv_summary}</Markdown>
           </div>
@@ -129,9 +138,30 @@ ${matching_items.map((item) => `- ${item.question}: ${item.answer}`).join('\n')}
 
   return (
     <div className="flex flex-row gap-2 items-center text-xl">
-      <button onClick={handleClick} className={candidateTextCss}>
-        <GrUserExpert className={`${iconClass} ml-1`} />
-        {t('Expert matcher profile')}
+      <button onClick={handleClick} className={candidateTextCss} title='Expert Matcher profile'>
+        <svg
+          className={`${iconClass} p-[3px] ml-1`}
+          viewBox="0 0 1200 1200"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="xMidYMid meet"
+        >
+          <g clipPath="url(#clip0_6695_10)">
+            <path
+              d="M600.001 37.5C716.575 37.5 782.359 57.4133 820.676 95.7305C858.993 134.048 878.905 199.831 878.905 316.405C878.905 432.98 858.993 498.763 820.676 537.08C782.359 575.397 716.575 595.31 600.001 595.31C483.427 595.31 417.643 575.397 379.326 537.08C341.009 498.763 321.096 432.98 321.096 316.405C321.096 199.831 341.009 134.048 379.326 95.7305C417.643 57.4132 483.427 37.5 600.001 37.5Z"
+              stroke="#9A19FF"
+              strokeWidth={75}
+            />
+            <path
+              d="M600 710.464C802.585 710.464 932.869 741.592 1015.92 808.293C1096.66 873.13 1141.5 978.943 1154.57 1152.1L1154.87 1156.21C1154.88 1156.33 1154.87 1156.38 1154.87 1156.39C1154.87 1156.4 1154.86 1156.41 1154.86 1156.42C1154.84 1156.46 1154.79 1156.59 1154.62 1156.76C1154.46 1156.94 1154.25 1157.08 1154.03 1157.18C1153.84 1157.26 1153.6 1157.33 1153.21 1157.33H46.7852C46.4046 1157.33 46.1555 1157.26 45.9668 1157.18C45.7467 1157.08 45.5401 1156.94 45.376 1156.76C45.2139 1156.59 45.156 1156.46 45.1426 1156.42C45.1368 1156.41 45.1345 1156.4 45.1328 1156.39C45.1316 1156.38 45.1241 1156.33 45.1328 1156.21C57.7941 980.612 102.705 873.641 184.075 808.293C266.482 742.113 395.382 710.952 595.265 710.469L600 710.464Z"
+              stroke="currentColor"
+              strokeWidth={85.3331}
+              strokeLinecap="round"
+            />
+          </g>
+        </svg>
+        {/* <GrUserExpert className={`${iconClass} ml-1`} />
+        {t('Expert matcher profile')} */}
       </button>
     </div>
   );
@@ -149,10 +179,10 @@ function OnlineProfile({ candidate }: { candidate: CandidateWithVotes }) {
         href={linkedin_profile_url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex flex-row items-center transition duration-300 ease-in-out hover:underline"
+        className="flex flex-row items-center transition duration-300 ease-in-out hover:underline" title='Online profile'
       >
-        <IoIosContact className={iconClass} />
-        {t('Online profile')}
+        <IoIosGlobe className={iconClass} />
+        {/* {t('Online profile')} */}
       </a>
     </div>
   );
@@ -161,7 +191,7 @@ function OnlineProfile({ candidate }: { candidate: CandidateWithVotes }) {
 function VoteDisplay({ candidate }: { candidate: CandidateWithVotes }) {
   const { t } = useTranslation();
   return (
-    <div className="text-xl pl-1">{t('vote_other', { count: candidate.votes })}</div>
+    <div className="text-lg">{t('vote_other', { count: candidate.votes })}</div>
   );
 }
 
@@ -169,15 +199,21 @@ function CadidateCard({ candidate, maxVote }: { candidate: CandidateWithVotes; m
   const { t } = useTranslation();
   const name = `${candidate.given_name} ${candidate.surname}`;
   return (
-    <div key={candidate.id} className="flex flex-col gap-2">
-      <div className="flex flex-row items-center text-2xl gap-2">
-        {name}{' '}
-        {candidate.votes > 0 && candidate.votes === maxVote && <GoTrophy className={iconClass} title={t('Best match')} />}
+    <div key={candidate.id} className="flex flex-col gap-4 dark:text-[#fafffe] bg-[#E6E5E6] dark:bg-[#38333d] p-6 rounded-2xl">
+      <div className="flex flex-row items-center text-2xl gap-6">
+        <CandidatePhoto candidate={candidate} />
+          <div className="flex flex-col gap-2">
+            <p className="mt-[-6px]">{name}{' '}</p>
+            <div className="flex flex-row">        
+              <ExpertMatcherProfile candidate={candidate} />
+              <OnlineProfile candidate={candidate} />
+              <div className="border-l border-gray-400 pl-4 ml-2 flex flex-row gap-2 items-center">
+                {candidate.votes > 0 && candidate.votes === maxVote && <GoTrophy className={iconClass} title={t('Best match')} />}
+                <VoteDisplay candidate={candidate} />
+              </div>              
+            </div>
+          </div>
       </div>
-      <CandidatePhoto candidate={candidate} />
-      <VoteDisplay candidate={candidate} />
-      <ExpertMatcherProfile candidate={candidate} />
-      <OnlineProfile candidate={candidate} />
       <CandidateCv candidate={candidate} />
     </div>
   );
@@ -188,9 +224,9 @@ export default function DifferentiationCandidates() {
   const { candidates } = useCurrentMessage();
   const maxVote = Math.max(...candidates.map((c) => c.votes));
   return (
-    <div className="dark:text-gray-100 mt-4">
-      <p className="w-full text-xl">{t('Candidates')}</p>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-w-full">
+    <div className="text-[#07000d] dark:text-[#fafffe] w-full">
+      <p className=" text-3xl py-6">{t('Candidates')}</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-full">
         {candidates
           .sort((a, b) => b.votes - a.votes)
           .map((candidate) => (
