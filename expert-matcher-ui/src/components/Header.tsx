@@ -1,5 +1,4 @@
 import HamburgerMenu from './menu/HamburgerMenu';
-import { LuMoon, LuSun } from 'react-icons/lu';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../context/AppStore';
 
