@@ -41,8 +41,7 @@ function CandidatePhoto({ candidate }: { candidate: CandidateWithVotes }) {
 }
 
 function CandidateCv({ candidate }: { candidate: CandidateWithVotes }) {
-  const { t } = useTranslation();
-  const [cvExpanded, setCvExpanded] = useState(true);
+  const [cvExpanded] = useState(true);
 
   return (
     <>
@@ -135,7 +134,6 @@ ${matching_items.map((item) => `- ${item.question}: ${item.answer}`).join('\n')}
 }
 
 function OnlineProfile({ candidate }: { candidate: CandidateWithVotes }) {
-  const { t } = useTranslation();
   const { linkedin_profile_url } = candidate;
   if (!linkedin_profile_url) {
     return null;

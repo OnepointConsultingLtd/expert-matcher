@@ -1,11 +1,9 @@
 import useHamburger from '../../hooks/useHamburger';
 import StartButton from './StartButton';
 import DarkModeButton from './DarkModeButton';
-import { useTranslation } from 'react-i18next';
 
 export default function HamburgerMenu() {
   const { open, setOpen, menuRef, imgRef } = useHamburger();
-  const { t } = useTranslation();
 
   return (
     <div className="hamburger-menu relative z-10 cursor-pointer">
