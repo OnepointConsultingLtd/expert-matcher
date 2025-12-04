@@ -2,27 +2,15 @@ import { useTranslation } from 'react-i18next';
 import { useCurrentMessage } from '../../hooks/useCurrentMessage';
 import { CandidateWithVotes } from '../../types/differentiation_questions';
 import { VscAccount } from 'react-icons/vsc';
-import { IoIosContact, IoIosGlobe } from 'react-icons/io';
-import { TbFileCv } from 'react-icons/tb';
+import { IoIosGlobe } from 'react-icons/io';
 import { useEffect, useRef, useState } from 'react';
-import { scrollToElement } from '../../lib/scrollSupport';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { GoTrophy } from 'react-icons/go';
-import { GrUserExpert } from "react-icons/gr";
 import { iconClass } from '../common';
 import { useAppStore } from '../../context/AppStore';
 import { getExpertMatcherProfile } from '../../lib/apiClient';
 import { DynamicConsultantProfile } from '../../types/dynamic_consultant_profile';
-
-const isDarkTheme = true;
-
-const lightModeColor = "#07000D";
-const darkModeColor = "#FAFFFE";
-
-const activeStrokeColor = isDarkTheme 
-    ? darkModeColor 
-    : lightModeColor;
 
 const candidateTextCss = 'flex flex-row items-center transition duration-300 ease-in-out hover:underline underline cursor-pointer';
 
@@ -60,25 +48,6 @@ function CandidateCv({ candidate }: { candidate: CandidateWithVotes }) {
     <>
       {candidate.cv_summary && (
         <div>
-          {/* <button
-            id={`${candidate.id}`}
-            className={candidateTextCss}
-            onClick={() => {
-              const newExpanded = !cvExpanded;
-              setCvExpanded(newExpanded);
-              if (newExpanded) {
-                const elementId = document.getElementById(`${candidate.id}`);
-                if (elementId) {
-                  setTimeout(() => {
-                    scrollToElement(elementId);
-                  }, 400);
-                }
-              }
-            }}
-          >
-            <TbFileCv className={iconClass} />
-            {t('CV')}
-          </button> */}
           <div
             className={`text-base overflow-hidden transition-all duration-300 ease-in-out ml-1 ${cvExpanded ? 'max-h-[1000px]' : 'max-h-0'}`}
           >
@@ -160,8 +129,6 @@ ${matching_items.map((item) => `- ${item.question}: ${item.answer}`).join('\n')}
             />
           </g>
         </svg>
-        {/* <GrUserExpert className={`${iconClass} ml-1`} />
-        {t('Expert matcher profile')} */}
       </button>
     </div>
   );
@@ -182,7 +149,6 @@ function OnlineProfile({ candidate }: { candidate: CandidateWithVotes }) {
         className="flex flex-row items-center transition duration-300 ease-in-out hover:underline" title='Online profile'
       >
         <IoIosGlobe className={iconClass} />
-        {/* {t('Online profile')} */}
       </a>
     </div>
   );
