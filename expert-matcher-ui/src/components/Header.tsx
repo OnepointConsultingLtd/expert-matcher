@@ -5,7 +5,7 @@ import { useAppStore } from '../context/AppStore';
 export default function Header() {
   const { t } = useTranslation();
   const imageAlt = t('Expert Matcher logo');
-  const { darkMode, setDarkMode } = useAppStore();
+  const { darkMode } = useAppStore();
 
   return (
     <div className="header min-h-14 pt-2 md:pt-3 pb-2 flex items-center w-full">
@@ -18,17 +18,6 @@ export default function Header() {
           />
         </div>
         <div className='flex items-center'>
-          {/* <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="p-2 rounded-full cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 mr-4"
-            aria-label="Toggle Dark Mode"
-          >
-            {darkMode ? (
-              <LuSun className="w-6 h-6 text-amber-200" />
-            ) : (
-              <LuMoon className="w-6 h-6 text-slate-600" />
-            )}
-          </button> */}
           <HamburgerMenu />
         </div>
       </div>
