@@ -3,7 +3,6 @@ import StartButton from './StartButton';
 import DarkModeButton from './DarkModeButton';
 
 export default function HamburgerMenu() {
-  const { t } = useTranslation();
   const { open, setOpen, menuRef, imgRef } = useHamburger();
 
   return (
