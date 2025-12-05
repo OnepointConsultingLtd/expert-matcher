@@ -5,7 +5,6 @@ import { buttonStyle } from '../common';
 import { useAppStore } from '../../context/AppStore';
 import { useChatStore } from '../../context/ChatStore';
 
-
 function Options({ question }: { question: QuestionWithSelectedOptions }) {
   const { t } = useTranslation();
   const { socket } = useChatStore();
@@ -20,10 +19,10 @@ function Options({ question }: { question: QuestionWithSelectedOptions }) {
   )?.selectedOptions;
 
   function onSelectOption(option: string, isSelected: boolean) {
-    if(isSelected) {
-      removeDifferentiationQuestionOption(question.question, option, socket)
+    if (isSelected) {
+      removeDifferentiationQuestionOption(question.question, option, socket);
     } else {
-      selectDifferentiationQuestionOption(question.question, option, socket)
+      selectDifferentiationQuestionOption(question.question, option, socket);
     }
   }
 
@@ -52,8 +51,13 @@ export default function DifferentiationQuestions() {
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-full my-6">
         {differentiationQuestions.map((question, index) => (
-          <div key={`${question.question}-${index}`} className="bg-[#E6E5E6] dark:text-[#fafffe] dark:bg-[#38333d] p-6 rounded-2xl flex flex-col gap-3">
-            <p className="w-fit mb-1 border border-[#6A666D] rounded-2xl py-1 px-2 bg-[#6A666D15] dark:bg-[#6A666D45] text-xs text-[#6A666D] dark:text-[#CDCCCE]">{question.dimension}</p>
+          <div
+            key={`${question.question}-${index}`}
+            className="bg-[#E6E5E6] dark:text-[#fafffe] dark:bg-[#38333d] p-6 rounded-2xl flex flex-col gap-3"
+          >
+            <p className="w-fit mb-1 border border-[#6A666D] rounded-2xl py-1 px-2 bg-[#6A666D15] dark:bg-[#6A666D45] text-xs text-[#6A666D] dark:text-[#CDCCCE]">
+              {question.dimension}
+            </p>
             <p className="w-full text-xl">{question.question}</p>
             <Options question={question} />
           </div>

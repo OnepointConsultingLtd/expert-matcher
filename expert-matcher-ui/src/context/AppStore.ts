@@ -10,7 +10,7 @@ import {
   Question,
   QuestionWithSelectedOptions,
 } from '../types/differentiation_questions';
-import { subscribeWithSelector } from 'zustand/middleware'
+import { subscribeWithSelector } from 'zustand/middleware';
 import { sendDifferentiationQuestionVotesWs } from '../lib/websocketFunctions';
 import { Socket } from 'socket.io-client';
 import { RefObject } from 'react';
@@ -55,8 +55,16 @@ interface AppStoreActions {
   addDifferentiationQuestion: (differentiationQuestion: Question) => void;
   clearDifferentiationQuestions: () => void;
   addCandidate: (candidate: Candidate) => void;
-  selectDifferentiationQuestionOption: (question: string, option: string, socket: RefObject<Socket | null>) => void;
-  removeDifferentiationQuestionOption: (question: string, option: string, socket: RefObject<Socket | null>) => void;
+  selectDifferentiationQuestionOption: (
+    question: string,
+    option: string,
+    socket: RefObject<Socket | null>
+  ) => void;
+  removeDifferentiationQuestionOption: (
+    question: string,
+    option: string,
+    socket: RefObject<Socket | null>
+  ) => void;
   setConnected: (connected: boolean) => void;
   setSending: (sending: boolean) => void;
   addSelectedSuggestions: (selectedSuggestion: string) => void;
@@ -114,7 +122,10 @@ function processVoting(
   return candidatesWithVotes;
 }
 
-function processDifferentiationQuestionVotes(differentiationQuestions: QuestionWithSelectedOptions[], socket: RefObject<Socket | null>) {
+function processDifferentiationQuestionVotes(
+  differentiationQuestions: QuestionWithSelectedOptions[],
+  socket: RefObject<Socket | null>
+) {
   const sessionId = getSessionId();
   if (sessionId) {
     const votes: DifferentiationQuestionVote[] = differentiationQuestions.flatMap((dq) => {
@@ -133,7 +144,13 @@ function processDifferentiationQuestionVotes(differentiationQuestions: QuestionW
   }
 }
 
-export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOverlayProps & MarkdownOverlayActions & DarkModeStoreState>()(
+export const useAppStore = create<
+  AppStoreState &
+    AppStoreActions &
+    MarkdownOverlayProps &
+    MarkdownOverlayActions &
+    DarkModeStoreState
+>()(
   subscribeWithSelector((set) => ({
     errorMessage: '',
     successMessage: '',
@@ -154,7 +171,14 @@ export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOver
     overlayError: '',
     darkMode: getInitialDarkMode(),
     overlaySetOpen: () => set({ overlayIsOpen: true }),
-    overlaySetClose: () => set({ overlayIsOpen: false, overlayContent: '', overlayTitle: '', overlayEmail: '', overlayError: '' }),
+    overlaySetClose: () =>
+      set({
+        overlayIsOpen: false,
+        overlayContent: '',
+        overlayTitle: '',
+        overlayEmail: '',
+        overlayError: '',
+      }),
     overlaySetTitle: (title: string) => set({ overlayTitle: title }),
     overlaySetContent: (content: string) => set({ overlayContent: content }),
     overlaySetEmail: (email: string) => set({ overlayEmail: email }),
@@ -171,7 +195,8 @@ export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOver
       }),
     setHistory: (history: QuestionSuggestions[]) =>
       set((state) => {
-        const currentIndex = history.length - 1 + (state.differentiationQuestions.length > 0 ? 1 : 0);
+        const currentIndex =
+          history.length - 1 + (state.differentiationQuestions.length > 0 ? 1 : 0);
         return { ...state, history, currentIndex, suggestionFilter: '' };
       }),
     addDifferentiationQuestion: (differentiationQuestion: Question) =>
@@ -189,7 +214,10 @@ export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOver
         }
         return {
           ...state,
-          differentiationQuestions: [...state.differentiationQuestions, questionWithSelectedOptions],
+          differentiationQuestions: [
+            ...state.differentiationQuestions,
+            questionWithSelectedOptions,
+          ],
         };
       }),
     clearDifferentiationQuestions: () =>
@@ -213,7 +241,11 @@ export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOver
         }
         return { ...state, candidates: [...state.candidates, candidateWithVotes] };
       }),
-    selectDifferentiationQuestionOption: (question: string, option: string, socket: RefObject<Socket | null>) =>
+    selectDifferentiationQuestionOption: (
+      question: string,
+      option: string,
+      socket: RefObject<Socket | null>
+    ) =>
       set((state) => {
         const questionWithSelectedOptionsIndex = state.differentiationQuestions.findIndex(
           (q) => q.question === question
@@ -239,14 +271,18 @@ export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOver
           modifiedQuestion,
           ...state.differentiationQuestions.slice(questionWithSelectedOptionsIndex + 1),
         ];
-        processDifferentiationQuestionVotes(updatedQuestions, socket)
+        processDifferentiationQuestionVotes(updatedQuestions, socket);
         return {
           ...state,
           differentiationQuestions: updatedQuestions,
           candidates: candidatesWithVotes,
         };
       }),
-    removeDifferentiationQuestionOption: (question: string, option: string, socket: RefObject<Socket | null>) =>
+    removeDifferentiationQuestionOption: (
+      question: string,
+      option: string,
+      socket: RefObject<Socket | null>
+    ) =>
       set((state) => {
         const questionWithSelectedOptionsIndex = state.differentiationQuestions.findIndex(
           (q) => q.question === question
@@ -270,7 +306,7 @@ export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOver
           modifiedQuestion,
           ...state.differentiationQuestions.slice(questionWithSelectedOptionsIndex + 1),
         ];
-        processDifferentiationQuestionVotes(updatedQuestions, socket)
+        processDifferentiationQuestionVotes(updatedQuestions, socket);
         return {
           ...state,
           differentiationQuestions: updatedQuestions,
@@ -285,7 +321,10 @@ export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOver
     addSelectedSuggestions: (selectedSuggestion: string) =>
       set((state) => {
         if (state.selectedSuggestions.includes(selectedSuggestion)) {
-          state.selectedSuggestions.splice(state.selectedSuggestions.indexOf(selectedSuggestion), 1);
+          state.selectedSuggestions.splice(
+            state.selectedSuggestions.indexOf(selectedSuggestion),
+            1
+          );
           return {
             ...state,
             selectedSuggestions: [...state.selectedSuggestions],
@@ -332,8 +371,11 @@ export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOver
       }),
     nextQuestion: () =>
       set((state) => {
-        if (state.differentiationQuestions.length === 0 ?
-          state.currentIndex < state.history.length - 1 : state.currentIndex < state.history.length) {
+        if (
+          state.differentiationQuestions.length === 0
+            ? state.currentIndex < state.history.length - 1
+            : state.currentIndex < state.history.length
+        ) {
           return {
             ...state,
             currentIndex: state.currentIndex + 1,
@@ -351,9 +393,9 @@ export const useAppStore = create<AppStoreState & AppStoreActions & MarkdownOver
       localStorage.setItem(DARK_MODE_STORAGE_KEY, String(darkMode));
       // Apply to DOM
       if (darkMode) {
-        document.documentElement.classList.add("dark");
+        document.documentElement.classList.add('dark');
       } else {
-        document.documentElement.classList.remove("dark");
+        document.documentElement.classList.remove('dark');
       }
       set({ darkMode });
     },

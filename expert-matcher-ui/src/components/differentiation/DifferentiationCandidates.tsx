@@ -12,7 +12,8 @@ import { useAppStore } from '../../context/AppStore';
 import { getExpertMatcherProfile } from '../../lib/apiClient';
 import { DynamicConsultantProfile } from '../../types/dynamic_consultant_profile';
 
-const candidateTextCss = 'flex flex-row items-center transition duration-300 ease-in-out hover:underline underline cursor-pointer';
+const candidateTextCss =
+  'flex flex-row items-center transition duration-300 ease-in-out hover:underline underline cursor-pointer';
 
 function OptionalLink({ href, children }: { href: string; children: React.ReactNode }) {
   if (!href) {
@@ -29,7 +30,11 @@ function CandidatePhoto({ candidate }: { candidate: CandidateWithVotes }) {
   if (candidate.photo_url_400) {
     return (
       <OptionalLink href={candidate.linkedin_profile_url}>
-        <img src={candidate.photo_url_400} alt={name ?? ''} className="w-20 rounded-full aspect-square object-cover" />
+        <img
+          src={candidate.photo_url_400}
+          alt={name ?? ''}
+          className="w-20 rounded-full aspect-square object-cover"
+        />
       </OptionalLink>
     );
   }
@@ -60,7 +65,7 @@ function CandidateCv({ candidate }: { candidate: CandidateWithVotes }) {
 
 function ExpertMatcherProfile({ candidate }: { candidate: CandidateWithVotes }) {
   const { t } = useTranslation();
-  const mdCache = useRef<Map<number, string>>(new Map);
+  const mdCache = useRef<Map<number, string>>(new Map());
   const { overlaySetTitle, overlaySetContent, overlaySetOpen, overlaySetError } = useAppStore();
   if (!candidate) {
     return null;
@@ -72,7 +77,6 @@ function ExpertMatcherProfile({ candidate }: { candidate: CandidateWithVotes }) 
   }, [candidate.votes]);
 
   function handleClick() {
-
     const title = `${given_name} ${surname}`;
     overlaySetTitle(title);
     overlaySetContent(``);
@@ -84,10 +88,12 @@ function ExpertMatcherProfile({ candidate }: { candidate: CandidateWithVotes }) 
         getExpertMatcherProfile(candidate.email)
           .then((data: DynamicConsultantProfile) => {
             const { profile, matching_items } = data;
-            const photoMd = candidate.photo_url_200 ? `![${title}](${candidate.photo_url_200} "${title}")` : '';
+            const photoMd = candidate.photo_url_200
+              ? `![${title}](${candidate.photo_url_200} "${title}")`
+              : '';
             const markdown = `${photoMd}
             
-${t("vote", { count: candidate.votes })}
+${t('vote', { count: candidate.votes })}
             
 ${profile}
 
@@ -106,7 +112,7 @@ ${matching_items.map((item) => `- ${item.question}: ${item.answer}`).join('\n')}
 
   return (
     <div className="flex flex-row gap-2 items-center text-xl">
-      <button onClick={handleClick} className={candidateTextCss} title='Expert Matcher profile'>
+      <button onClick={handleClick} className={candidateTextCss} title="Expert Matcher profile">
         <svg
           className={`${iconClass} p-[3px] ml-1`}
           viewBox="0 0 1200 1200"
@@ -144,7 +150,8 @@ function OnlineProfile({ candidate }: { candidate: CandidateWithVotes }) {
         href={linkedin_profile_url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex flex-row items-center transition duration-300 ease-in-out hover:underline" title='Online profile'
+        className="flex flex-row items-center transition duration-300 ease-in-out hover:underline"
+        title="Online profile"
       >
         <IoIosGlobe className={iconClass} />
       </a>
@@ -154,29 +161,32 @@ function OnlineProfile({ candidate }: { candidate: CandidateWithVotes }) {
 
 function VoteDisplay({ candidate }: { candidate: CandidateWithVotes }) {
   const { t } = useTranslation();
-  return (
-    <div className="text-lg">{t('vote_other', { count: candidate.votes })}</div>
-  );
+  return <div className="text-lg">{t('vote_other', { count: candidate.votes })}</div>;
 }
 
 function CadidateCard({ candidate, maxVote }: { candidate: CandidateWithVotes; maxVote: number }) {
   const { t } = useTranslation();
   const name = `${candidate.given_name} ${candidate.surname}`;
   return (
-    <div key={candidate.id} className="flex flex-col gap-4 dark:text-[#fafffe] bg-[#E6E5E6] dark:bg-[#38333d] p-6 rounded-2xl">
+    <div
+      key={candidate.id}
+      className="flex flex-col gap-4 dark:text-[#fafffe] bg-[#E6E5E6] dark:bg-[#38333d] p-6 rounded-2xl"
+    >
       <div className="flex flex-row items-center text-2xl gap-6">
         <CandidatePhoto candidate={candidate} />
-          <div className="flex flex-col gap-2">
-            <p className="mt-[-6px]">{name}{' '}</p>
-            <div className="flex flex-row">        
-              <ExpertMatcherProfile candidate={candidate} />
-              <OnlineProfile candidate={candidate} />
-              <div className="border-l border-gray-400 pl-4 ml-2 flex flex-row gap-2 items-center">
-                {candidate.votes > 0 && candidate.votes === maxVote && <GoTrophy className={iconClass} title={t('Best match')} />}
-                <VoteDisplay candidate={candidate} />
-              </div>              
+        <div className="flex flex-col gap-2">
+          <p className="mt-[-6px]">{name} </p>
+          <div className="flex flex-row">
+            <ExpertMatcherProfile candidate={candidate} />
+            <OnlineProfile candidate={candidate} />
+            <div className="border-l border-gray-400 pl-4 ml-2 flex flex-row gap-2 items-center">
+              {candidate.votes > 0 && candidate.votes === maxVote && (
+                <GoTrophy className={iconClass} title={t('Best match')} />
+              )}
+              <VoteDisplay candidate={candidate} />
             </div>
           </div>
+        </div>
       </div>
       <CandidateCv candidate={candidate} />
     </div>

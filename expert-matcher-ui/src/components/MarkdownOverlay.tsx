@@ -6,10 +6,17 @@ import remarkGfm from 'remark-gfm';
 import Spinner from './spinners/Spinner';
 import { renderMessage } from './messages/ErrorMessage';
 
-export default function MarkdownOverlay () {
+export default function MarkdownOverlay() {
   // Handle escape key to close overlay
-  const { overlayIsOpen, overlaySetClose, overlayContent, overlayTitle, overlayError, overlaySetError } = useAppStore();
-  
+  const {
+    overlayIsOpen,
+    overlaySetClose,
+    overlayContent,
+    overlayTitle,
+    overlayError,
+    overlaySetError,
+  } = useAppStore();
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') overlaySetClose();
@@ -78,8 +85,11 @@ export default function MarkdownOverlay () {
               <div className="overlay-content flex-1 overflow-auto p-6 w-full">
                 <div className="prose dark:prose-invert max-w-none">
                   {!overlayContent && !overlayError && <Spinner />}
-                  {overlayContent && <ReactMarkdown remarkPlugins={[remarkGfm]}>{overlayContent}</ReactMarkdown>}
-                  {overlayError && renderMessage(overlayError, 'bg-red-500', 'border-red-500', overlaySetError)}
+                  {overlayContent && (
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{overlayContent}</ReactMarkdown>
+                  )}
+                  {overlayError &&
+                    renderMessage(overlayError, 'bg-red-500', 'border-red-500', overlaySetError)}
                 </div>
               </div>
             </div>
@@ -88,4 +98,4 @@ export default function MarkdownOverlay () {
       )}
     </AnimatePresence>
   );
-}; 
+}

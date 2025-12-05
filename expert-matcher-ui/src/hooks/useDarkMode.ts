@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { useAppStore } from "../context/AppStore";
+import { useEffect } from 'react';
+import { useAppStore } from '../context/AppStore';
 
 const DARK_MODE_STORAGE_KEY = 'expert-matcher-dark-mode';
 
@@ -31,5 +31,5 @@ export function useDarkMode() {
     };
   }, [darkMode, setDarkMode]);
 
-  return { darkMode, setDarkMode }
+  return { darkMode, setDarkMode };
 }

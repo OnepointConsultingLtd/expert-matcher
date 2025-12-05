@@ -21,7 +21,7 @@ export default function Suggestions() {
     <div className="mt-0">
       <div className="flex flex-row justify-left mb-6 border border-[#636565] rounded-md p-2 gap-2 max-w-1/2">
         <span className="text-gray-[#636565] my-auto pointer-events-none">
-            <FiSearch className="w-4 h-4" aria-hidden="true" />
+          <FiSearch className="w-4 h-4" aria-hidden="true" />
         </span>
         <input
           type="search"
@@ -49,7 +49,9 @@ export default function Suggestions() {
               >
                 <div>{suggestion}</div>
                 {suggestions_count[i] > 0 && (
-                  <div className={`text-sm ${isSelected ? 'text-[#fafffe]' : 'text-[#636565] dark:text-[#fafffe]'}`}>
+                  <div
+                    className={`text-sm ${isSelected ? 'text-[#fafffe]' : 'text-[#636565] dark:text-[#fafffe]'}`}
+                  >
                     {t('consultantWithCount', { count: suggestions_count[i] })}
                   </div>
                 )}

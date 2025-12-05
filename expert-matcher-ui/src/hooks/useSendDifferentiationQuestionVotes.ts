@@ -5,6 +5,6 @@ export function useSendDifferentiationQuestionVotes() {
   const votes = differentiationQuestions
     .map((dq) => dq.selectedOptions.length)
     .reduce((a, b) => a + b, 0);
-  
+
   return { votes, setSending };
 }

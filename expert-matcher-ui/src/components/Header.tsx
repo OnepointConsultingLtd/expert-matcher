@@ -13,11 +13,11 @@ export default function Header() {
         <div className="flex flex-row items-end">
           <img
             className="w-52 lg:w-72"
-            src={darkMode ? "/images/expertmatcher-white.png" : "/images/expertmatcher-black.png"}
+            src={darkMode ? '/images/expertmatcher-white.png' : '/images/expertmatcher-black.png'}
             alt={imageAlt}
           />
         </div>
-        <div className='flex items-center'>
+        <div className="flex items-center">
           <HamburgerMenu />
         </div>
       </div>

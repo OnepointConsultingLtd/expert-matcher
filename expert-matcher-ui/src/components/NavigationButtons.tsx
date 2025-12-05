@@ -35,15 +35,11 @@ import { useCurrentMessage } from '../hooks/useCurrentMessage';
 
 function SelectButtons() {
   const { t } = useTranslation();
-  const {
-    selectAllSuggestions,
-    deselectAllSuggestions,
-    sending,
-  } = useAppStore();
+  const { selectAllSuggestions, deselectAllSuggestions, sending } = useAppStore();
   const { isLast, selectedSuggestions } = useCurrentMessage();
-  
+
   const isAllSelected = selectedSuggestions && selectedSuggestions.length > 0;
-  
+
   const handleToggle = () => {
     if (isAllSelected) {
       deselectAllSuggestions();
@@ -51,31 +47,25 @@ function SelectButtons() {
       selectAllSuggestions();
     }
   };
-  
+
   return (
     <div>
-      <button
-        className={buttonStyle}
-        onClick={handleToggle}
-        disabled={sending || !isLast}
-      >
+      <button className={buttonStyle} onClick={handleToggle} disabled={sending || !isLast}>
         {t(isAllSelected ? 'Deselect all' : 'Select all')}
       </button>
     </div>
-  )
+  );
 }
 
 export default function NavigationButtons() {
   const { t } = useTranslation();
-  const {
-    sending,
-    previousQuestion,
-    currentIndex,
-  } = useAppStore();
+  const { sending, previousQuestion, currentIndex } = useAppStore();
   const { handleNext } = useHandleNext();
   const { selectedSuggestions, historyLength, hasDifferentiationQuestions } = useCurrentMessage();
   return (
-    <div className={`flex ${!hasDifferentiationQuestions ? "justify-between" : "justify-end"} mt-6 mb-3`}>
+    <div
+      className={`flex ${!hasDifferentiationQuestions ? 'justify-between' : 'justify-end'} mt-6 mb-3`}
+    >
       {!hasDifferentiationQuestions && <SelectButtons />}
       <div className="flex flex-col">
         <div className="flex flex-row">
@@ -83,7 +73,7 @@ export default function NavigationButtons() {
             className={`${buttonStyle} ml-2 flex`}
             onClick={() => previousQuestion()}
             disabled={sending || currentIndex === 0}
-            title='Previous'
+            title="Previous"
           >
             <MdOutlineArrowBackIos className="md:mr-2 h-6 w-6" />
             {/* <span className="hidden md:inline">{t('Previous')}</span> */}
@@ -97,7 +87,7 @@ export default function NavigationButtons() {
             className={`${buttonStyle} ml-2 flex`}
             onClick={() => handleNext()}
             disabled={sending || selectedSuggestions.length === 0}
-            title='Next'
+            title="Next"
           >
             <MdOutlineArrowForwardIos className="md:mr-2 h-6 w-6" />
             {/* <span className="hidden md:inline">{t('Next')}</span> */}

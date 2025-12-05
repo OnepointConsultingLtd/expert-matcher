@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 export default function DarkModeButton() {
   const { darkMode, setDarkMode } = useAppStore();
   const { t } = useTranslation();
-  const switchLabel = darkMode ? t('Switch to Light Mode') : t('Switch to Dark Mode')
+  const switchLabel = darkMode ? t('Switch to Light Mode') : t('Switch to Dark Mode');
 
   return (
     <button
@@ -22,7 +22,7 @@ export default function DarkModeButton() {
       )}
 
       <div className="ml-3 text-left">
-        <div className="font-medium">{darkMode? t('Dark mode') : t("Light mode")}</div>
+        <div className="font-medium">{darkMode ? t('Dark mode') : t('Light mode')}</div>
       </div>
 
       <div className="ml-auto">
@@ -41,7 +41,9 @@ export default function DarkModeButton() {
             aria-label={switchLabel}
           />
           <div className="w-11 h-6 bg-[#6A666D45] peer-focus:ring-2 peer-focus:ring-[#6A666D45] rounded-full peer peer-checked:bg-[#9A19FF] transition-colors" />
-          <span className={`absolute left-1 top-1 w-4 h-4 bg-[#fafffe] rounded-full shadow transform transition ${darkMode ? 'translate-x-5' : ''}`} />
+          <span
+            className={`absolute left-1 top-1 w-4 h-4 bg-[#fafffe] rounded-full shadow transform transition ${darkMode ? 'translate-x-5' : ''}`}
+          />
         </label>
       </div>
     </button>
