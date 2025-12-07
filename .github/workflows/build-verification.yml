@@ -25,3 +25,8 @@ jobs:
       - name: Build project
         working-directory: expert-matcher-ui
         run: yarn build
+        
+      - name: Format code
+        working-directory: expert-matcher-ui
+        run: yarn format
+
