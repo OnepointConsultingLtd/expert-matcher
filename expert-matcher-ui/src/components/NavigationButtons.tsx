@@ -62,6 +62,9 @@ export default function NavigationButtons() {
   const { sending, previousQuestion, currentIndex } = useAppStore();
   const { handleNext } = useHandleNext();
   const { selectedSuggestions, historyLength, hasDifferentiationQuestions } = useCurrentMessage();
+
+  const msg = "formatting"
+  
   return (
     <div
       className={`flex ${!hasDifferentiationQuestions ? 'justify-between' : 'justify-end'} mt-6 mb-3`}
