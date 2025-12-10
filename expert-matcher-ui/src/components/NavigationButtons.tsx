@@ -38,7 +38,7 @@ function SelectButtons() {
   const { selectAllSuggestions, deselectAllSuggestions, sending } = useAppStore();
   const { isLast, selectedSuggestions } = useCurrentMessage();
 
-  const isAllSelected   =    selectedSuggestions && selectedSuggestions.length > 0;
+  const isAllSelected = selectedSuggestions && selectedSuggestions.length > 0;
 
   const handleToggle = () => {
     if (isAllSelected) {
@@ -50,9 +50,13 @@ function SelectButtons() {
 
   return (
     <div>
+
       <button className={buttonStyle} onClick={handleToggle} disabled={sending || !isLast}>
+
         {t(isAllSelected ? 'Deselect all' : 'Select all')}
+        
       </button>
+
     </div>
   );
 }
