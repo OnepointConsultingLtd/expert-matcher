@@ -76,7 +76,7 @@ def generate_pdf(response: DifferentiationQuestionsResponse, session_id: str) ->
 
 def render_candidate_report(response: DifferentiationQuestionsResponse) -> str:
     banner_path = (
-        (cfg.base_folder / "expert-matcher-ui/public/images/expertmatcher.png")
+        (cfg.base_folder / "expert-matcher-ui/public/images/expertmatcher-black.png")
         .absolute()
         .as_uri()
     )
