@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - git-format-workflow
 
 jobs:
   build:
@@ -23,15 +22,19 @@ jobs:
         working-directory: expert-matcher-ui
         run: yarn install
 
-    
+     
         
       - name: Format code
         working-directory: expert-matcher-ui
+        run: yarn format
+
+      - name: Commit formatted code
         run: |
-             echo "Running formatter..."
-             yarn format
-      
-      
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add .
+          git commit -m "Auto-format code" || echo "No changes to commit"
+
       - name: Build project
         working-directory: expert-matcher-ui
         run: yarn build
