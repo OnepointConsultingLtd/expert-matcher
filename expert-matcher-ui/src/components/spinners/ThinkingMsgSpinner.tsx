@@ -5,12 +5,12 @@ const ThinkingMsgSpinner = ({ className = `h-20 w-20` }) => {
   const { t } = useTranslation();
 
   const messages = [
-  'Preparing your questions…',
-  'Thinking…',
-  'Connecting to our AI engine…',
-  'Analyzing your answers…',
-  'Generating custom questions…',
-  'Almost ready…',
+  'Please wait',
+  'Thinking',
+  'Connecting to our AI engine',
+  'Analyzing your answers',
+  'Generating custom questions',
+  'Almost ready',
 ];
 
 
@@ -19,12 +19,11 @@ const ThinkingMsgSpinner = ({ className = `h-20 w-20` }) => {
   const [key, setKey] = useState(0);
 
   useEffect(() => {
-  if (index === messages.length - 1) return; // STOP when reaching last message
-
+  if (index === messages.length - 1) return; 
   const interval = setInterval(() => {
     setIsVisible(false);
 
-    setTimeout(() => {
+    // setTimeout(() => {
       setIndex((i) => {
         const next = i + 1;
 
@@ -38,7 +37,7 @@ const ThinkingMsgSpinner = ({ className = `h-20 w-20` }) => {
 
       setKey((k) => k + 1);
       setIsVisible(true);
-    }, 300);
+    // }, 300);
   }, 1800);
 
   return () => clearInterval(interval);
