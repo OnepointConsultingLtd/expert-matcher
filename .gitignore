@@ -86,6 +86,10 @@ dist-ssr/
 .temp
 .tmp
 *.tsbuildinfo
+SPINNER_UPDATE_SUMMARY.md
+CODE_REVIEW.md
+
+
 
 # Editor directories and files
 .vscode/*
