@@ -14,7 +14,7 @@ export default function Body() {
       <div className="body-container flex flex-row w-full">
         <div className="interaction-container flex flex-col w-full">
           <div className="flex flex-row justify-center items-center w-full">
-            {!connected && <ThinkingMsgSpinner message="Connecting to server" />}
+            {!connected && <ThinkingMsgSpinner />}
             {sending && <ThinkingMsgSpinner />}
           </div>
           <ErrorMessage />
