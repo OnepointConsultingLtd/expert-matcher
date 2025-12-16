@@ -1,9 +1,9 @@
 import { useWebsockets } from '../hooks/useWebsockets';
 import { useAppStore } from '../context/AppStore';
-import Spinner from './spinners/Spinner';
 import ErrorMessage from './messages/ErrorMessage';
 import DifferentiationPanel from './differentiation/DifferentiationPanel';
 import QuestionsPanel from './questions/QuestionsPanel';
+import ThinkingMsgSpinner from './spinners/ThinkingMsgSpinner';
 
 export default function Body() {
   useWebsockets();
@@ -14,8 +14,8 @@ export default function Body() {
       <div className="body-container flex flex-row w-full">
         <div className="interaction-container flex flex-col w-full">
           <div className="flex flex-row justify-center items-center w-full">
-            {!connected && <Spinner message="Connecting to server" />}
-            {sending && <Spinner />}
+            {!connected && <ThinkingMsgSpinner message="Connecting to server" />}
+            {sending && <ThinkingMsgSpinner />}
           </div>
           <ErrorMessage />
           <QuestionsPanel />

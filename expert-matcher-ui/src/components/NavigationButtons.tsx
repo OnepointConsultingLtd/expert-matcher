@@ -62,35 +62,51 @@ export default function NavigationButtons() {
   const { sending, previousQuestion, currentIndex } = useAppStore();
   const { handleNext } = useHandleNext();
   const { selectedSuggestions, historyLength, hasDifferentiationQuestions } = useCurrentMessage();
+  console.log(selectedSuggestions, currentIndex);
+
+  const hasAnySuggestionsSelected = selectedSuggestions.length > 0;
+  console.log('hasAnySuggestions ', hasAnySuggestionsSelected);
+
   return (
     <div
       className={`flex ${!hasDifferentiationQuestions ? 'justify-between' : 'justify-end'} mt-6 mb-3`}
     >
       {!hasDifferentiationQuestions && <SelectButtons />}
       <div className="flex flex-col">
-        <div className="flex flex-row">
-          <button
-            className={`${buttonStyle} ml-2 flex`}
-            onClick={() => previousQuestion()}
-            disabled={sending || currentIndex === 0}
-            title="Previous"
-          >
-            <MdOutlineArrowBackIos className="md:mr-2 h-6 w-6" />
-            {/* <span className="hidden md:inline">{t('Previous')}</span> */}
-          </button>
-          {historyLength > 0 && (
-            <div className="text-[#07000d] dark:text-[#fafffe]">
-              {t('stepOf', { step: currentIndex + 1, total: historyLength })}
-            </div>
+        <div className="flex items-center justify-center gap-4 mt-6 mb-3 w-full">
+          {currentIndex > 0 ? (
+            <button
+              onClick={() => previousQuestion()}
+              disabled={sending}
+              className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-white/10
+ transition disabled:opacity-40 cursor-pointer"
+              title="Previous"
+            >
+              <MdOutlineArrowBackIos className="h-6 w-6 text-gray-600 dark:text-gray-300 " />
+            </button>
+          ) : (
+            <div className="w-10"></div>
           )}
+
+          <div className="text-gray-900 dark:text-[#fafffe] text-lg font-medium min-w-[110px] text-center">
+            {t('stepOf', { step: currentIndex + 1, total: historyLength })}
+          </div>
+
           <button
-            className={`${buttonStyle} ml-2 flex`}
             onClick={() => handleNext()}
             disabled={sending || selectedSuggestions.length === 0}
             title="Next"
+            className={`
+      p-2 rounded-full transition transform 
+      flex items-center justify-center
+      ${
+        selectedSuggestions.length > 0
+          ? 'bg-[#9A19FF] text-white hover:scale-105 cursor-pointer'
+          : 'bg-white/5 text-gray-400 opacity-40'
+      }
+    `}
           >
-            <MdOutlineArrowForwardIos className="md:mr-2 h-6 w-6" />
-            {/* <span className="hidden md:inline">{t('Next')}</span> */}
+            <MdOutlineArrowForwardIos className="h-6 w-6" />
           </button>
         </div>
       </div>
