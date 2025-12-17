@@ -104,3 +104,5 @@ CODE_REVIEW.md
 
 # Project specific
 consultant_finder_ui/
+
+data/expert_matcher.sql
