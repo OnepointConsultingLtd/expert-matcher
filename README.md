@@ -18,6 +18,10 @@ source .venv/bin/activate
 uv sync
 ```
 
+## Install WKHTMLTOPDF
+
+Go to https://wkhtmltopdf.org/ for instructions.
+
 ## Configuration
 
 The environment variables can be found in this file: [.env_local](.env_local)

@@ -6,7 +6,7 @@ const content = fs.readFileSync(indexHtmlPath, 'utf8');
 
 const newContent = content.replace(/<script>.+?<\/script>/gsm, `<script>
       const server = "localhost";
-      const port = 8090;
+      const port = 8082;
       const protocol = window.location.protocol;
       const wsProtocol = protocol === 'https' ? 'wss' : 'ws';
       window.expertMatcherConfig = {
