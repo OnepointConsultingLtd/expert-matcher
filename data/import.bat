@@ -1,0 +1,1 @@
+"C:\Program Files\PostgreSQL\17\bin\psql.exe" -U postgres -h 127.0.0.1 -d expert_matcher_footanstey < expert_matcher.sql
