@@ -1,9 +1,10 @@
 import asyncio
 import os
 import re
+import sys
 
 from aiohttp import web
-from typing import Callable, Awaitable
+from typing import Awaitable
 
 from expert_matcher.config.config import ws_cfg, cfg
 from expert_matcher.server.ws_server import app
@@ -95,12 +96,14 @@ def overwrite_ui_properties():
 
 def run_server():
     # Compile the client app using vite
-    original_dir = os.getcwd()
-    os.chdir(ws_cfg.ui_folder)
-    os.system("npm install")
-    os.system("npm run build")
-    os.chdir(original_dir)
-    overwrite_ui_properties()
+    if "--no-ui-build" not in sys.argv:
+        print("Building UI", sys.argv)
+        original_dir = os.getcwd()
+        os.chdir(ws_cfg.ui_folder)
+        os.system("npm install")
+        os.system("npm run build")
+        os.chdir(original_dir)
+        overwrite_ui_properties()
 
     # Setup the routes for the web application
     for url in INDEX_LINKS:
