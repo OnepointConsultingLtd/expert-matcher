@@ -72,7 +72,7 @@
       const server = "localhost";
       const port = 8082;
       const protocol = window.location.protocol;
-      const wsProtocol = protocol === 'https' ? 'wss' : 'ws';
+      const wsProtocol = protocol === 'https:' ? 'wss' : 'ws';
       window.expertMatcherConfig = {
         websocketUrl: `${wsProtocol}://${server}:${port}`,
         reportUrl: `${protocol}//${server}:${port}`,
