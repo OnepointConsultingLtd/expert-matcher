@@ -1,5 +1,5 @@
 import { useChatStore } from '../context/ChatStore';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { useEffect } from 'react';
 import { useAppStore } from '../context/AppStore';
 import { ContentType, MessageStatus, WS_EVENTS } from '../types/ws';
@@ -24,13 +24,19 @@ export function useWebsockets() {
   } = useAppStore();
 
   useEffect(() => {
-    socket.current = io(websocketUrl);
 
     function deleteErrorMessage() {
       if (errorMessage === t('Disconnected from websocket')) {
         setErrorMessage('');
       }
     }
+
+    const s: Socket = io(websocketUrl, {
+      // optionally force websocket to reduce polling churn:
+      // transports: ["websocket"],
+      // reconnection: true,
+    });
+    socket.current = s;
 
     function onConnect() {
       setConnected(true);
@@ -106,7 +112,9 @@ export function useWebsockets() {
         socket.current.off(WS_EVENTS.CONNECT, onConnect);
         socket.current.off(WS_EVENTS.DISCONNECT, onDisconnect);
         socket.current.off(WS_EVENTS.SERVER_MESSAGE, onServerMessage);
+        socket.current.disconnect();
+        socket.current = null;
       }
     };
-  }, [websocketUrl, errorMessage]);
+  }, [websocketUrl, setErrorMessage, setSending, setSessionId, setHistory, addDifferentiationQuestion, addCandidate, t]);
 }

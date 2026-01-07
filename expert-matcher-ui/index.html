@@ -69,15 +69,18 @@
       content="Onepoint Consulting Ltd"
     />
     <script>
-      const server = "expertmatcher.onepointltd.ai";
-      const port = 443;
-      const protocol = 'https'
+      const server = "localhost";
+      const port = 8082;
+      const protocol = window.location.protocol;
       const wsProtocol = protocol === 'https' ? 'wss' : 'ws';
       window.expertMatcherConfig = {
         websocketUrl: `${wsProtocol}://${server}:${port}`,
-        reportUrl: `${protocol}://${server}:${port}`,
+        reportUrl: `${protocol}//${server}:${port}`,
       };
     </script>
+
+
+
 
   </head>
   <body>
