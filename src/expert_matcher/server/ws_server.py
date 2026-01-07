@@ -1,6 +1,9 @@
 import socketio
 from aiohttp import web
+import ipaddress
 import asyncio
+import time
+from collections import defaultdict, deque
 
 from expert_matcher.config.config import ws_cfg
 from expert_matcher.server.agent_session import AgentSession
@@ -42,7 +45,63 @@ sio = socketio.AsyncServer(
     logger=True,
     max_http_buffer_size=5242880,
 )
-app = web.Application()
+
+WINDOW, MAX_REQ = 1.0, 8  # 8 req/sec per IP
+
+
+hits = defaultdict(deque)
+
+
+@web.middleware
+async def rate_limit(request, handler):
+    # Only apply rate limiting to socket.io requests
+    if not request.path.startswith("/socket.io/"):
+        return await handler(request)
+
+    ip = extract_client_ip(request)
+    now = time.monotonic()
+    q = hits[ip]
+
+    # Clean old timestamps
+    while q and now - q[0] > WINDOW:
+        q.popleft()
+
+    # Check rate limit
+    if len(q) >= MAX_REQ:
+        return web.Response(status=429, text="Too Many Requests")
+
+    # Add current request timestamp
+    q.append(now)
+    return await handler(request)
+
+
+def extract_client_ip(request) -> str:
+    """Extract and validate client IP address from request headers."""
+    # Check X-Forwarded-For header (for reverse proxies)
+    forwarded_for = request.headers.get("X-Forwarded-For")
+    if forwarded_for:
+        # X-Forwarded-For can contain multiple IPs, take the first one
+        client_ip = forwarded_for.split(",")[0].strip()
+        try:
+            # Validate IP address
+            ipaddress.ip_address(client_ip)
+            return client_ip
+        except ValueError:
+            pass
+
+    # Fall back to direct connection IP
+    if request.remote:
+        try:
+            ipaddress.ip_address(request.remote)
+            return request.remote
+        except ValueError:
+            pass
+
+    # If all else fails, return a default identifier
+    return "unknown"
+
+
+app = web.Application(middlewares=[rate_limit])
 sio.attach(app)
 
 
