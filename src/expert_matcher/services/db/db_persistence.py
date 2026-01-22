@@ -46,7 +46,8 @@ INNER JOIN TB_CATEGORY C ON C.ID = Q.CATEGORY_ID
 WHERE ACTIVE is true
 ORDER BY order_index offset (SELECT count(*) FROM TB_SESSION_QUESTION sq
 INNER JOIN TB_SESSION s on s.id = sq.session_id
-WHERE s.session_id = %(session_id)s and sq.id in (SELECT SESSION_QUESTION_ID FROM TB_SESSION_QUESTION_RESPONSES)) LIMIT 1
+WHERE s.session_id = %(session_id)s and sq.id in (SELECT SESSION_QUESTION_ID FROM TB_SESSION_QUESTION_RESPONSES)) 
+LIMIT 1
 """
     res = await select_from(sql, {"session_id": session_id})
     if len(res) == 0:
@@ -73,8 +74,8 @@ INNER JOIN TB_CONSULTANT_CATEGORY_ITEM_ASSIGNMENT IA ON IA.CATEGORY_ITEM_ID = I.
 INNER JOIN TB_CONSULTANT CO ON CO.ID = IA.CONSULTANT_ID
 WHERE Q.QUESTION = %(question)s
 AND IA.CONSULTANT_ID = ANY(%(consultant_ids)s) 
-GROUP BY I.ITEM
-ORDER BY I.ITEM ASC
+GROUP BY I.SORT_ORDER, I.ITEM
+ORDER BY I.SORT_ORDER, I.ITEM ASC
 """
     res_suggestions = await select_from(
         sql_suggestions,
@@ -195,7 +196,8 @@ INNER JOIN TB_CATEGORY_QUESTION cq on cq.CATEGORY_ID = c.ID
 INNER JOIN TB_SESSION_QUESTION sq on sq.CATEGORY_QUESTION_ID = cq.ID
 INNER JOIN TB_SESSION s on s.id = sq.SESSION_ID
 WHERE s.session_id = %(session_id)s and cq.ID = %(question_id)s
-ORDER BY 1
+-- order by sort_order if available, otherwise by item
+ORDER BY ci.SORT_ORDER, ci.ITEM;
 """
         selected_suggestions_sql = """
 -- select selected suggestions (category items) for session and question
@@ -205,7 +207,9 @@ inner join TB_SESSION s on s.ID = sq.SESSION_ID
 inner join TB_CATEGORY_ITEM ci on ci.ID = r.CATEGORY_ITEM_ID
 INNER JOIN TB_CATEGORY c on c.ID = ci.CATEGORY_ID
 INNER JOIN TB_CATEGORY_QUESTION cq on cq.CATEGORY_ID = c.ID
-WHERE s.session_id = %(session_id)s and cq.ID = %(question_id)s;
+WHERE s.session_id = %(session_id)s and cq.ID = %(question_id)s
+-- order by sort_order if available, otherwise by item
+ORDER BY ci.SORT_ORDER, ci.ITEM;
 """
         await cur.execute(sql, {"session_id": session_id})
         question_rows = await cur.fetchall()
