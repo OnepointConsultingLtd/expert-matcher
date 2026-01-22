@@ -52,7 +52,6 @@ const ThinkingMsgSpinner = ({ className = `h-20 w-20` }) => {
     >
       {/* SIMPLE Loader */}
       <div className="relative flex items-center justify-center">
-        <div className="absolute h-20 w-20 rounded-full border-4 border-gray-300 border-t-[#9A19FF] animate-spin" />
         <img
           src="/images/D-Well_Icons_one_frame.gif"
           alt={t('Please wait')}
