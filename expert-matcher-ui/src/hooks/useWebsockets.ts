@@ -1,10 +1,10 @@
 import { useChatStore } from '../context/ChatStore';
 import { io, Socket } from 'socket.io-client';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAppStore } from '../context/AppStore';
 import { ContentType, MessageStatus, WS_EVENTS } from '../types/ws';
 import { getSessionId } from '../lib/sessionFunctions';
-import { safeEmit, startSession } from '../lib/websocketFunctions';
+import { startSession } from '../lib/websocketFunctions';
 import { ServerMessage } from '../types/ws';
 import { useTranslation } from 'react-i18next';
 import { Question, Candidate } from '../types/differentiation_questions';
@@ -17,25 +17,45 @@ export function useWebsockets() {
     setSessionId,
     setHistory,
     setSending,
-    errorMessage,
     setErrorMessage,
     addDifferentiationQuestion,
     addCandidate,
   } = useAppStore();
+  
+  // Track if we've already initialized to prevent duplicate connections
+  const initializedRef = useRef(false);
 
   useEffect(() => {
-
-    function deleteErrorMessage() {
-      if (errorMessage === t('Disconnected from websocket')) {
-        setErrorMessage('');
-      }
+    // Prevent duplicate initialization
+    if (initializedRef.current) {
+      return;
     }
 
+    // If there's already a connected socket, don't create a new one
+    if (socket.current?.connected) {
+      initializedRef.current = true;
+      return;
+    }
+
+    // Clean up any existing socket before creating a new one
+    if (socket.current) {
+      socket.current.removeAllListeners();
+      socket.current.disconnect();
+      socket.current = null;
+    }
+
+    initializedRef.current = true;
+
+    // Create socket inside useEffect using websocketUrl from store
     const s: Socket = io(websocketUrl, {
-      // optionally force websocket to reduce polling churn:
-      // transports: ["websocket"],
-      // reconnection: true,
+      // Force websocket transport to reduce HTTP polling and rate limit issues
+      transports: ['websocket'],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5,
     });
+    
     socket.current = s;
 
     function onConnect() {
@@ -44,23 +64,19 @@ export function useWebsockets() {
       const sessionId = getSessionId();
       startSession(socket.current, sessionId);
       console.info('Connected to websocket');
-      deleteErrorMessage();
-
-      setInterval(() => {
-        safeEmit(socket.current, WS_EVENTS.ECHO, getSessionId());
-      }, 120 * 1000);
+      // Clear disconnect error message on successful connection
+      setErrorMessage('');
     }
 
     function onDisconnect() {
       setConnected(false);
-      console.info('Disconnected from websocket');
       setErrorMessage(t('Disconnected from websocket'));
     }
 
     function onServerMessage(serverMessage: ServerMessage) {
       console.info('Server message: ', serverMessage);
       setSending(false);
-      deleteErrorMessage();
+      // Clear any previous error messages on successful message
       switch (serverMessage.status) {
         case MessageStatus.OK:
           setSessionId(serverMessage.session_id);
@@ -108,13 +124,17 @@ export function useWebsockets() {
     });
 
     return () => {
+      initializedRef.current = false;
       if (socket.current) {
         socket.current.off(WS_EVENTS.CONNECT, onConnect);
         socket.current.off(WS_EVENTS.DISCONNECT, onDisconnect);
         socket.current.off(WS_EVENTS.SERVER_MESSAGE, onServerMessage);
+        socket.current.off('connect_error');
+        socket.current.off('connect_timeout');
+        socket.current.removeAllListeners();
         socket.current.disconnect();
         socket.current = null;
       }
     };
-  }, [websocketUrl, setErrorMessage, setSending, setSessionId, setHistory, addDifferentiationQuestion, addCandidate, t]);
+  }, [websocketUrl, setConnected, setSending, setSessionId, setHistory, setErrorMessage, addDifferentiationQuestion, addCandidate, t]);
 }
