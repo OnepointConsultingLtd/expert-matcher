@@ -50,9 +50,9 @@ function SelectButtons() {
 
   return (
     <div>
-      <button className={buttonStyle} onClick={handleToggle} disabled={sending || !isLast}>
+      {!sending && <button className={buttonStyle} onClick={handleToggle} disabled={sending || !isLast}>
         {t(isAllSelected ? 'Deselect all' : 'Select all')}
-      </button>
+      </button>}
     </div>
   );
 }
@@ -66,6 +66,8 @@ export default function NavigationButtons() {
 
   const hasAnySuggestionsSelected = selectedSuggestions.length > 0;
   console.log('hasAnySuggestions ', hasAnySuggestionsSelected);
+
+  if(sending) return null;
 
   return (
     <div
