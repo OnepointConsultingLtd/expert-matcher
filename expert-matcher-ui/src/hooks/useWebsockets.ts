@@ -70,6 +70,7 @@ export function useWebsockets() {
 
     function onDisconnect() {
       setConnected(false);
+      console.info('Disconnected from websocket');
       setErrorMessage(t('Disconnected from websocket'));
     }
 
