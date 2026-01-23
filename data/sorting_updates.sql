@@ -76,7 +76,7 @@ WHERE category_id = (
   SELECT id
   FROM tb_category
   WHERE name = 'company size'
-)
+);
 
 UPDATE public.tb_category_item
 SET item = regexp_replace(item, '^-', '~')
