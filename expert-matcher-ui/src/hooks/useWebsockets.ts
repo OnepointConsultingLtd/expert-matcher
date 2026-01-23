@@ -1,6 +1,6 @@
 import { useChatStore } from '../context/ChatStore';
 import { io, Socket } from 'socket.io-client';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAppStore } from '../context/AppStore';
 import { ContentType, MessageStatus, WS_EVENTS } from '../types/ws';
 import { getSessionId } from '../lib/sessionFunctions';
@@ -22,14 +22,37 @@ export function useWebsockets() {
     addCandidate,
   } = useAppStore();
 
+  // Track if we've already initialized to prevent duplicate connections
+  const initializedRef = useRef(false);
+
   useEffect(() => {
+
+    // Prevent duplicate initialization
+    if (initializedRef.current) {
+      return;
+    }
+
+    // If there's already a connected socket, don't create a new one
+    if (socket.current?.connected) {
+      initializedRef.current = true;
+      return;
+    }
+
+    // Clean up any existing socket before creating a new one
+    if (socket.current) {
+      socket.current.removeAllListeners();
+      socket.current.disconnect();
+      socket.current = null;
+    }
 
     const s: Socket = io(websocketUrl, {
       // optionally force websocket to reduce polling churn:
-      // transports: ["websocket"],
+      // transports: ["websocket"], // This is causing issues with the server in production
       // reconnection: true,
     });
     socket.current = s;
+
+    initializedRef.current = true;
 
     let echoIntervalId: number | null = null;
 
@@ -103,6 +126,7 @@ export function useWebsockets() {
     });
 
     return () => {
+      initializedRef.current = false;
       if (echoIntervalId) {
         clearInterval(echoIntervalId);
         echoIntervalId = null;
@@ -111,6 +135,7 @@ export function useWebsockets() {
         socket.current.off(WS_EVENTS.CONNECT, onConnect);
         socket.current.off(WS_EVENTS.DISCONNECT, onDisconnect);
         socket.current.off(WS_EVENTS.SERVER_MESSAGE, onServerMessage);
+        socket.current.removeAllListeners();
         socket.current.disconnect();
         socket.current = null;
       }
