@@ -69,8 +69,6 @@ where category_id = (SELECT id FROM tb_category WHERE name = 'years of experienc
 update public.tb_category_item set sort_order = 22
 where category_id = (SELECT id FROM tb_category WHERE name = 'years of experience') and item = '~35 years+';
 
-ALTER TABLE public.tb_category_item ADD SORT_ORDER INT;
-
 UPDATE public.tb_category_item SET SORT_ORDER = ID - 191
 WHERE category_id = (
   SELECT id
