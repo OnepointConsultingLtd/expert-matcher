@@ -170,7 +170,7 @@ function CadidateCard({ candidate, maxVote }: { candidate: CandidateWithVotes; m
   return (
     <div
       key={candidate.id}
-      className="flex flex-col gap-4 dark:text-[#fafffe] bg-[#E6E5E6] dark:bg-[#38333d] p-6 rounded-2xl"
+      className="flex flex-col gap-4 dark:text-[#fafffe] bg-[#F3E5FF] dark:bg-[#bb66ff45] p-6 rounded-2xl"
     >
       <div className="flex flex-row items-center text-2xl gap-6">
         <CandidatePhoto candidate={candidate} />
