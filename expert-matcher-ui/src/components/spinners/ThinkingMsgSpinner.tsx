@@ -8,7 +8,7 @@ const ThinkingMsgSpinner = ({ className = `h-20 w-20` }) => {
   'Please wait',
   'Thinking',
   'Connecting to our AI engine',
-  'Analyzing your answers',
+  'Analysing your answers',
   'Generating custom questions',
   'Almost ready',
 ];

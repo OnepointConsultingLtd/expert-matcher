@@ -54,9 +54,9 @@ export default function DifferentiationQuestions() {
         {differentiationQuestions.map((question, index) => (
           <div
             key={`${question.question}-${index}`}
-            className="bg-[#E6E5E6] dark:text-[#fafffe] dark:bg-[#38333d] p-6 rounded-2xl flex flex-col gap-3"
+            className="bg-[#e6e5e645] dark:text-[#fafffe] dark:bg-[#38333d] p-6 rounded-2xl flex flex-col gap-3"
           >
-            <p className="w-fit mb-1 border border-[#6A666D] rounded-2xl py-1 px-2 bg-[#6A666D15] dark:bg-[#6A666D45] text-xs text-[#6A666D] dark:text-[#CDCCCE]">
+            <p className="w-fit mb-1 rounded-2xl py-1 px-2 bg-[#6A666D15] dark:bg-[#6A666D45] text-xs text-[#07000d] dark:text-[#fafffe]">
               {formatDimensionName(question.dimension)}
             </p>
             <p className="w-full text-xl">{question.question}</p>
