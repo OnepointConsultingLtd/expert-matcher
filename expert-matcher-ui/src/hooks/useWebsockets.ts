@@ -26,7 +26,7 @@ export function useWebsockets() {
 
     const s: Socket = io(websocketUrl, {
       // optionally force websocket to reduce polling churn:
-      // transports: ["websocket"],
+      transports: ["websocket"],
       // reconnection: true,
     });
     socket.current = s;
