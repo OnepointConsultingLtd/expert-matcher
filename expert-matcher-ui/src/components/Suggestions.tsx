@@ -6,7 +6,7 @@ import AvailableConsultants from './AvailableConsultants';
 
 export default function Suggestions() {
   const { t } = useTranslation();
-  const { addSelectedSuggestions, suggestionFilter, setSuggestionFilter } = useAppStore();
+  const { addSelectedSuggestions, suggestionFilter } = useAppStore();
   const currentMessage = useCurrentMessage();
   if (!currentMessage) return null;
   const { questionSuggestions, selectedSuggestions, isLast, displayRegularQuestions } =
