@@ -4,7 +4,7 @@ import Home from './components/Home';
 
 function App() {
   return (
-    <div className="flex flex-col w-full justify-center items-center px-4 max-w-screen-xl mx-auto">
+    <div className="flex flex-col w-full min-h-screen justify-center items-center px-4 max-w-screen-xl mx-auto">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="*" element={<Home />} />

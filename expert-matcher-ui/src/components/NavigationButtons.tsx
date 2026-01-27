@@ -4,8 +4,6 @@ import { buttonStyle } from './common';
 import { useHandleNext } from '../hooks/useHandleNext';
 import { MdOutlineArrowForwardIos, MdOutlineArrowBackIos } from 'react-icons/md';
 import { useCurrentMessage } from '../hooks/useCurrentMessage';
-import AvailableConsultants from './AvailableConsultants';
-
 // function SelectButtons() {
 //   const { t } = useTranslation();
 //   const {
@@ -62,7 +60,8 @@ export default function NavigationButtons() {
   const { t } = useTranslation();
   const { sending, previousQuestion, currentIndex } = useAppStore();
   const { handleNext } = useHandleNext();
-  const { selectedSuggestions, historyLength, hasDifferentiationQuestions } = useCurrentMessage();
+  const { selectedSuggestions, historyLength, hasDifferentiationQuestions, isLast } =
+    useCurrentMessage();
   console.log(selectedSuggestions, currentIndex);
 
   const hasAnySuggestionsSelected = selectedSuggestions.length > 0;
@@ -70,9 +69,8 @@ export default function NavigationButtons() {
 
   return (
     <div className="flex flex-col">
-      <AvailableConsultants />
       <div className={`flex justify-between mt-6 mb-3`}>
-        {!hasDifferentiationQuestions && <SelectButtons />}
+        {!hasDifferentiationQuestions ? <SelectButtons /> : <div />}
         <div className="flex flex-col">
           <div className="flex items-center justify-center gap-4  w-full">
             {currentIndex > 0 ? (
@@ -90,7 +88,9 @@ export default function NavigationButtons() {
             )}
 
             <div className="text-gray-900 dark:text-[#fafffe] text-lg font-medium min-w-[110px] text-center">
-              {t('stepOf', { step: currentIndex + 1, total: historyLength })}
+              {isLast
+                ? t('step', { step: currentIndex + 1 })
+                : t('stepOf', { step: currentIndex + 1, total: historyLength })}
             </div>
 
             <button

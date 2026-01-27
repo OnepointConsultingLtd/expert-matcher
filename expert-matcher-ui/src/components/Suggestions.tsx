@@ -1,9 +1,8 @@
 import { useCurrentMessage } from '../hooks/useCurrentMessage';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../context/AppStore';
-import AvailableConsultants from './AvailableConsultants';
 import { buttonStyle } from './common';
-import { FiSearch } from 'react-icons/fi';
+import AvailableConsultants from './AvailableConsultants';
 
 export default function Suggestions() {
   const { t } = useTranslation();
@@ -19,6 +18,7 @@ export default function Suggestions() {
 
   return (
     <div className="mt-0">
+      <AvailableConsultants />
       {/* <div className="flex flex-row justify-left mb-6 border border-[#636565] rounded-md p-2 gap-2 max-w-1/2">
         <span className="text-gray-[#636565] my-auto pointer-events-none">
           <FiSearch className="w-4 h-4" aria-hidden="true" />
