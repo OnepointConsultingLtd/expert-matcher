@@ -19,7 +19,7 @@ export default function Suggestions() {
 
   return (
     <div className="mt-0">
-      <div className="flex flex-row justify-left mb-6 border border-[#636565] rounded-md p-2 gap-2 max-w-1/2">
+      {/* <div className="flex flex-row justify-left mb-6 border border-[#636565] rounded-md p-2 gap-2 max-w-1/2">
         <span className="text-gray-[#636565] my-auto pointer-events-none">
           <FiSearch className="w-4 h-4" aria-hidden="true" />
         </span>
@@ -30,8 +30,7 @@ export default function Suggestions() {
           placeholder={t('Search suggestions')}
           className="w-full focus:outline-none bg-transparent"
         ></input>
-      </div>
-      <AvailableConsultants />
+      </div> */}
       <div className="container suggestions animate-fade-down grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 max-w-full">
         {suggestions
           .filter((s) => s.length === 0 || s.toLowerCase().includes(suggestionFilter.toLowerCase()))
