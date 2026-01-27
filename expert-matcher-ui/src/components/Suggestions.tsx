@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../context/AppStore';
 import { buttonStyle } from './common';
 import AvailableConsultants from './AvailableConsultants';
-import { FiSearch } from 'react-icons/fi';
 
 export default function Suggestions() {
   const { t } = useTranslation();
