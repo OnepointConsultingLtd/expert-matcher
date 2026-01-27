@@ -5,8 +5,13 @@ import { useCurrentMessage } from '../hooks/useCurrentMessage';
 export default function AvailableConsultants() {
   const { t } = useTranslation();
   const { connected, sending } = useAppStore();
-  const { isLast, questionSuggestions } = useCurrentMessage();
-  if (!connected || sending || !isLast || !questionSuggestions) {
+  const { questionSuggestions } = useCurrentMessage();
+  if (
+    !connected ||
+    sending ||
+    !questionSuggestions ||
+    questionSuggestions.available_consultants_count <= 0
+  ) {
     return null;
   }
   return (

@@ -5,25 +5,24 @@ const ThinkingMsgSpinner = ({ className = `h-20 w-20` }) => {
   const { t } = useTranslation();
 
   const messages = [
-  'Please wait',
-  'Thinking',
-  'Connecting to our AI engine',
-  'Analysing your answers',
-  'Generating custom questions',
-  'Almost ready',
-];
-
+    'Please wait',
+    'Thinking',
+    'Connecting to our AI engine',
+    'Analysing your answers',
+    'Generating custom questions',
+    'Almost ready',
+  ];
 
   const [index, setIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [key, setKey] = useState(0);
 
   useEffect(() => {
-  if (index === messages.length - 1) return; 
-  const interval = setInterval(() => {
-    setIsVisible(false);
+    if (index === messages.length - 1) return;
+    const interval = setInterval(() => {
+      setIsVisible(false);
 
-    // setTimeout(() => {
+      // setTimeout(() => {
       setIndex((i) => {
         const next = i + 1;
 
@@ -37,11 +36,11 @@ const ThinkingMsgSpinner = ({ className = `h-20 w-20` }) => {
 
       setKey((k) => k + 1);
       setIsVisible(true);
-    // }, 300);
-  }, 1800);
+      // }, 300);
+    }, 1800);
 
-  return () => clearInterval(interval);
-}, [index]);
+    return () => clearInterval(interval);
+  }, [index]);
 
   return (
     <div
@@ -66,11 +65,7 @@ const ThinkingMsgSpinner = ({ className = `h-20 w-20` }) => {
           className={`
              flex items-center justify-center gap-2
             transition-all duration-500 w-full
-            ${
-              isVisible
-                ? 'opacity-100 translate-y-0'
-                : 'opacity-0 -translate-y-2'
-            }
+            ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}
             
           `}
         >
@@ -79,7 +74,7 @@ const ThinkingMsgSpinner = ({ className = `h-20 w-20` }) => {
           </span>
 
           {/* Dots */}
-          <span className="inline-flex items-center justify-center gap-1 mt-1 ">
+          {/* <span className="inline-flex items-center justify-center gap-1 mt-1 ">
             <span className="w-1.5 h-1.5 bg-[#9A19FF] rounded-full animate-bounce" />
             <span
               className="w-1.5 h-1.5 bg-[#9A19FF] rounded-full animate-bounce"
@@ -89,7 +84,7 @@ const ThinkingMsgSpinner = ({ className = `h-20 w-20` }) => {
               className="w-1.5 h-1.5 bg-[#9A19FF] rounded-full animate-bounce"
               style={{ animationDelay: '300ms' }}
             />
-          </span>
+          </span> */}
         </div>
       </div>
 
@@ -100,11 +95,7 @@ const ThinkingMsgSpinner = ({ className = `h-20 w-20` }) => {
             key={i}
             className={`
               w-2 h-2 rounded-full transition-all duration-300
-              ${
-                i === index
-                  ? 'bg-[#9A19FF] scale-110'
-                  : 'bg-gray-300 dark:bg-gray-600'
-              }
+              ${i === index ? 'bg-[#9A19FF] scale-110' : 'bg-gray-300 dark:bg-gray-600'}
             `}
           />
         ))}
