@@ -83,3 +83,6 @@ WHERE category_id = (
   FROM tb_category
   WHERE name = 'years of experience'
 );
+
+-- update the question text to replace consultant with expert
+UPDATE public.tb_category_question set question = regexp_replace(question, 'consultant', 'expert');

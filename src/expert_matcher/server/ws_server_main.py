@@ -29,6 +29,10 @@ async def get_index(_: web.Request) -> web.Response:
     return web.FileResponse(PATH_INDEX)
 
 
+async def favicon(_: web.Request) -> web.Response:
+    return web.FileResponse(UI_DIST_FOLDER / "favicon.png")
+
+
 async def handle_error(func: Awaitable) -> Awaitable:
     try:
         return await func()
@@ -108,6 +112,7 @@ def run_server():
     # Setup the routes for the web application
     for url in INDEX_LINKS:
         app.router.add_get(url, get_index)
+    app.router.add_get("/favicon.png", favicon)
     app.add_routes(routes)
     for folder in ["images", "assets"]:
         app.router.add_static(

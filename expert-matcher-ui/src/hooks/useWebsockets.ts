@@ -1,6 +1,6 @@
 import { useChatStore } from '../context/ChatStore';
 import { io, Socket } from 'socket.io-client';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAppStore } from '../context/AppStore';
 import { ContentType, MessageStatus, WS_EVENTS } from '../types/ws';
 import { getSessionId } from '../lib/sessionFunctions';
@@ -17,26 +17,44 @@ export function useWebsockets() {
     setSessionId,
     setHistory,
     setSending,
-    errorMessage,
     setErrorMessage,
     addDifferentiationQuestion,
     addCandidate,
   } = useAppStore();
 
+  // Track if we've already initialized to prevent duplicate connections
+  const initializedRef = useRef(false);
+
   useEffect(() => {
 
-    function deleteErrorMessage() {
-      if (errorMessage === t('Disconnected from websocket')) {
-        setErrorMessage('');
-      }
+    // Prevent duplicate initialization
+    if (initializedRef.current) {
+      return;
+    }
+
+    // If there's already a connected socket, don't create a new one
+    if (socket.current?.connected) {
+      initializedRef.current = true;
+      return;
+    }
+
+    // Clean up any existing socket before creating a new one
+    if (socket.current) {
+      socket.current.removeAllListeners();
+      socket.current.disconnect();
+      socket.current = null;
     }
 
     const s: Socket = io(websocketUrl, {
       // optionally force websocket to reduce polling churn:
-      // transports: ["websocket"],
+      // transports: ["websocket"], // This is causing issues with the server in production
       // reconnection: true,
     });
     socket.current = s;
+
+    initializedRef.current = true;
+
+    let echoIntervalId: number | null = null;
 
     function onConnect() {
       setConnected(true);
@@ -44,9 +62,9 @@ export function useWebsockets() {
       const sessionId = getSessionId();
       startSession(socket.current, sessionId);
       console.info('Connected to websocket');
-      deleteErrorMessage();
+      setErrorMessage('');
 
-      setInterval(() => {
+      echoIntervalId = setInterval(() => {
         safeEmit(socket.current, WS_EVENTS.ECHO, getSessionId());
       }, 120 * 1000);
     }
@@ -60,7 +78,7 @@ export function useWebsockets() {
     function onServerMessage(serverMessage: ServerMessage) {
       console.info('Server message: ', serverMessage);
       setSending(false);
-      deleteErrorMessage();
+      setErrorMessage('');
       switch (serverMessage.status) {
         case MessageStatus.OK:
           setSessionId(serverMessage.session_id);
@@ -108,10 +126,16 @@ export function useWebsockets() {
     });
 
     return () => {
+      initializedRef.current = false;
+      if (echoIntervalId) {
+        clearInterval(echoIntervalId);
+        echoIntervalId = null;
+      }
       if (socket.current) {
         socket.current.off(WS_EVENTS.CONNECT, onConnect);
         socket.current.off(WS_EVENTS.DISCONNECT, onDisconnect);
         socket.current.off(WS_EVENTS.SERVER_MESSAGE, onServerMessage);
+        socket.current.removeAllListeners();
         socket.current.disconnect();
         socket.current = null;
       }

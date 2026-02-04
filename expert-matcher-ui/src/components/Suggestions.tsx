@@ -3,11 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../context/AppStore';
 import { buttonStyle } from './common';
 import AvailableConsultants from './AvailableConsultants';
-import { FiSearch } from 'react-icons/fi';
 
 export default function Suggestions() {
   const { t } = useTranslation();
-  const { addSelectedSuggestions, suggestionFilter, setSuggestionFilter } = useAppStore();
+  const { addSelectedSuggestions, suggestionFilter } = useAppStore();
   const currentMessage = useCurrentMessage();
   if (!currentMessage) return null;
   const { questionSuggestions, selectedSuggestions, isLast, displayRegularQuestions } =
