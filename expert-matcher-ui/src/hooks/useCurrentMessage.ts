@@ -14,7 +14,8 @@ export function useCurrentMessage() {
   const displayRegularQuestions =
     !sending &&
     (!hasDifferentiationQuestions ||
-      (hasDifferentiationQuestions && currentIndex + 1 < historyLength));
+      (hasDifferentiationQuestions && currentIndex + 1 < historyLength))
+      && candidates?.length === 0;
   if (!history || currentIndex === null || currentIndex < 0 || !history[currentIndex]) {
     return {
       questionSuggestions: null,

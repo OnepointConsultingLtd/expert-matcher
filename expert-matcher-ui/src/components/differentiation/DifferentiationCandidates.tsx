@@ -197,6 +197,9 @@ export default function DifferentiationCandidates() {
   const { t } = useTranslation();
   const { candidates } = useCurrentMessage();
   const maxVote = Math.max(...candidates.map((c) => c.votes));
+  if (candidates.length === 0) {
+    return null;
+  }
   return (
     <div className="text-[#07000d] dark:text-[#fafffe] w-full">
       <p className=" text-3xl py-6">{t('Candidates')}</p>
