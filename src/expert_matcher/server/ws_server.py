@@ -212,7 +212,7 @@ async def handle_response(sid: str, session_id: str | None, response: ClientResp
 
 
 async def handle_missing_session(sid: str, session_id: str):
-    await send_error(sid, session_id, "Session not found")
+    await send_error(sid, session_id, "Session not found. Please restart the session.")
 
 
 async def send_error(sid: str, session_id: str, message: str):

@@ -212,12 +212,13 @@ export const useAppStore = create<
         ) {
           return { ...state };
         }
+        const differentiationQuestions = [
+          ...state.differentiationQuestions,
+          questionWithSelectedOptions,
+        ];
         return {
           ...state,
-          differentiationQuestions: [
-            ...state.differentiationQuestions,
-            questionWithSelectedOptions,
-          ],
+          differentiationQuestions,
         };
       }),
     clearDifferentiationQuestions: () =>
@@ -239,7 +240,7 @@ export const useAppStore = create<
             }
           }
         }
-        return { ...state, candidates: [...state.candidates, candidateWithVotes] };
+        return { ...state, candidates: [...state.candidates, candidateWithVotes], sending: false };
       }),
     selectDifferentiationQuestionOption: (
       question: string,

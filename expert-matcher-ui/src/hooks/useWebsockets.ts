@@ -77,19 +77,20 @@ export function useWebsockets() {
 
     function onServerMessage(serverMessage: ServerMessage) {
       console.info('Server message: ', serverMessage);
-      setSending(false);
       setErrorMessage('');
       switch (serverMessage.status) {
         case MessageStatus.OK:
           setSessionId(serverMessage.session_id);
           switch (serverMessage.content_type) {
             case ContentType.HISTORY:
+              setSending(false);
               setHistory(serverMessage.content?.history ?? []);
               break;
             case ContentType.DIFFERENTIATION_QUESTIONS:
               addDifferentiationQuestion(serverMessage.content as Question);
               break;
             case ContentType.CANDIDATE:
+              setSending(false);
               addCandidate(serverMessage.content as Candidate);
               break;
             case ContentType.VOTES_SAVED:
@@ -100,6 +101,7 @@ export function useWebsockets() {
               setErrorMessage(serverMessage.content?.message ?? t('An error occurred.'));
               break;
             default:
+              setSending(false);
               console.error('Unknown content type: ', serverMessage.content_type);
           }
           break;
@@ -108,6 +110,7 @@ export function useWebsockets() {
           setErrorMessage(serverMessage.content?.message ?? t('An error occurred.'));
           break;
         default:
+          setSending(false);
           const error = t('Unknown status', { status: serverMessage.status });
           console.error(error);
           setErrorMessage(error);
