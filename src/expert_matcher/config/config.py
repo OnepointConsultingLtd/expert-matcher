@@ -25,10 +25,29 @@ def create_db_conn_str() -> str:
 
 
 class Config:
-    model = os.getenv("OPENAI_MODEL")
-    assert model, "OPENAI_MODEL is not set"
-    api_key = os.getenv("OPENAI_API_KEY")
-    assert api_key, "OPENAI_API_KEY is not set"
+    # OpenAI configuration (fallback if OpenRouter not configured)
+    openai_model = os.getenv("OPENAI_MODEL")
+    openai_api_key = os.getenv("OPENAI_API_KEY")
+    
+    # OpenRouter configuration
+    openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+    openrouter_model = os.getenv("OPENROUTER_MODEL")
+    openrouter_provider = os.getenv("OPENROUTER_PROVIDER", "")
+    
+    # Determine which provider to use (OpenRouter takes precedence if configured)
+    use_openrouter = bool(openrouter_api_key and openrouter_model)
+    
+    if use_openrouter:
+        model = openrouter_model
+        api_key = openrouter_api_key
+        assert model, "OPENROUTER_MODEL is not set"
+        assert api_key, "OPENROUTER_API_KEY is not set"
+    else:
+        model = openai_model
+        api_key = openai_api_key
+        assert model, "OPENAI_MODEL is not set"
+        assert api_key, "OPENAI_API_KEY is not set"
+    
     db_conn_str = create_db_conn_str()
 
     # Connection pool settings
@@ -42,7 +61,27 @@ class Config:
     assert prompts_toml.exists(), f"prompts.toml {prompts_toml} does not exist"
     prompt_templates = load_toml(prompts_toml)
 
-    llm = ChatOpenAI(model=model, api_key=api_key)
+    # Initialize LLM with OpenRouter or OpenAI
+    if use_openrouter:
+        # OpenRouter configuration
+        openrouter_headers = {
+            "HTTP-Referer": os.getenv("OPENROUTER_HTTP_REFERER", "https://github.com/OnepointConsultingLtd/expert-matcher"),
+            "X-Title": os.getenv("OPENROUTER_APP_NAME", "Expert Matcher"),
+        }
+        
+        # Add provider header if specified (for routing/preference)
+        if openrouter_provider:
+            openrouter_headers["X-Provider"] = openrouter_provider
+        
+        llm = ChatOpenAI(
+            model=model,
+            api_key=api_key,
+            base_url="https://openrouter.ai/api/v1",
+            default_headers=openrouter_headers,
+        )
+    else:
+        # OpenAI configuration
+        llm = ChatOpenAI(model=model, api_key=api_key)
 
     ui_domain = os.getenv("UI_DOMAIN", "localhost")
     ui_port = int(os.getenv("UI_PORT", 8090))

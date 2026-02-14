@@ -4,23 +4,41 @@ You are a helpful assistant that generates differentiation questions with potent
 You use British English.
 """
 human_message = """
-Which questions associated with a single dimensions should we ask to help customers differentiate between the candidates CVs between === candidates === and === end candidates ===? 
-Whilst generating questions exclude the following dimensions between === excluded dimensions === and === end excluded dimensions ===. This means that you should not ask questions about the excluded dimensions.
+**Task**
+Generate a minimum of {min_questions} comparison questions that will help customers differentiate between the candidates provided. Each question must be associated with a single dimension and include a list of potential answers derived from the actual features present in the candidate CVs.
 
-Note that the questions should always be associated to a single dimension and you should generate a list of potential answers for each question based on the features of the candidates.
+**Objective**
+Enable customers to efficiently compare and evaluate candidates by providing targeted questions that highlight meaningful differences in their qualifications, experience, and expertise across relevant professional dimensions.
 
+**Knowledge**
+Candidates to analyze:
+{candidates}
+
+Dimensions to exclude from question generation:
+{excluded_dimensions}
+
+**Constraints and Requirements**
+You should:
+1. Generate questions that are each tied to exactly one dimension only
+2. Exclude any questions related to the dimensions listed in the excluded dimensions section
+3. Create potential answers based solely on the features, qualifications, and experience found in the provided candidate CVs
+4. Avoid using individual person names as potential answers
+5. Ensure the potential answers are specific, concrete attributes that appear in the candidate data
+6. Generate at least {min_questions} questions total
+
+**Examples**
 Here are some examples of what you should generate:
 
 question: What are the consultant's certifications?
 dimension: certifications
-potential_answers:
+options:
 - AWS Certified
 - Azure Certified
 - GCP Certified
 
 question: In which programming languages does the consultant have experience?
 dimension: programming_languages
-potential_answers:
+options:
 - Python
 - Java
 - C#
@@ -30,16 +48,59 @@ potential_answers:
 - C++
 - C
 
-Please ensure that you generate a minimum of {min_questions} questions.
+question: What is the seniority level of the consultants at the firm?
+dimension: Seniority Level
+options:
+- Partner level
+- Director level
+- Partner or Director level
+- Associate or Paralegal
+- Senior Consultant level
+- Consultant level
+- Senior Associate level
+- Associate level
 
-=== candidates ===
-{candidates}
-=== end candidates ===
+question: What is the consultant's previous professional background?
+dimension: Previous Professional Background
+options:
+- Banking law
+- Secure lending in the agriculture sector
+- Commercial property law
+- Commercial litigation
+- Corporate law
+- Corporate finance
+- Corporate governance
 
-=== excluded dimensions ===
-{excluded_dimensions}
-=== end excluded dimensions ===
+question: What is the consultant's experience with resolution of disputes?
+dimension: Dispute Resolution Experience
+options:
+- Commercial litigation
+- Corporate litigation
+- International arbitration
+- Mediation
+- Negotiation
+- Alternative dispute resolution
 
+question: What is the consultant's experience with emerging markets?
+dimension: Emerging Markets Expertise
+options:
+- Natural capital
+- Environmental regulations
+- Environmental impact assessment
+- Environmental management
+- Biodiversity conservation
+
+question: What is the consultant's experience with high net worth taxation?
+dimension: High Net Worth Taxation
+options:
+- UK High Net Worth Taxation
+- International High Net Worth Taxation
+- UK Capital Gains Taxation
+- International Capital Gains Taxation
+- UK Inheritance Taxation
+- International Inheritance Taxation
+- UK Trusts and Estates
+- International Trusts and Estates
 
 """
 
