@@ -102,6 +102,13 @@ options:
 - UK Trusts and Estates
 - International Trusts and Estates
 
+question: What is the consultant's expertise in Business Immigration?
+dimension: Immigration expertise
+options:
+- Leads the Business Immigration practice including sponsorship licences and SMS navigation
+- Specialises in immigration alongside employment, focusing on Skilled Worker and Global Business Mobility routes
+- Developed the business immigration team as part of a wider advisory specialist group
+
 """
 
 [dynamic_user_profile]
