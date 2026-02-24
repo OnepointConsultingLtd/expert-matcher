@@ -1,3 +1,4 @@
+import asyncio
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableSequence
 
@@ -59,9 +60,17 @@ async def _generate_differentiation_questions(
     candidates: list[Consultant], excluded_dimensions: list[str]
 ) -> DifferentiationQuestions:
     """Generate differentiation questions"""
-    chain = _chain_factory()
-    input = await _prepare_input(candidates, excluded_dimensions)
-    return await chain.ainvoke(input)
+    retries = 5
+    for attempt in range(retries):
+        try:
+            chain = _chain_factory()
+            input = await _prepare_input(candidates, excluded_dimensions)
+            return await chain.ainvoke(input)
+        except Exception as e:
+            if attempt == retries - 1:
+                raise
+            else:
+                await asyncio.sleep(2 ** attempt)
 
 
 async def generate_differentiation_questions(
