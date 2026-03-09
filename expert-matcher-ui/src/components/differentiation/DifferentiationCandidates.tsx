@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next';
 import { useCurrentMessage } from '../../hooks/useCurrentMessage';
 import { CandidateWithVotes } from '../../types/differentiation_questions';
 import { VscAccount } from 'react-icons/vsc';
-import { IoIosGlobe } from 'react-icons/io';
 import { useEffect, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -11,25 +10,26 @@ import { iconClass } from '../common';
 import { useAppStore } from '../../context/AppStore';
 import { getExpertMatcherProfile } from '../../lib/apiClient';
 import { DynamicConsultantProfile } from '../../types/dynamic_consultant_profile';
+import { FaLinkedin } from 'react-icons/fa';
 
 const candidateTextCss =
   'flex flex-row items-center transition duration-300 ease-in-out hover:underline underline cursor-pointer';
 
-function OptionalLink({ href, children }: { href: string; children: React.ReactNode }) {
-  if (!href) {
-    return children;
-  }
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="no-underline hover:no-underline hover:text-inherit"
-    >
-      {children}
-    </a>
-  );
-}
+// function OptionalLink({ href, children }: { href: string; children: React.ReactNode }) {
+//   if (!href) {
+//     return children;
+//   }
+//   return (
+//     <a
+//       href={href}
+//       target="_blank"
+//       rel="noopener noreferrer"
+//       className="no-underline hover:no-underline hover:text-inherit"
+//     >
+//       {children}
+//     </a>
+//   );
+// }
 
 function CandidatePhoto({ candidate }: { candidate: CandidateWithVotes }) {
   const [imgError, setImgError] = useState(false);
@@ -37,14 +37,12 @@ function CandidatePhoto({ candidate }: { candidate: CandidateWithVotes }) {
 
   if (candidate.photo_url_400 && !imgError) {
     return (
-      <OptionalLink href={candidate.linkedin_profile_url}>
-        <img
-          src={candidate.photo_url_400}
-          alt={name}
-          className="w-20 rounded-full aspect-square object-cover"
-          onError={() => setImgError(true)}
-        />
-      </OptionalLink>
+      <img
+        src={candidate.photo_url_400}
+        alt={name}
+        className="w-20 rounded-full aspect-square object-cover"
+        onError={() => setImgError(true)}
+      />
     );
   }
 
@@ -52,7 +50,7 @@ function CandidatePhoto({ candidate }: { candidate: CandidateWithVotes }) {
     `${candidate.given_name?.[0] ?? ''}${candidate.surname?.[0] ?? ''}`.toUpperCase();
 
   return (
-    <OptionalLink href={candidate.linkedin_profile_url}>
+    <>
       {initials ? (
         <div className="w-20 h-20 rounded-full flex items-center justify-center bg-[#e4caff] dark:bg-[#7e34c9] text-[#5c1699] dark:text-[#fafffe] text-3xl font-bold no-underline hover:no-underline">
           {initials}
@@ -60,7 +58,7 @@ function CandidatePhoto({ candidate }: { candidate: CandidateWithVotes }) {
       ) : (
         <VscAccount className="w-20 h-20" />
       )}
-    </OptionalLink>
+    </>
   );
 }
 
@@ -172,7 +170,7 @@ function OnlineProfile({ candidate }: { candidate: CandidateWithVotes }) {
         className="flex flex-row items-center transition duration-300 ease-in-out hover:underline"
         title="Online profile"
       >
-        <IoIosGlobe className={iconClass} />
+        <FaLinkedin className={iconClass} />
       </a>
     </div>
   );

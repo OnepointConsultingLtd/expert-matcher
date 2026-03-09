@@ -9,8 +9,8 @@ export default function DifferentiationPanel() {
   return (
     <>
       <SaveVotes />
-      <DifferentiationQuestions />
       <DifferentiationCandidates />
+      <DifferentiationQuestions />
     </>
   );
 }
