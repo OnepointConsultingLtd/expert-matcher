@@ -20,27 +20,46 @@ function OptionalLink({ href, children }: { href: string; children: React.ReactN
     return children;
   }
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="no-underline hover:no-underline hover:text-inherit"
+    >
       {children}
     </a>
   );
 }
 
 function CandidatePhoto({ candidate }: { candidate: CandidateWithVotes }) {
-  if (candidate.photo_url_400) {
+  const [imgError, setImgError] = useState(false);
+  const name = `${candidate.given_name} ${candidate.surname}`;
+
+  if (candidate.photo_url_400 && !imgError) {
     return (
       <OptionalLink href={candidate.linkedin_profile_url}>
         <img
           src={candidate.photo_url_400}
-          alt={name ?? ''}
+          alt={name}
           className="w-20 rounded-full aspect-square object-cover"
+          onError={() => setImgError(true)}
         />
       </OptionalLink>
     );
   }
+
+  const initials =
+    `${candidate.given_name?.[0] ?? ''}${candidate.surname?.[0] ?? ''}`.toUpperCase();
+
   return (
     <OptionalLink href={candidate.linkedin_profile_url}>
-      <VscAccount className="w-full h-full" />
+      {initials ? (
+        <div className="w-20 h-20 rounded-full flex items-center justify-center bg-[#e4caff] dark:bg-[#7e34c9] text-[#5c1699] dark:text-[#fafffe] text-3xl font-bold no-underline hover:no-underline">
+          {initials}
+        </div>
+      ) : (
+        <VscAccount className="w-20 h-20" />
+      )}
     </OptionalLink>
   );
 }
