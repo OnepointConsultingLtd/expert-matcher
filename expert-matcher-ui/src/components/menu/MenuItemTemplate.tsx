@@ -11,14 +11,14 @@ export default function MenuItemTemplate({
 }) {
   const { t } = useTranslation();
   return (
-    <div
-      className="menu-item w-full flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-[#38333d] transition-colors duration-200 cursor-pointer"
+    <button
+      className="menu-item w-full flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-[#38333d] transition-colors duration-200 cursor-pointer text-left"
       onClick={func}
     >
-      <div className="">{children}</div>
+      <div className="flex items-center justify-center">{children}</div>
       <div className="pl-4">
-        <button>{t(title)}</button>
+        <span className="font-medium">{t(title)}</span>
       </div>
-    </div>
+    </button>
   );
 }

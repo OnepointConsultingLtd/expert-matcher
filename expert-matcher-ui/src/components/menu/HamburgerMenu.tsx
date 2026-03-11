@@ -37,7 +37,7 @@ export default function HamburgerMenu() {
       {open && (
         <menu
           ref={menuRef}
-          className="animate-fade-down flex flex-col items-start absolute right-5 top-[30px] md:top-[35px] w-80 py-6 px-8 rounded-lg border shadow-muted bg-[#fafffe] dark:text-[#fafffe] dark:bg-[#1F1925] rounded-2xl"
+          className="animate-fade-down flex flex-col items-start absolute right-5 top-[30px] md:top-[35px] w-72 md:w-80 py-6 px-2 md:px-8 rounded-lg border shadow-muted bg-[#fafffe] dark:text-[#fafffe] dark:bg-[#1F1925]"
         >
           <StartButton />
           <hr className="mt-6 mb-6 h-[1px] bg-[#07000d] dark:bg-gray-100 w-full" />

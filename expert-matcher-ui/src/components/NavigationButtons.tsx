@@ -67,7 +67,7 @@ export default function NavigationButtons() {
   const hasAnySuggestionsSelected = selectedSuggestions.length > 0;
   console.log('hasAnySuggestions ', hasAnySuggestionsSelected);
 
-  if(sending) return null;
+  if (sending) return null;
 
   return (
     <div className="flex flex-col">

@@ -21,7 +21,7 @@ export default function DarkModeButton() {
         <LuSun className="w-6 h-6 text-[#07000d] dark:text-[#fafffe]" />
       )}
 
-      <div className="ml-3 text-left">
+      <div className="pl-4 text-left">
         <div className="font-medium">{darkMode ? t('Dark mode') : t('Light mode')}</div>
       </div>
 
@@ -40,9 +40,9 @@ export default function DarkModeButton() {
             aria-checked={darkMode}
             aria-label={switchLabel}
           />
-          <div className="w-11 mt-2 h-6 bg-[#6A666D45] peer-focus:ring-2 peer-focus:ring-[#6A666D45] rounded-full peer peer-checked:bg-[#9A19FF] transition-colors" />
+          <div className="w-11 h-6 bg-[#6A666D45] peer-focus:ring-2 peer-focus:ring-[#6A666D45] rounded-full peer peer-checked:bg-[#9A19FF] transition-colors" />
           <span
-            className={`absolute left-1 top-3 w-4 h-4 bg-[#fafffe] rounded-full shadow transform transition ${darkMode ? 'translate-x-5' : ''}`}
+            className={`absolute left-0.5 top-0.5 w-5 h-5 bg-[#fafffe] rounded-full shadow transform transition ${darkMode ? 'translate-x-5' : ''}`}
           />
         </label>
       </div>
