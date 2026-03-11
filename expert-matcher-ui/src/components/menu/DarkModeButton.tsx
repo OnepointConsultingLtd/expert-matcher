@@ -25,7 +25,7 @@ export default function DarkModeButton() {
         <div className="font-medium">{darkMode ? t('Dark mode') : t('Light mode')}</div>
       </div>
 
-      <div className="ml-auto">
+      <div className="ml-auto ">
         <label
           // prevent clicks inside the toggle from bubbling up to the button (avoids double toggle)
           onClick={(e) => e.stopPropagation()}
@@ -40,9 +40,9 @@ export default function DarkModeButton() {
             aria-checked={darkMode}
             aria-label={switchLabel}
           />
-          <div className="w-11 h-6 bg-[#6A666D45] peer-focus:ring-2 peer-focus:ring-[#6A666D45] rounded-full peer peer-checked:bg-[#9A19FF] transition-colors" />
+          <div className="w-11 mt-2 h-6 bg-[#6A666D45] peer-focus:ring-2 peer-focus:ring-[#6A666D45] rounded-full peer peer-checked:bg-[#9A19FF] transition-colors" />
           <span
-            className={`absolute left-1 top-1 w-4 h-4 bg-[#fafffe] rounded-full shadow transform transition ${darkMode ? 'translate-x-5' : ''}`}
+            className={`absolute left-1 top-3 w-4 h-4 bg-[#fafffe] rounded-full shadow transform transition ${darkMode ? 'translate-x-5' : ''}`}
           />
         </label>
       </div>
