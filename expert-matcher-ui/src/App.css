@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: "Manrope", sans-serif;
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Then add your custom base styles */

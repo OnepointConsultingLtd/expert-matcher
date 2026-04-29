@@ -11,7 +11,7 @@
     "Dark mode": "Dark mode",
     "Deselect all": "Deselect all",
     "differentiationQuestionsIntro": "Here are some questions to help you find the right expert. Click on the options to vote and rank the candidates.",
-    "disclaimer": "AI-generated content may be incomplete or misleading. Validate with your domain specialist(s) or <anchor id='free-consultation' href='https://www.onepointltd.com/data-wellness/onepoint-d-well/'><strong><underline>arrange a free consultation</underline></strong></anchor> with a Onepoint Expert Matcher expert.",
+    "disclaimer": "AI-generated content may be incomplete or misleading. Validate with your domain specialist(s) or <anchor id='free-consultation' href='https://www.onepointltd.com/data-wellness/onepoint-d-well/'><underline>arrange a free consultation</underline></anchor> with a Onepoint Expert Matcher expert.",
     "Disconnected from websocket": "Disconnected from websocket",
     "Error fetching expert matcher profile": "Error fetching expert matcher profile: {{error}}",
     "Expert Matcher": "Expert Matcher",
