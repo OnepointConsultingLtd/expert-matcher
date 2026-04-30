@@ -62,10 +62,10 @@ export default function NavigationButtons() {
   const { handleNext } = useHandleNext();
   const { selectedSuggestions, historyLength, hasDifferentiationQuestions, isLast } =
     useCurrentMessage();
-  console.log(selectedSuggestions, currentIndex);
+  // console.log(selectedSuggestions, currentIndex);
 
-  const hasAnySuggestionsSelected = selectedSuggestions.length > 0;
-  console.log('hasAnySuggestions ', hasAnySuggestionsSelected);
+  // const hasAnySuggestionsSelected = selectedSuggestions.length > 0;
+  // console.log('hasAnySuggestions ', hasAnySuggestionsSelected);
 
   if (sending) return null;
 

@@ -168,7 +168,7 @@ function OnlineProfile({ candidate }: { candidate: CandidateWithVotes }) {
         target="_blank"
         rel="noopener noreferrer"
         className="flex flex-row items-center transition duration-300 ease-in-out hover:underline"
-        title="Online profile"
+        title="Linkedin profile"
       >
         <FaLinkedin className={iconClass} />
       </a>

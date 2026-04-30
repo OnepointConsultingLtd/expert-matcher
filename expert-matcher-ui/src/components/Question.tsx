@@ -17,5 +17,17 @@ export default function Question() {
   if (!questionSuggestions || !displayRegularQuestions || sending)
     return <TitleDisplay message={t('differentiationQuestionsIntro')} />;
 
-  return <TitleDisplay message={questionSuggestions.question} />;
+  return (
+    <>
+      <TitleDisplay message={questionSuggestions.question} />
+      {displayRegularQuestions && !sending && (
+        <div
+          className="w-full mb-12 text-[#4d4d4d] dark:text-gray-100 gap-4"
+          dangerouslySetInnerHTML={{
+            __html: t('placeholder-normal'),
+          }}
+        />
+      )}
+    </>
+  );
 }
