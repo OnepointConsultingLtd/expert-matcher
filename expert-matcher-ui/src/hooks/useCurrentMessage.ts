@@ -11,11 +11,9 @@ export function useCurrentMessage() {
   } = useAppStore();
   const hasDifferentiationQuestions = differentiationQuestions.length > 0;
   const historyLength = history?.length + (hasDifferentiationQuestions ? 1 : 0);
+  const isLastStep = currentIndex + 1 === historyLength;
   const displayRegularQuestions =
-    !sending &&
-    (!hasDifferentiationQuestions ||
-      (hasDifferentiationQuestions && currentIndex + 1 < historyLength))
-      && candidates?.length === 0;
+    !sending && (!isLastStep || (!hasDifferentiationQuestions && candidates?.length === 0));
   if (!history || currentIndex === null || currentIndex < 0 || !history[currentIndex]) {
     return {
       questionSuggestions: null,

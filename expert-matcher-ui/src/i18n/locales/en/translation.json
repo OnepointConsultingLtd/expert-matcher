@@ -17,7 +17,7 @@
     "Expert Matcher": "Expert Matcher",
     "Expert matcher profile": "Expert matcher profile",
     "Light mode": "Light mode",
-    "Online profile": "Online profile",
+    "Online profile": "Linkedin profile",
     "Next": "Next",
     "Restart": "Restart",
     "saveVotes_one": "Saved {{count}} vote",
@@ -37,5 +37,7 @@
     "vote_one": "{{count}} vote",
     "vote_other": "{{count}} votes",
     "Votes saved": "Votes saved",
-    "Would you like to restart the expert matcher?": "Would you like to restart the expert matcher?"
+    "Would you like to restart the expert matcher?": "Would you like to restart the expert matcher?",
+    "placeholder-normal": "Select one or more areas of expertise to find your perfect expert match.",
+    "Download report": "Download report"
 }
